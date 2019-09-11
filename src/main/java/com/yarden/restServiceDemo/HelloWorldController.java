@@ -21,23 +21,18 @@ public class HelloWorldController {
     private static SheetService sheetApiService = null;
 
     @RequestMapping(method = RequestMethod.GET, path = "/result")
-    public String helloWorld(@RequestBody String json) {
-        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        String sdkName = jsonObject.get("sdk").getAsString();
-        String id = jsonObject.get("id").getAsString();
-        String sandbox = jsonObject.get("sandbox").getAsString();
-        JsonObject results = jsonObject.get("results").getAsJsonObject();
-        Set<Map.Entry<String, JsonElement>> entrySet = results.entrySet();
-        for (Map.Entry<String, JsonElement> entry: entrySet) {
+    public String getRequest(@RequestBody String json) {
+        RequestJson requestJson = new Gson().fromJson(json, RequestJson.class);
+        Set<Map.Entry<String, JsonElement>> resultsEntrySet = requestJson.getResults().entrySet();
+        for (Map.Entry<String, JsonElement> entry: resultsEntrySet) {
+            TestResultData testResult = new Gson().fromJson(entry.getValue(), TestResultData.class);
+            Set<Map.Entry<String, JsonElement>> paramsSet = testResult.getParameters().entrySet();
             String testName = entry.getKey();
-            JsonObject testResult = entry.getValue().getAsJsonObject();
-            JsonObject testParams = testResult.get("parameters").getAsJsonObject();
-            Set<Map.Entry<String, JsonElement>> paramsSet = testParams.entrySet();
             String paramsString = new String();
             for (Map.Entry<String, JsonElement> param: paramsSet) {
-                paramsString = paramsString + "(" + param.getKey() + ":" + param.getValue() + ") ";
+                paramsString = paramsString + "(" + param.getKey() + ":" + param.getValue().getAsString() + ") ";
             }
-            boolean isPassed = testResult.get("passed").getAsBoolean();
+            paramsString.trim();
         }
         JsonArray sheetData = null;
         try {

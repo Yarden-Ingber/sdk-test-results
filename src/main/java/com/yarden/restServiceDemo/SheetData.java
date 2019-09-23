@@ -6,7 +6,7 @@ public class SheetData {
 
     private static JsonArray sheetData = null;
 
-    public static JsonArray getSheetData(){
+    public synchronized static JsonArray getSheetData(){
         if (sheetData == null) {
             try {
                 sheetData = HelloWorldController.getSheetApiService().getAllSheet().execute().body();
@@ -15,6 +15,10 @@ public class SheetData {
             }
         }
         return sheetData;
+    }
+
+    public synchronized static void clearCachedSheetData(){
+        sheetData = null;
     }
 
 }

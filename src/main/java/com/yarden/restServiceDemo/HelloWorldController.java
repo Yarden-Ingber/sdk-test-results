@@ -26,6 +26,7 @@ public class HelloWorldController {
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public String getRequest(@RequestBody String json) {
+        SheetData.clearCachedSheetData();
         RequestJson requestJson = new Gson().fromJson(json, RequestJson.class);
         deleteColumnForNewTestId(requestJson);
         JsonArray resultsArray = requestJson.getResults();

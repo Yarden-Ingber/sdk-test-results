@@ -26,7 +26,6 @@ public class HelloWorldController {
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public String getRequest(@RequestBody String json) {
-        SheetData.clearCachedSheetData();
         RequestJson requestJson = new Gson().fromJson(json, RequestJson.class);
         deleteColumnForNewTestId(requestJson);
         JsonArray resultsArray = requestJson.getResults();
@@ -55,6 +54,7 @@ public class HelloWorldController {
     private synchronized void deleteColumnForNewTestId(RequestJson requestJson){
         if (requestJson.getId() == null ||
                 !requestJson.getId().equals(getColumnId(requestJson.getSdk()))){
+            SheetData.clearCachedSheetData();
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
         }

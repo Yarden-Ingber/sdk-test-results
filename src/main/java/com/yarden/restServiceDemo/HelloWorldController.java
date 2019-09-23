@@ -14,6 +14,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,9 +27,7 @@ public class HelloWorldController {
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public String getRequest(@RequestBody String json) {
         RequestJson requestJson = new Gson().fromJson(json, RequestJson.class);
-        if (requestJson.getId() == null){
-            deleteEntireSdkColumn(requestJson.getSdk());
-        }
+        deleteColumnForNewTestId(requestJson);
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
@@ -50,6 +49,33 @@ public class HelloWorldController {
             paramsString = paramsString + "(" + capitalize(param.getKey()) + ":" + capitalize(param.getValue().getAsString()) + ") ";
         }
         return paramsString.trim();
+    }
+
+    private synchronized void deleteColumnForNewTestId(RequestJson requestJson){
+        if (requestJson.getId() == null ||
+                !requestJson.getId().equals(getColumnId(requestJson.getSdk()))){
+            deleteEntireSdkColumn(requestJson.getSdk());
+            updateTestResultId(requestJson.getSdk(), requestJson.getId());
+        }
+    }
+
+    private synchronized String getColumnId(String sdk){
+        for (JsonElement sheetEntry: SheetData.getSheetData()){
+            if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(SheetColumnNames.IDRow.value)){
+                return sheetEntry.getAsJsonObject().get(sdk).getAsString();
+            }
+        }
+        return "";
+    }
+
+    private synchronized void updateTestResultId(String sdk, String id){
+        for (JsonElement sheetEntry: SheetData.getSheetData()){
+            if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(SheetColumnNames.IDRow.value)){
+                sheetEntry.getAsJsonObject().addProperty(sdk, id);
+                return;
+            }
+        }
+        return;
     }
 
     private synchronized void updateSingleTestResult(String sdk, String testName, boolean passed){
@@ -107,7 +133,7 @@ public class HelloWorldController {
         for (char c : s.toCharArray()) {
             c = (capNext)
                     ? Character.toUpperCase(c)
-                    : Character.toLowerCase(c);
+                    : c;
             sb.append(c);
             capNext = (ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0); // explicit cast not needed
         }
@@ -139,7 +165,7 @@ public class HelloWorldController {
     }
 
     public enum SheetColumnNames {
-        TestName("test_name"), Java("java");
+        TestName("test_name"), IDRow("id");
 
         String value;
 

@@ -12,7 +12,7 @@ http://sdk-test-results.herokuapp.com
 
 Send a `GET` to `/health` - returns a `200`
 
-Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and a result JSON of how many records were deleted and created.
+Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and the requested JSON.
 
 ```
 {  

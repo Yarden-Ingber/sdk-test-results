@@ -1,6 +1,8 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,8 +15,6 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,11 +23,35 @@ public class HelloWorldController {
 
     private static final String apiKey = "ux9w3vd819op9";
     private static SheetService sheetApiService = null;
+    private RequestJson requestJson;
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
-    public String getRequest(@RequestBody String json) {
-        RequestJson requestJson = new Gson().fromJson(json, RequestJson.class);
-        deleteColumnForNewTestId(requestJson);
+    public ResponseEntity postResults(@RequestBody String json) {
+        try {
+            requestJson = new Gson().fromJson(json, RequestJson.class);
+        } catch (JsonSyntaxException e) {
+            return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            new RequestJsonValidator(requestJson).validate();
+        } catch (JsonParseException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        try {
+            deleteColumnForNewTestId();
+            updateSheetWithNewResults();
+        } catch (Throwable t) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(requestJson, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/health")
+    public ResponseEntity getHealth(){
+        return new ResponseEntity("Up and running!", HttpStatus.OK);
+    }
+
+    private void updateSheetWithNewResults(){
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
@@ -36,7 +60,6 @@ public class HelloWorldController {
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
         writeEntireSheetData(SheetData.getSheetData());
-        return json;
     }
 
     private String getTestParamsAsString(TestResultData testResult){
@@ -51,16 +74,16 @@ public class HelloWorldController {
         return paramsString.trim();
     }
 
-    private synchronized void deleteColumnForNewTestId(RequestJson requestJson){
+    private synchronized void deleteColumnForNewTestId(){
         if (requestJson.getId() == null ||
-                !requestJson.getId().equals(getColumnId(requestJson.getSdk()))){
+                !requestJson.getId().equals(getCurrentColumnId(requestJson.getSdk()))){
             SheetData.clearCachedSheetData();
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
         }
     }
 
-    private synchronized String getColumnId(String sdk){
+    private synchronized String getCurrentColumnId(String sdk){
         for (JsonElement sheetEntry: SheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(SheetColumnNames.IDRow.value)){
                 return sheetEntry.getAsJsonObject().get(sdk).getAsString();
@@ -124,24 +147,15 @@ public class HelloWorldController {
     }
 
     private static String capitalize(String s) {
-
-        final String ACTIONABLE_DELIMITERS = " '-/_"; // these cause the character following
-        // to be capitalized
-
+        final String ACTIONABLE_DELIMITERS = " '-/_"; // these cause the character following to be capitalized
         StringBuilder sb = new StringBuilder();
         boolean capNext = true;
-
         for (char c : s.toCharArray()) {
-            c = (capNext)
-                    ? Character.toUpperCase(c)
-                    : c;
+            c = capNext ? Character.toUpperCase(c) : c;
             sb.append(c);
             capNext = (ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0); // explicit cast not needed
         }
-        return sb.toString().replace(" ", "")
-                .replace("_", "")
-                .replace("-", "")
-                .replace(".", "");
+        return sb.toString().replaceAll("[ |\\.|\\-|_]", "");
     }
 
     public interface SheetService {

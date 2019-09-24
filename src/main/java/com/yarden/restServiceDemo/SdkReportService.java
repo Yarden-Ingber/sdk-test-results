@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class SdkReportService {
@@ -54,9 +53,8 @@ public class SdkReportService {
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
-            /* Ignore parameters until we fix issue with java parameter names
-                String paramsString = getTestParamsAsString(testResult);
-             */
+//            Ignore parameters until we fix issue with java parameter names
+//            String paramsString = getTestParamsAsString(testResult);
             String paramsString = "";
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
@@ -68,8 +66,10 @@ public class SdkReportService {
             return "";
         }
         Set<Map.Entry<String, JsonElement>> paramsSet = testResult.getParameters().entrySet();
+        List<Map.Entry<String, JsonElement>> paramsList = new ArrayList<>(paramsSet);
+        Collections.sort(paramsList, new ParamsComperator());
         String paramsString = new String();
-        for (Map.Entry<String, JsonElement> param: paramsSet) {
+        for (Map.Entry<String, JsonElement> param: paramsList) {
             paramsString = paramsString + "(" + capitalize(param.getKey()) + ":" + capitalize(param.getValue().getAsString()) + ") ";
         }
         return paramsString.trim();
@@ -165,6 +165,19 @@ public class SdkReportService {
 
         SheetColumnNames(String value){
             this.value = value;
+        }
+    }
+
+    public class ParamsComperator implements Comparator<Map.Entry<String, JsonElement>> {
+        @Override
+        public int compare(Map.Entry<String, JsonElement> lhs, Map.Entry<String, JsonElement> rhs) {
+            if (lhs == rhs)
+                return 0;
+            if (lhs == null)
+                return -1;
+            if (rhs == null)
+                return 1;
+            return capitalize(lhs.getKey()).compareTo(capitalize(rhs.getKey()));
         }
     }
 

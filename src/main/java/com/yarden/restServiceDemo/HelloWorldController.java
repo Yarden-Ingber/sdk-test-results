@@ -7,13 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +14,6 @@ import java.util.Set;
 @RestController
 public class HelloWorldController {
 
-    private static final String apiKey = "ux9w3vd819op9";
-    private static SheetService sheetApiService = null;
     private RequestJson requestJson;
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
@@ -124,26 +115,15 @@ public class HelloWorldController {
     private synchronized void writeEntireSheetData(JsonArray modifiedSheetData){
         try {
             try {
-                getSheetApiService().deleteEntireSheet().execute();
-                getSheetApiService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
+                SheetDBApiService.getService().deleteEntireSheet().execute();
+                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
             } catch (Throwable t1) {
-                getSheetApiService().deleteEntireSheet().execute();
-                getSheetApiService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
+                SheetDBApiService.getService().deleteEntireSheet().execute();
+                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
             }
         } catch (Throwable t) {
             System.out.println("ERROR: failed to update sheet: " + t.getMessage());
         }
-    }
-
-    public static SheetService getSheetApiService(){
-        if (sheetApiService == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://sheetdb.io/api/v1/" + apiKey + "/")
-                    .addConverterFactory(GsonConverterFactory.create(new Gson()))
-                    .build();
-            sheetApiService = retrofit.create(SheetService.class);
-        }
-        return sheetApiService;
     }
 
     private static String capitalize(String s) {
@@ -156,17 +136,6 @@ public class HelloWorldController {
             capNext = (ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0); // explicit cast not needed
         }
         return sb.toString().replaceAll("[ |\\.|\\-|_]", "");
-    }
-
-    public interface SheetService {
-        @GET(".")
-        Call<JsonArray> getAllSheet();
-
-        @POST(".")
-        Call<JsonObject>  updateSheet(@Body JsonObject jsonObject);
-
-        @DELETE("all")
-        Call<JsonObject> deleteEntireSheet();
     }
 
     public enum TestResults{

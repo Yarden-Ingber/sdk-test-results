@@ -20,10 +20,11 @@ public class SdkReportService {
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
+        SheetData.clearCachedSheetData();
         googleSheetTabName = null;
         try {
             requestJson = new Gson().fromJson(json, RequestJson.class);
-            if (requestJson.getSandbox()) {
+            if (requestJson.getSandbox() != null && requestJson.getSandbox()) {
                 googleSheetTabName = sandboxSheetName;
             }
         } catch (JsonSyntaxException e) {

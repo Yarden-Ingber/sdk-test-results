@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-public class HelloWorldController {
+public class SdkReportService {
 
     private RequestJson requestJson;
 

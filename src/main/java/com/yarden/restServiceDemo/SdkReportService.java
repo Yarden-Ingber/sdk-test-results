@@ -47,7 +47,10 @@ public class SdkReportService {
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
-            String paramsString = getTestParamsAsString(testResult);
+            /* Ignore parameters until we fix issue with java parameter names
+                String paramsString = getTestParamsAsString(testResult);
+             */
+            String paramsString = "";
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
         writeEntireSheetData(SheetData.getSheetData());
@@ -135,7 +138,7 @@ public class SdkReportService {
             sb.append(c);
             capNext = (ACTIONABLE_DELIMITERS.indexOf((int) c) >= 0); // explicit cast not needed
         }
-        return sb.toString().replaceAll("[ |\\.|\\-|_]", "");
+        return sb.toString().replaceAll("[ |\\-|_]", "");
     }
 
     public enum TestResults{

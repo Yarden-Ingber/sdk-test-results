@@ -15,16 +15,22 @@ import java.util.Set;
 public class SdkReportService {
 
     private RequestJson requestJson;
+    private String googleSheetTabName = null;
+    private static final String sandboxSheetName = "sandbox";
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
+        googleSheetTabName = null;
         try {
             requestJson = new Gson().fromJson(json, RequestJson.class);
+            if (requestJson.getSandbox()) {
+                googleSheetTabName = sandboxSheetName;
+            }
         } catch (JsonSyntaxException e) {
             return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
         }
         try {
-            new RequestJsonValidator(requestJson).validate();
+            new RequestJsonValidator(requestJson).validate(googleSheetTabName);
         } catch (JsonParseException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -34,7 +40,7 @@ public class SdkReportService {
         } catch (Throwable t) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity(requestJson, HttpStatus.OK);
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/health")
@@ -53,7 +59,7 @@ public class SdkReportService {
             String paramsString = "";
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
-        writeEntireSheetData(SheetData.getSheetData());
+        writeEntireSheetData(SheetData.getSheetData(googleSheetTabName));
     }
 
     private String getTestParamsAsString(TestResultData testResult){
@@ -78,7 +84,7 @@ public class SdkReportService {
     }
 
     private synchronized String getCurrentColumnId(String sdk){
-        for (JsonElement sheetEntry: SheetData.getSheetData()){
+        for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
             if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(SheetColumnNames.IDRow.value)){
                 return sheetEntry.getAsJsonObject().get(sdk).getAsString();
             }
@@ -87,7 +93,7 @@ public class SdkReportService {
     }
 
     private synchronized void updateTestResultId(String sdk, String id){
-        for (JsonElement sheetEntry: SheetData.getSheetData()){
+        for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
             if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(SheetColumnNames.IDRow.value)){
                 sheetEntry.getAsJsonObject().addProperty(sdk, id);
                 return;
@@ -98,7 +104,7 @@ public class SdkReportService {
 
     private synchronized void updateSingleTestResult(String sdk, String testName, boolean passed){
         String testResult = passed ? TestResults.Passed.value : TestResults.Failed.value;
-        for (JsonElement sheetEntry: SheetData.getSheetData()){
+        for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
             if (sheetEntry.getAsJsonObject().get(SheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(TestResults.Failed.value)) {
                     sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
@@ -106,11 +112,11 @@ public class SdkReportService {
                 return;
             }
         }
-        SheetData.getSheetData().add(new JsonParser().parse("{\"" + SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}"));
+        SheetData.getSheetData(googleSheetTabName).add(new JsonParser().parse("{\"" + SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}"));
     }
 
     private synchronized void deleteEntireSdkColumn(String sdk){
-        for (JsonElement sheetEntry: SheetData.getSheetData()){
+        for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
         }
     }
@@ -118,11 +124,11 @@ public class SdkReportService {
     private synchronized void writeEntireSheetData(JsonArray modifiedSheetData){
         try {
             try {
-                SheetDBApiService.getService().deleteEntireSheet().execute();
-                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
+                SheetDBApiService.getService().deleteEntireSheet(googleSheetTabName).execute();
+                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), googleSheetTabName).execute();
             } catch (Throwable t1) {
-                SheetDBApiService.getService().deleteEntireSheet().execute();
-                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject()).execute();
+                SheetDBApiService.getService().deleteEntireSheet(googleSheetTabName).execute();
+                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), googleSheetTabName).execute();
             }
         } catch (Throwable t) {
             System.out.println("ERROR: failed to update sheet: " + t.getMessage());

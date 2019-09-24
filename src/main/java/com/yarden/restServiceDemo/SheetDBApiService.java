@@ -6,10 +6,7 @@ import com.google.gson.JsonObject;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
+import retrofit2.http.*;
 
 public class SheetDBApiService {
 
@@ -29,13 +26,13 @@ public class SheetDBApiService {
 
     public interface SheetService {
         @GET(".")
-        Call<JsonArray> getAllSheet();
+        Call<JsonArray> getAllSheet(@Query("sheet") String sheetName);
 
         @POST(".")
-        Call<JsonObject>  updateSheet(@Body JsonObject jsonObject);
+        Call<JsonObject>  updateSheet(@Body JsonObject jsonObject, @Query("sheet") String sheetName);
 
         @DELETE("all")
-        Call<JsonObject> deleteEntireSheet();
+        Call<JsonObject> deleteEntireSheet(@Query("sheet") String sheetName);
     }
 
 }

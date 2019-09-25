@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 public class SheetData {
 
     private static JsonArray sheetData = null;
+    private static JsonArray highLevelSheetData = null;
 
     public synchronized static JsonArray getSheetData(String googleSheetTabName){
         if (sheetData == null) {
@@ -22,20 +23,23 @@ public class SheetData {
     }
 
     public synchronized static JsonArray getHighLevelSheet(){
-        try {
+        if (highLevelSheetData == null){
             try {
-                return SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
-            } catch (Throwable t1) {
-                return SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+                try {
+                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+                } catch (Throwable t1) {
+                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+                }
+            } catch (Throwable t) {
+                System.out.println("ERROR: failed getting sheet:" + t.getMessage());
             }
-        } catch (Throwable t) {
-            System.out.println("ERROR: failed getting sheet:" + t.getMessage());
         }
-        return new JsonArray();
+        return highLevelSheetData;
     }
 
     public synchronized static void clearCachedSheetData(){
         sheetData = null;
+        highLevelSheetData = null;
     }
 
 }

@@ -23,7 +23,7 @@ public class Enums {
     }
 
     public enum SheetColumnNames {
-        TestName("test_name"), IDRow("id");
+        TestName("test_name"), IDRow("id"), Fail("_fail"), Pass("_pass");
 
         String value;
 

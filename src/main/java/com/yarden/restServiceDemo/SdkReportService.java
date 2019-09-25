@@ -75,16 +75,16 @@ public class SdkReportService {
     }
 
     private float getCurrentRunIdSuccessPercentage(){
-        int countPassedTests = 0; int countTotalTests = 0;
+        int countPassedTests = 0; int countFailedTests = 0;
         for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
-            if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals("1") ||
-                    sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals("0") ||
-                    sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals("-1"))
-                countTotalTests++;
-            if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals("1"))
-                countPassedTests++;
+            JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value);
+            int passedValueInteger = passedValue == null || passedValue.getAsString().isEmpty() ? 0 : sheetEntry.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value).getAsInt();
+            JsonElement failedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Fail.value);
+            int failedValueInteger = failedValue == null || failedValue.getAsString().isEmpty() ? 0 : sheetEntry.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Fail.value).getAsInt();
+            countPassedTests += passedValueInteger;
+            countFailedTests += failedValueInteger;
         }
-        return (countPassedTests*100)/countTotalTests;
+        return (countPassedTests*100)/(countPassedTests+countFailedTests);
     }
 
     private String getTestParamsAsString(TestResultData testResult){
@@ -139,10 +139,25 @@ public class SdkReportService {
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(Enums.TestResults.Failed.value)) {
                     sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
                 }
+                incrementPassFailColumn(sdk, sheetEntry, passed);
                 return;
             }
         }
-        SheetData.getSheetData(googleSheetTabName).add(new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}"));
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
+        SheetData.getSheetData(googleSheetTabName).add(newEntry);
+        incrementPassFailColumn(sdk, newEntry, passed);
+    }
+
+    private void incrementPassFailColumn(String sdk, JsonElement sheetEntry, boolean passed){
+        if (passed) {
+            JsonElement valueBeforeIncrement = sheetEntry.getAsJsonObject().get(sdk + Enums.SheetColumnNames.Pass.value);
+            int valueBeforeIncrementInteger = valueBeforeIncrement == null || valueBeforeIncrement.getAsString().isEmpty() ? 0 : sheetEntry.getAsJsonObject().get(sdk + Enums.SheetColumnNames.Pass.value).getAsInt();
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, valueBeforeIncrementInteger + 1);
+        } else {
+            JsonElement valueBeforeIncrement = sheetEntry.getAsJsonObject().get(sdk + Enums.SheetColumnNames.Fail.value);
+            int valueBeforeIncrementInteger = valueBeforeIncrement == null || valueBeforeIncrement.getAsString().isEmpty() ? 0 : sheetEntry.getAsJsonObject().get(sdk + Enums.SheetColumnNames.Fail.value).getAsInt();
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, valueBeforeIncrementInteger + 1);
+        }
     }
 
     private synchronized void addHighLevelReportEntry(String sdk, String id){
@@ -155,6 +170,8 @@ public class SdkReportService {
     private synchronized void deleteEntireSdkColumn(String sdk){
         for (JsonElement sheetEntry: SheetData.getSheetData(googleSheetTabName)){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, "");
         }
     }
 

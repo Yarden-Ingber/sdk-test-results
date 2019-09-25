@@ -13,7 +13,7 @@ public class Enums {
     }
 
     public enum SheetTabsNames {
-        TestData("test_data"), HighLevel("high_level"), Sandbox("sandbox");
+        Report("report"), HighLevel("high_level"), Sandbox("sandbox");
 
         String value;
 
@@ -33,7 +33,7 @@ public class Enums {
     }
 
     public enum HighLevelSheetColumnNames {
-        Sdk("sdk"), LastRun("last_run"), ID("id"), SuccessPercentage("success percentage");
+        Sdk("sdk"), LastRun("last_run"), ID("id"), SuccessPercentage("success percentage"), AmountOfTests("amount of tests");
 
         String value;
 

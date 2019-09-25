@@ -26,9 +26,9 @@ public class SheetData {
         if (highLevelSheetData == null){
             try {
                 try {
-                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(Enums.SheetTabsNames.HighLevel.value).execute().body();
                 } catch (Throwable t1) {
-                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(Enums.SheetTabsNames.HighLevel.value).execute().body();
                 }
             } catch (Throwable t) {
                 System.out.println("ERROR: failed getting sheet:" + t.getMessage());

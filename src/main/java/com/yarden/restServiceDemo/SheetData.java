@@ -21,6 +21,19 @@ public class SheetData {
         return sheetData;
     }
 
+    public synchronized static JsonArray getHighLevelSheet(){
+        try {
+            try {
+                return SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+            } catch (Throwable t1) {
+                return SheetDBApiService.getService().getAllSheet(SdkReportService.SheetTabsNames.HighLevel.value).execute().body();
+            }
+        } catch (Throwable t) {
+            System.out.println("ERROR: failed getting sheet:" + t.getMessage());
+        }
+        return new JsonArray();
+    }
+
     public synchronized static void clearCachedSheetData(){
         sheetData = null;
     }

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -15,7 +17,6 @@ public class SdkReportService {
 
     private RequestJson requestJson;
     private String googleSheetTabName = null;
-    private static final String sandboxSheetName = "sandbox";
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
@@ -24,7 +25,7 @@ public class SdkReportService {
         try {
             requestJson = new Gson().fromJson(json, RequestJson.class);
             if (requestJson.getSandbox() != null && requestJson.getSandbox()) {
-                googleSheetTabName = sandboxSheetName;
+                googleSheetTabName = SheetTabsNames.Sandbox.value;
             }
         } catch (JsonSyntaxException e) {
             return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
@@ -81,6 +82,7 @@ public class SdkReportService {
             SheetData.clearCachedSheetData();
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
+            addHighLevelReportEntry(requestJson.getSdk());
         }
     }
 
@@ -114,6 +116,16 @@ public class SdkReportService {
             }
         }
         SheetData.getSheetData(googleSheetTabName).add(new JsonParser().parse("{\"" + SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}"));
+    }
+
+    private synchronized void addHighLevelReportEntry(String sdk){
+        SheetData.getHighLevelSheet().add(new JsonParser().parse("{\"" + HighLevelSheetColumnNames.Sdk.value + "\":\"" + sdk + "\",\"" + HighLevelSheetColumnNames.LastRun.value + "\":\"" + new Timestamp(System.currentTimeMillis()) + "\"}"));
+        try {
+            SheetDBApiService.getService().deleteEntireSheet(SheetTabsNames.HighLevel.value).execute();
+            SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + SheetData.getHighLevelSheet().toString() + "}").getAsJsonObject(), SheetTabsNames.HighLevel.value).execute();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     private synchronized void deleteEntireSdkColumn(String sdk){
@@ -158,12 +170,32 @@ public class SdkReportService {
         }
     }
 
+    public enum SheetTabsNames {
+        TestData("test_data"), HighLevel("high_level"), Sandbox("sandbox");
+
+        String value;
+
+        SheetTabsNames(String value){
+            this.value = value;
+        }
+    }
+
     public enum SheetColumnNames {
         TestName("test_name"), IDRow("id");
 
         String value;
 
         SheetColumnNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum HighLevelSheetColumnNames {
+        Sdk("sdk"), LastRun("last_run");
+
+        String value;
+
+        HighLevelSheetColumnNames(String value){
             this.value = value;
         }
     }

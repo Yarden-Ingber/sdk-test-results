@@ -48,6 +48,7 @@ public class SheetData {
         System.out.println("There was no ID row");
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + Enums.SheetColumnNames.IDRow.value + "\",\"" + requestJson.getSdk() + "\":\"" + requestJson.getId() + "\"}");
         addElementToBeginningOfReportSheet(newEntry);
+        System.out.println("Now the cached sheet looks like this: " + sheetData.toString());
     }
 
     public synchronized static void addElementToBeginningOfReportSheet(JsonElement jsonElement){

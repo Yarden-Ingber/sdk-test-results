@@ -19,16 +19,5 @@ public class RequestJsonValidator {
         if (!SheetData.getSheetData(googleSheetTabName).get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
             throw new JsonParseException("No SDK named " + requestJson.getSdk() + " in the sheet");
         }
-        validateThereIsIdRowOnSheet(googleSheetTabName, requestJson);
-    }
-
-    public static synchronized void validateThereIsIdRowOnSheet(String googleSheetTabName, RequestJson requestJson){
-        for (JsonElement sheetEntry : SheetData.getSheetData(googleSheetTabName)) {
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
-                return;
-            }
-        }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + Enums.SheetColumnNames.IDRow.value + "\",\"" + requestJson.getSdk() + "\":\"" + requestJson.getId() + "\"}");
-        SheetData.addElementToBeginningOfReportSheet(newEntry);
     }
 }

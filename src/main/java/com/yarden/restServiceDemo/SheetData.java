@@ -2,6 +2,7 @@ package com.yarden.restServiceDemo;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 public class SheetData {
 
@@ -36,6 +37,17 @@ public class SheetData {
             }
         }
         return highLevelSheetData;
+    }
+
+    public static synchronized void validateThereIsIdRowOnSheet(String googleSheetTabName, RequestJson requestJson){
+        for (JsonElement sheetEntry : getSheetData(googleSheetTabName)) {
+            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
+                return;
+            }
+        }
+        System.out.println("There was no ID row");
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + Enums.SheetColumnNames.IDRow.value + "\",\"" + requestJson.getSdk() + "\":\"" + requestJson.getId() + "\"}");
+        addElementToBeginningOfReportSheet(newEntry);
     }
 
     public synchronized static void addElementToBeginningOfReportSheet(JsonElement jsonElement){

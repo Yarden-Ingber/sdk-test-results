@@ -200,7 +200,7 @@ public class SdkReportService {
     }
 
     private static synchronized void writeEntireSheetData(JsonArray modifiedSheetData, String sheetTabName, RequestJson requestJson){
-        RequestJsonValidator.validateThereIsIdRowOnSheet(sheetTabName, requestJson);
+        SheetData.validateThereIsIdRowOnSheet(sheetTabName, requestJson);
         try {
             try {
                 SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();

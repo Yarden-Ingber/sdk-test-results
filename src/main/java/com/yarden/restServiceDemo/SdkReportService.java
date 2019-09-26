@@ -37,9 +37,10 @@ public class SdkReportService {
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults();
+            writeEntireSheetData(SheetData.getSheetData(googleSheetTabName), googleSheetTabName, requestJson);
             if (!isSandbox()) {
-                updateHighLevelSuccessPercentage();
-                updateHighLevelTestCount();
+                updateLocalCachedHighLevelReport();
+                writeEntireSheetData(SheetData.getHighLevelSheet(), Enums.SheetTabsNames.HighLevel.value, requestJson);
             }
         } catch (Throwable t) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -52,6 +53,11 @@ public class SdkReportService {
         return new ResponseEntity("Up and running!", HttpStatus.OK);
     }
 
+    private void updateLocalCachedHighLevelReport(){
+        updateLocalCachedHighLevelSuccessPercentage();
+        updateLocalCachedHighLevelTestCount();
+    }
+
     private void updateSheetWithNewResults(){
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
@@ -62,27 +68,24 @@ public class SdkReportService {
             String paramsString = "";
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
-        writeEntireSheetData(SheetData.getSheetData(googleSheetTabName), googleSheetTabName);
     }
 
-    private synchronized void updateHighLevelSuccessPercentage(){
+    private synchronized void updateLocalCachedHighLevelSuccessPercentage(){
         for (JsonElement sheetEntry: SheetData.getHighLevelSheet()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
                 sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.SuccessPercentage.value, getCurrentRunIdSuccessPercentage());
             }
         }
-        writeEntireSheetData(SheetData.getHighLevelSheet(), Enums.SheetTabsNames.HighLevel.value);
     }
 
-    private synchronized void updateHighLevelTestCount(){
+    private synchronized void updateLocalCachedHighLevelTestCount(){
         for (JsonElement sheetEntry: SheetData.getHighLevelSheet()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
                 sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.AmountOfTests.value, getTotalAmountOfTests());
             }
         }
-        writeEntireSheetData(SheetData.getHighLevelSheet(), Enums.SheetTabsNames.HighLevel.value);
     }
 
     private float getCurrentRunIdSuccessPercentage(){
@@ -114,11 +117,9 @@ public class SdkReportService {
     }
 
     private String getTestParamsAsString(TestResultData testResult){
-        if (testResult.getParameters() == null) {
+        if (testResult.getParameters() == null)
             return "";
-        }
-        Set<Map.Entry<String, JsonElement>> paramsSet = testResult.getParameters().entrySet();
-        List<Map.Entry<String, JsonElement>> paramsList = new ArrayList<>(paramsSet);
+        List<Map.Entry<String, JsonElement>> paramsList = new ArrayList<>(testResult.getParameters().entrySet());
         Collections.sort(paramsList, new ParamsComperator());
         String paramsString = new String();
         for (Map.Entry<String, JsonElement> param: paramsList) {
@@ -134,7 +135,7 @@ public class SdkReportService {
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
             if (!isSandbox()) {
-                addHighLevelReportEntry(requestJson.getSdk(), requestJson.getId());
+                addLocalCachedHighLevelReportEntry(requestJson.getSdk(), requestJson.getId());
             }
         }
     }
@@ -184,11 +185,10 @@ public class SdkReportService {
         }
     }
 
-    private synchronized void addHighLevelReportEntry(String sdk, String id){
+    private synchronized void addLocalCachedHighLevelReportEntry(String sdk, String id){
         SheetData.getHighLevelSheet().add(new JsonParser().parse("{\"" + Enums.HighLevelSheetColumnNames.Sdk.value + "\":\"" + sdk + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.LastRun.value + "\":\"" + new Timestamp(System.currentTimeMillis()) + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}"));
-        writeEntireSheetData(SheetData.getHighLevelSheet(), Enums.SheetTabsNames.HighLevel.value);
     }
 
     private synchronized void deleteEntireSdkColumn(String sdk){
@@ -199,7 +199,8 @@ public class SdkReportService {
         }
     }
 
-    private static synchronized void writeEntireSheetData(JsonArray modifiedSheetData, String sheetTabName){
+    private static synchronized void writeEntireSheetData(JsonArray modifiedSheetData, String sheetTabName, RequestJson requestJson){
+        RequestJsonValidator.validateThereIsIdRowOnSheet(sheetTabName, requestJson);
         try {
             try {
                 SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();

@@ -37,6 +37,7 @@ public class SdkReportService {
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults();
+            SheetData.validateThereIsIdRowOnSheet(googleSheetTabName, requestJson);
             writeEntireSheetData(SheetData.getSheetData(googleSheetTabName), googleSheetTabName, requestJson);
             if (!isSandbox()) {
                 updateLocalCachedHighLevelReport();
@@ -205,14 +206,18 @@ public class SdkReportService {
     }
 
     private static synchronized void writeEntireSheetData(JsonArray modifiedSheetData, String sheetTabName, RequestJson requestJson){
-        SheetData.validateThereIsIdRowOnSheet(sheetTabName, requestJson);
         try {
-            try {
-                SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();
-                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), sheetTabName).execute();
-            } catch (Throwable t1) {
-                SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();
-                SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), sheetTabName).execute();
+            int retryCount = 0;
+            int maxRetry = 5;
+            while (retryCount < maxRetry) {
+                try {
+                    SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();
+                    SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), sheetTabName).execute();
+                    return;
+                } catch (Throwable t1) {
+                    Thread.sleep(1000 );
+                    retryCount++;
+                }
             }
         } catch (Throwable t) {
             System.out.println("ERROR: failed to update sheet: " + t.getMessage());

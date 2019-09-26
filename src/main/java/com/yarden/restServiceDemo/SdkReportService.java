@@ -131,7 +131,6 @@ public class SdkReportService {
     private synchronized void deleteColumnForNewTestId(){
         if (requestJson.getId() == null ||
                 !requestJson.getId().equals(getCurrentColumnId(requestJson.getSdk()))){
-            SheetData.clearCachedSheetData();
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
             if (!isSandbox()) {
@@ -186,6 +185,12 @@ public class SdkReportService {
     }
 
     private synchronized void addLocalCachedHighLevelReportEntry(String sdk, String id){
+        for (JsonElement sheetEntry: SheetData.getHighLevelSheet()) {
+            if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(id) &&
+                    sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(sdk)){
+                return;
+            }
+        }
         SheetData.getHighLevelSheet().add(new JsonParser().parse("{\"" + Enums.HighLevelSheetColumnNames.Sdk.value + "\":\"" + sdk + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.LastRun.value + "\":\"" + new Timestamp(System.currentTimeMillis()) + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}"));

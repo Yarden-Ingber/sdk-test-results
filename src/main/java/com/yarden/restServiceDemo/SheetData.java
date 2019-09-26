@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 public class SheetData {
 
@@ -35,6 +36,15 @@ public class SheetData {
             }
         }
         return highLevelSheetData;
+    }
+
+    public synchronized static void addElementToBeginningOfReportSheet(JsonElement jsonElement){
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(jsonElement);
+        for (JsonElement sheetEntry: sheetData){
+            jsonArray.add(sheetEntry);
+        }
+        sheetData = jsonArray;
     }
 
     public synchronized static void clearCachedSheetData(){

@@ -6,10 +6,10 @@ import com.google.gson.JsonParser;
 
 public class SheetData {
 
-    private static JsonArray sheetData = null;
-    private static JsonArray highLevelSheetData = null;
+    private JsonArray sheetData = null;
+    private JsonArray highLevelSheetData = null;
 
-    public synchronized static JsonArray getSheetData(String googleSheetTabName){
+    public JsonArray getSheetData(String googleSheetTabName){
         if (sheetData == null) {
             try {
                 try {
@@ -24,7 +24,7 @@ public class SheetData {
         return sheetData;
     }
 
-    public synchronized static JsonArray getHighLevelSheet(){
+    public JsonArray getHighLevelSheet(){
         if (highLevelSheetData == null){
             try {
                 try {
@@ -39,7 +39,7 @@ public class SheetData {
         return highLevelSheetData;
     }
 
-    public static synchronized void validateThereIsIdRowOnSheet(String googleSheetTabName, RequestJson requestJson){
+    public void validateThereIsIdRowOnSheet(String googleSheetTabName, RequestJson requestJson){
         for (JsonElement sheetEntry : getSheetData(googleSheetTabName)) {
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
                 return;
@@ -51,7 +51,7 @@ public class SheetData {
         System.out.println("Now the cached sheet looks like this: " + sheetData.toString());
     }
 
-    public synchronized static void addElementToBeginningOfReportSheet(JsonElement jsonElement){
+    public void addElementToBeginningOfReportSheet(JsonElement jsonElement){
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(jsonElement);
         for (JsonElement sheetEntry: sheetData){
@@ -60,7 +60,7 @@ public class SheetData {
         sheetData = jsonArray;
     }
 
-    public synchronized static void clearCachedSheetData(){
+    public void clearCachedSheetData(){
         sheetData = null;
         highLevelSheetData = null;
     }

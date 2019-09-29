@@ -175,6 +175,7 @@ public class SdkReportService {
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(Enums.TestResults.Failed.value)) {
+                    Logger.info("Adding test result for sdk: " + sdk + "," + testResult);
                     sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
                 }
                 incrementPassFailColumn(sdk, sheetEntry, passed);
@@ -182,7 +183,7 @@ public class SdkReportService {
             }
         }
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
-        Logger.info("Adding result: " + newEntry.toString() + " to sheet");
+        Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData(googleSheetTabName).add(newEntry);
         incrementPassFailColumn(sdk, newEntry, passed);
     }

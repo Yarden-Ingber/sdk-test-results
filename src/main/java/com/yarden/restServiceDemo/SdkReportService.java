@@ -66,7 +66,7 @@ public class SdkReportService {
     private void updateSheetWithNewResults(){
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
-            Logger.info("Adding test result to sdk " + requestJson.getSdk() + ": " + result.getAsString());
+            Logger.info("Adding test result to sdk " + requestJson.getSdk() + ": " + result.toString());
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
 //            Ignore parameters until we fix issue with java parameter names

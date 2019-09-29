@@ -101,15 +101,15 @@ public class SdkReportService {
     private float calculateCurrentRunIdSuccessPercentage(){
         int countPassedTests = 0; int countFailedTests = 0;
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
-            int passedValueInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-            int failedValueInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+            int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
+            int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             countPassedTests += passedValueInteger;
             countFailedTests += failedValueInteger;
         }
         return (countPassedTests*100)/(countPassedTests+countFailedTests);
     }
 
-    private int getPermutationResultCountForTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
+    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
         JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
         return (passedValue == null || passedValue.getAsString().isEmpty()) ?
                 0 :
@@ -119,8 +119,8 @@ public class SdkReportService {
     private int getTotalAmountOfTests(){
         int totalAmount = 0;
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
-            int passedValueInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-            int failedValueInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+            int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
+            int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             totalAmount += passedValueInteger + failedValueInteger;
         }
         return totalAmount;
@@ -191,13 +191,13 @@ public class SdkReportService {
     private void incrementPassFailColumn(String sdk, JsonElement sheetEntry, boolean passed){
         if (passed) {
             String passedColumn = sdk + Enums.SheetColumnNames.Pass.value;
-            Logger.info("Adding 1 to " + passedColumn);
-            int valueBeforeIncrementInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
+            Logger.info("Adding 1 to " + passedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value));
+            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
             sheetEntry.getAsJsonObject().addProperty(passedColumn, valueBeforeIncrementInteger + 1);
         } else {
             String failedColumn = sdk + Enums.SheetColumnNames.Fail.value;
-            Logger.info("Adding 1 to " + failedColumn);
-            int valueBeforeIncrementInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+            Logger.info("Adding 1 to " + failedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value));
+            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             sheetEntry.getAsJsonObject().addProperty(failedColumn, valueBeforeIncrementInteger + 1);
         }
     }

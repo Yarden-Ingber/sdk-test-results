@@ -175,7 +175,7 @@ public class SdkReportService {
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(Enums.TestResults.Failed.value)) {
-                    Logger.info("Adding test result for sdk: " + sdk + "," + testResult);
+                    Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
                     sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
                 }
                 incrementPassFailColumn(sdk, sheetEntry, passed);

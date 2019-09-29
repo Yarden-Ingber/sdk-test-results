@@ -65,7 +65,7 @@ public class SdkReportService {
     }
 
     private void updateSheetWithNewResults(){
-        Logger.info("Updating results in sheet");
+        Logger.info("Updating results in local cached sheet");
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
@@ -218,7 +218,7 @@ public class SdkReportService {
     }
 
     private void deleteEntireSdkColumn(String sdk){
-        Logger.info("Deleting entire row for sdk: " + sdk);
+        Logger.info("Deleting entire column for sdk: " + sdk);
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");

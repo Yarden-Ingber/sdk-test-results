@@ -21,6 +21,7 @@ public class SdkReportService {
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
+        Logger.info("New result request detected");
         googleSheetTabName = null;
         try {
             requestJson = new Gson().fromJson(json, RequestJson.class);

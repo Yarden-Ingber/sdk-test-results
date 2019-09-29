@@ -64,9 +64,9 @@ public class SdkReportService {
     }
 
     private void updateSheetWithNewResults(){
+        Logger.info("Updating results in sheet");
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
-            Logger.info("Adding test result to sdk " + requestJson.getSdk() + ": " + result.toString());
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
 //            Ignore parameters until we fix issue with java parameter names
@@ -80,8 +80,9 @@ public class SdkReportService {
         for (JsonElement sheetEntry: sheetData.getHighLevelSheet()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
-                Logger.info("Updating success percentage for sdk: " + requestJson.getSdk() + " and id: " + requestJson.getId() + " to: " + getCurrentRunIdSuccessPercentage());
-                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.SuccessPercentage.value, getCurrentRunIdSuccessPercentage());
+                float calculatedSuccessPercentage = calculateCurrentRunIdSuccessPercentage();
+                Logger.info("Updating success percentage for sdk: " + requestJson.getSdk() + " and id: " + requestJson.getId() + " to: " + calculatedSuccessPercentage);
+                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.SuccessPercentage.value, calculatedSuccessPercentage);
             }
         }
     }
@@ -90,12 +91,14 @@ public class SdkReportService {
         for (JsonElement sheetEntry: sheetData.getHighLevelSheet()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
-                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.AmountOfTests.value, getTotalAmountOfTests());
+                int amountOfTests = getTotalAmountOfTests();
+                Logger.info("Updating test count in high level sheet for entry: " + sheetEntry.toString() + " to: " + amountOfTests);
+                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.AmountOfTests.value, amountOfTests);
             }
         }
     }
 
-    private float getCurrentRunIdSuccessPercentage(){
+    private float calculateCurrentRunIdSuccessPercentage(){
         int countPassedTests = 0; int countFailedTests = 0;
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
             int passedValueInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
@@ -179,17 +182,22 @@ public class SdkReportService {
             }
         }
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
+        Logger.info("Adding result: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData(googleSheetTabName).add(newEntry);
         incrementPassFailColumn(sdk, newEntry, passed);
     }
 
     private void incrementPassFailColumn(String sdk, JsonElement sheetEntry, boolean passed){
         if (passed) {
+            String passedColumn = sdk + Enums.SheetColumnNames.Pass.value;
+            Logger.info("Adding 1 to " + passedColumn);
             int valueBeforeIncrementInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, valueBeforeIncrementInteger + 1);
+            sheetEntry.getAsJsonObject().addProperty(passedColumn, valueBeforeIncrementInteger + 1);
         } else {
+            String failedColumn = sdk + Enums.SheetColumnNames.Fail.value;
+            Logger.info("Adding 1 to " + failedColumn);
             int valueBeforeIncrementInteger = getPermutationResultCountForTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, valueBeforeIncrementInteger + 1);
+            sheetEntry.getAsJsonObject().addProperty(failedColumn, valueBeforeIncrementInteger + 1);
         }
     }
 
@@ -208,6 +216,7 @@ public class SdkReportService {
     }
 
     private void deleteEntireSdkColumn(String sdk){
+        Logger.info("Deleting entire row for sdk: " + sdk);
         for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");

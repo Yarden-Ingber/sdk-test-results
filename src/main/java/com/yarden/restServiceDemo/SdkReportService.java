@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -95,6 +93,7 @@ public class SdkReportService {
                 int amountOfTests = getTotalAmountOfTests();
                 Logger.info("Updating test count in high level sheet for entry: " + sheetEntry.toString() + " to: " + amountOfTests);
                 sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.AmountOfTests.value, amountOfTests);
+                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.LastUpdate.value, Logger.getTimaStamp());
             }
         }
     }
@@ -211,7 +210,7 @@ public class SdkReportService {
             }
         }
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.HighLevelSheetColumnNames.Sdk.value + "\":\"" + sdk + "\"," +
-                "\"" + Enums.HighLevelSheetColumnNames.LastRun.value + "\":\"" + new Timestamp(System.currentTimeMillis()) + "\"," +
+                "\"" + Enums.HighLevelSheetColumnNames.StartTimestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}");
         Logger.info("Adding new entry to high level sheet: " + newEntry.toString());
         sheetData.getHighLevelSheet().add(newEntry);

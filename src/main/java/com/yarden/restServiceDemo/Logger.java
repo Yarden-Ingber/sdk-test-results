@@ -1,5 +1,6 @@
 package com.yarden.restServiceDemo;
 
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -19,8 +20,6 @@ public class Logger {
 
     public static String getTimaStamp(){
         ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("GMT+3"));
-        String timestamp = zonedDateTime.getYear() + "-" + zonedDateTime.getMonthValue() + "-" + zonedDateTime.getDayOfMonth() + " "
-                + zonedDateTime.getHour() + ":" + zonedDateTime.getMinute() + ":" + zonedDateTime.getSecond();
-        return timestamp;
+        return Timestamp.valueOf(zonedDateTime.toLocalDateTime()).toString();
     }
 }

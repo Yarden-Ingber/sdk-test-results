@@ -7,43 +7,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.*;
 
 @RestController
 public class SdkReportService {
 
     private RequestJson requestJson;
-    private String googleSheetTabName = null;
+    private String googleSheetTabName = Enums.SheetTabsNames.Report.value;
     private SheetData sheetData = null;
+    private SheetData highLevelSheetData = null;
     public static final String lock = "LOCK";
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
-        Logger.info("New result request detected: " + json);
-        googleSheetTabName = null;
+        newRequestPrint(json);
+        googleSheetTabName = Enums.SheetTabsNames.Report.value;
         try {
             requestJson = new Gson().fromJson(json, RequestJson.class);
-            if (isSandbox()) {
-                googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
-            }
         } catch (JsonSyntaxException e) {
             return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
         }
+        if (isSandbox()) {
+            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+        }
         synchronized (lock) {
-            sheetData = new SheetData();
+            sheetData = new SheetData(googleSheetTabName);
+            highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
             try {
-                new RequestJsonValidator(requestJson).validate(sheetData, googleSheetTabName);
+                new RequestJsonValidator(requestJson).validate(sheetData);
             } catch (JsonParseException e) {
                 return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
             try {
                 deleteColumnForNewTestId();
                 updateSheetWithNewResults();
-                sheetData.validateThereIsIdRowOnSheet(googleSheetTabName, requestJson);
-                writeEntireSheetData(sheetData.getSheetData(googleSheetTabName), googleSheetTabName);
+                sheetData.validateThereIsIdRowOnSheet(requestJson);
+                writeEntireSheetData(sheetData);
                 if (!isSandbox()) {
                     updateLocalCachedHighLevelReport();
-                    writeEntireSheetData(sheetData.getHighLevelSheet(), Enums.SheetTabsNames.HighLevel.value);
+                    writeEntireSheetData(highLevelSheetData);
                 }
             } catch (Throwable t) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -76,7 +79,7 @@ public class SdkReportService {
     }
 
     private void updateLocalCachedHighLevelSuccessPercentage(){
-        for (JsonElement sheetEntry: sheetData.getHighLevelSheet()) {
+        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
                 float calculatedSuccessPercentage = calculateCurrentRunIdSuccessPercentage();
@@ -87,7 +90,7 @@ public class SdkReportService {
     }
 
     private void updateLocalCachedHighLevelTestCount(){
-        for (JsonElement sheetEntry: sheetData.getHighLevelSheet()) {
+        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
                 int amountOfTests = getTotalAmountOfTests();
@@ -100,7 +103,7 @@ public class SdkReportService {
 
     private float calculateCurrentRunIdSuccessPercentage(){
         int countPassedTests = 0; int countFailedTests = 0;
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
             int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             countPassedTests += passedValueInteger;
@@ -118,7 +121,7 @@ public class SdkReportService {
 
     private int getTotalAmountOfTests(){
         int totalAmount = 0;
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
             int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             totalAmount += passedValueInteger + failedValueInteger;
@@ -153,7 +156,7 @@ public class SdkReportService {
     }
 
     private String getCurrentColumnId(String sdk){
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)){
                 return sheetEntry.getAsJsonObject().get(sdk).getAsString();
             }
@@ -162,7 +165,7 @@ public class SdkReportService {
     }
 
     private void updateTestResultId(String sdk, String id){
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)){
                 sheetEntry.getAsJsonObject().addProperty(sdk, id);
                 return;
@@ -172,7 +175,7 @@ public class SdkReportService {
 
     private void updateSingleTestResult(String sdk, String testName, boolean passed){
         String testResult = passed ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(Enums.TestResults.Failed.value)) {
                     Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
@@ -184,7 +187,7 @@ public class SdkReportService {
         }
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
         Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
-        sheetData.getSheetData(googleSheetTabName).add(newEntry);
+        sheetData.getSheetData().add(newEntry);
         incrementPassFailColumn(sdk, newEntry, passed);
     }
 
@@ -203,7 +206,7 @@ public class SdkReportService {
     }
 
     private void addLocalCachedHighLevelReportEntry(String sdk, String id){
-        for (JsonElement sheetEntry: sheetData.getHighLevelSheet()) {
+        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
             if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(id) &&
                     sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(sdk)){
                 return;
@@ -213,27 +216,26 @@ public class SdkReportService {
                 "\"" + Enums.HighLevelSheetColumnNames.StartTimestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}");
         Logger.info("Adding new entry to high level sheet: " + newEntry.toString());
-        sheetData.getHighLevelSheet().add(newEntry);
+        highLevelSheetData.getSheetData().add(newEntry);
     }
 
     private void deleteEntireSdkColumn(String sdk){
         Logger.info("Deleting entire column for sdk: " + sdk);
-        for (JsonElement sheetEntry: sheetData.getSheetData(googleSheetTabName)){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, "");
         }
     }
 
-    private void writeEntireSheetData(JsonArray modifiedSheetData, String sheetTabName){
+    private void writeEntireSheetData(SheetData sheetData){
         try {
             int retryCount = 0;
             int maxRetry = 5;
             while (retryCount < maxRetry) {
                 try {
-                    Logger.info("Writing local cached sheet to google sheet: " + modifiedSheetData);
-                    SheetDBApiService.getService().deleteEntireSheet(sheetTabName).execute();
-                    SheetDBApiService.getService().updateSheet(new JsonParser().parse("{\"data\":" + modifiedSheetData.toString() + "}").getAsJsonObject(), sheetTabName).execute();
+                    Logger.info("Writing local cached sheet to google sheet: " + sheetData.getSheetData());
+                    SheetDBApiService.updateSheet(sheetData);
                     return;
                 } catch (Throwable t1) {
                     Logger.warn("Failed writing sheet. retrying...");
@@ -274,6 +276,12 @@ public class SdkReportService {
     private boolean isSandbox(){
         return (requestJson.getSandbox() != null) &&
                 (requestJson.getSandbox());
+    }
+
+    private void newRequestPrint(String json){
+        Logger.info("**********************************************************************************************");
+        Logger.info("**********************************************************************************************");
+        Logger.info("New result request detected: " + json);
     }
 
 }

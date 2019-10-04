@@ -4,18 +4,29 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.util.List;
+
 public class SheetData {
 
     private JsonArray sheetData = null;
-    private JsonArray highLevelSheetData = null;
+    private List<String> columnNames = null;
+    private String sheetTabName;
 
-    public JsonArray getSheetData(String googleSheetTabName){
+    public SheetData(String googleSheetTabName){
+        this.sheetTabName = googleSheetTabName;
+    }
+
+    public JsonArray getSheetData(){
         if (sheetData == null) {
             try {
                 try {
-                    sheetData = SheetDBApiService.getService().getAllSheet(googleSheetTabName).execute().body();
+                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabName);
+                    columnNames = SheetDBApiService.getKeyList(sheet);
+                    sheetData = SheetDBApiService.listToJsonArray(sheet);
                 } catch (Throwable t1) {
-                    sheetData = SheetDBApiService.getService().getAllSheet(googleSheetTabName).execute().body();
+                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabName);
+                    columnNames = SheetDBApiService.getKeyList(sheet);
+                    sheetData = SheetDBApiService.listToJsonArray(sheet);
                 }
             } catch (Throwable t) {
                 System.out.println("ERROR: failed getting sheet:" + t.getMessage());
@@ -24,23 +35,8 @@ public class SheetData {
         return sheetData;
     }
 
-    public JsonArray getHighLevelSheet(){
-        if (highLevelSheetData == null){
-            try {
-                try {
-                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(Enums.SheetTabsNames.HighLevel.value).execute().body();
-                } catch (Throwable t1) {
-                    highLevelSheetData = SheetDBApiService.getService().getAllSheet(Enums.SheetTabsNames.HighLevel.value).execute().body();
-                }
-            } catch (Throwable t) {
-                System.out.println("ERROR: failed getting sheet:" + t.getMessage());
-            }
-        }
-        return highLevelSheetData;
-    }
-
-    public void validateThereIsIdRowOnSheet(String googleSheetTabName, RequestJson requestJson){
-        for (JsonElement sheetEntry : getSheetData(googleSheetTabName)) {
+    public void validateThereIsIdRowOnSheet(RequestJson requestJson){
+        for (JsonElement sheetEntry : getSheetData()) {
             if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
                 return;
             }
@@ -60,9 +56,16 @@ public class SheetData {
         sheetData = jsonArray;
     }
 
+    public List<String> getColumnNames(){
+        return columnNames;
+    }
+
+    public String getSheetTabName() {
+        return sheetTabName;
+    }
+
     public void clearCachedSheetData(){
         sheetData = null;
-        highLevelSheetData = null;
     }
 
 }

@@ -13,7 +13,7 @@ public class Enums {
     }
 
     public enum SheetTabsNames {
-        Report("report"), HighLevel("high_level"), Sandbox("sandbox");
+        Report("Coverage comparing"), HighLevel("Results history"), Sandbox("sandbox");
 
         String value;
 
@@ -23,7 +23,7 @@ public class Enums {
     }
 
     public enum SheetColumnNames {
-        TestName("test_name"), IDRow("id"), Fail("_fail"), Pass("_pass");
+        TestName("Test name"), IDRow("id"), Fail("_fail"), Pass("_pass");
 
         String value;
 

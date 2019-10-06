@@ -33,7 +33,7 @@ public class Enums {
     }
 
     public enum HighLevelSheetColumnNames {
-        Sdk("sdk"), StartTimestamp("start_timestamp"), LastUpdate("last_update"), ID("id"), SuccessPercentage("success percentage"), AmountOfTests("amount of tests");
+        Sdk("sdk"), StartTimestamp("start timestamp"), LastUpdate("last update"), ID("id"), SuccessPercentage("success percentage"), AmountOfTests("amount of tests");
 
         String value;
 

@@ -1,6 +1,8 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.*;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +60,17 @@ public class SdkReportService {
     @RequestMapping(method = RequestMethod.GET, path = "/health")
     public ResponseEntity getHealth(){
         return new ResponseEntity("Up and running!", HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
+    public ResponseEntity SendMail(@RequestBody String json){
+        try {
+            EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
+            new MailSender().send(requestJson);
+        } catch (MailjetSocketTimeoutException | MailjetException e) {
+            new ResponseEntity("Failed sending email", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity("Mail sent", HttpStatus.OK);
     }
 
     private void updateLocalCachedHighLevelReport(){

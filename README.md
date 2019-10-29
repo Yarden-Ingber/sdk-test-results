@@ -38,6 +38,25 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
 }
 ```
 
+Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `200` and the requested JSON.
+
+```
+{  
+  "sdk":"java",
+  "id":"1234",
+  "extra_data":[  
+    {  
+      "test_name": "test7",
+      "data": "any string"
+    },
+    {  
+      "test_name": "test8",
+      "data": "any string"
+    }
+  ]
+}
+```
+
 ### Optional Routes
 
 <u>`id` - UUID<u>

@@ -56,6 +56,15 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
 }
 ```
 
+Send a `POST` to `/send_mail` with the JSON payload (below) - returns a `200`.
+
+```
+{  
+  "sdk":"java",
+  "version":"RELEASE_CANDIDATE-4.1.13"
+}
+```
+
 ### Optional Routes
 
 <u>`id` - UUID<u>

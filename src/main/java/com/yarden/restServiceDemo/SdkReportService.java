@@ -16,6 +16,7 @@ import java.util.*;
 public class SdkReportService {
 
     private RequestJson requestJson;
+    private ExtraDataRequestJson extraDataRequestJson;
     private String googleSheetTabName = Enums.SheetTabsNames.Report.value;
     private SheetData sheetData = null;
     private SheetData highLevelSheetData = null;
@@ -23,17 +24,17 @@ public class SdkReportService {
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
-        newRequestPrint(json);
-        googleSheetTabName = Enums.SheetTabsNames.Report.value;
-        try {
-            requestJson = new Gson().fromJson(json, RequestJson.class);
-        } catch (JsonSyntaxException e) {
-            return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
-        }
-        if (isSandbox()) {
-            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
-        }
         synchronized (lock) {
+            newRequestPrint(json);
+            googleSheetTabName = Enums.SheetTabsNames.Report.value;
+            try {
+                requestJson = new Gson().fromJson(json, RequestJson.class);
+            } catch (JsonSyntaxException e) {
+                return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
+            }
+            if (isSandbox()) {
+                googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+            }
             sheetData = new SheetData(googleSheetTabName);
             highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
             try {
@@ -62,6 +63,27 @@ public class SdkReportService {
         return new ResponseEntity("Up and running!", HttpStatus.OK);
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/extra_test_data")
+    public ResponseEntity postExtraTestData(@RequestBody String json){
+        synchronized (lock) {
+            newRequestPrint(json);
+            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+            try {
+                extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
+            } catch (JsonSyntaxException e) {
+                return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
+            }
+            sheetData = new SheetData(googleSheetTabName);
+            try {
+                updateSheetWithExtraTestData();
+                writeEntireSheetData(sheetData);
+            } catch (Throwable t) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
     public ResponseEntity SendMail(@RequestBody String json){
         try {
@@ -76,6 +98,15 @@ public class SdkReportService {
     private void updateLocalCachedHighLevelReport(){
         updateLocalCachedHighLevelSuccessPercentage();
         updateLocalCachedHighLevelTestCount();
+    }
+
+    private void updateSheetWithExtraTestData(){
+        JsonArray extraDataArray = extraDataRequestJson.getExtraData();
+        for (JsonElement testData: extraDataArray){
+            ExtraDataPojo extraDataPojo = new Gson().fromJson(testData, ExtraDataPojo.class);
+            String testName = capitalize(extraDataPojo.getTestName());
+            addExtraDataToSingleTestInSandbox(extraDataRequestJson.getSdk(), testName, extraDataPojo.getData());
+        }
     }
 
     private void updateSheetWithNewResults(){
@@ -184,6 +215,18 @@ public class SdkReportService {
                 return;
             }
         }
+    }
+
+    private void addExtraDataToSingleTestInSandbox(String sdk, String testName, String extraData){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
+            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.ExtraData.value, extraData);
+                return;
+            }
+        }
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + Enums.SheetColumnNames.ExtraData.value + "\":\"" + extraData + "\"}");
+        Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
+        sheetData.getSheetData().add(newEntry);
     }
 
     private void updateSingleTestResult(String sdk, String testName, boolean passed){

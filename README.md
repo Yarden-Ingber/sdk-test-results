@@ -43,7 +43,6 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
 ```
 {  
   "sdk":"java",
-  "id":"1234",
   "extra_data":[  
     {  
       "test_name": "test7",

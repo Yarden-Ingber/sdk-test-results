@@ -281,6 +281,9 @@ public class SdkReportService {
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, "");
+            if (isSandbox()) {
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.ExtraData.value, "");
+            }
         }
     }
 

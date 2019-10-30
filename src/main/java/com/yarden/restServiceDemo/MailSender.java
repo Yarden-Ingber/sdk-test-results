@@ -48,7 +48,7 @@ public class MailSender {
         return new JSONArray()
                 .put(new JSONObject()
                         .put("Email", "yarden.ingber@applitools.com")
-                        .put("Name", "Yarden"))
+                        .put("Name", "Yarden"));
 //                .put(new JSONObject()
 //                        .put("Email", "adam.carmi@applitools.com")
 //                        .put("Name", "Adam Carmi"))

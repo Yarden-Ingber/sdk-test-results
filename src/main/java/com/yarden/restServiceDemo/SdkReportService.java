@@ -87,6 +87,7 @@ public class SdkReportService {
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
     public ResponseEntity SendMail(@RequestBody String json){
         try {
+            newRequestPrint(json);
             EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
             new MailSender().send(requestJson);
         } catch (MailjetSocketTimeoutException | MailjetException e) {

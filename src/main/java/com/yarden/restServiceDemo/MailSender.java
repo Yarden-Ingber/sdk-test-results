@@ -34,7 +34,7 @@ public class MailSender {
                                         .put("Name", "Yarden Ingber"))
                                 .put(Emailv31.Message.TO, getRecipientsJsonArray())
                                 .put(Emailv31.Message.SUBJECT, "SDK Release")
-                                .put(Emailv31.Message.TEXTPART, "SDK: " + sdk + "\nVersion: " + version + "\nChange Log: " + changeLog)
+                                .put(Emailv31.Message.TEXTPART, "SDK: " + sdk + "\nVersion: " + version + "\nChange Log:\n\n" + changeLog)
                                 .put(Emailv31.Message.ATTACHMENTS, new JSONArray()
                                     .put(new JSONObject()
                                         .put("ContentType", "text/plain")
@@ -73,7 +73,8 @@ public class MailSender {
         htmlReportStringBuilder.append("<div>\n" +
                 "\n" +
                 "<h2>Test Report for SDK: " + sdk + "</h2>" +
-                "<h2>SDK Version: " + version + "</h2><br>");
+                "<h2>SDK Version: " + version + "</h2><br>" +
+                "<h2>Change log:\n" + changeLog + "</h2><br>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br>");
         htmlReportStringBuilder.append(getDetailedReportTable());

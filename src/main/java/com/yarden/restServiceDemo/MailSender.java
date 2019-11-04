@@ -74,7 +74,7 @@ public class MailSender {
                 "\n" +
                 "<h2>Test Report for SDK: " + sdk + "</h2>" +
                 "<h2>SDK Version: " + version + "</h2><br>" +
-                "<h2>Change log:<br>" + changeLog + "</h2><br>");
+                "<h2>Change log:<br>" + changeLog.replace("\n", "<br>") + "</h2><br>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br>");
         htmlReportStringBuilder.append(getDetailedReportTable());

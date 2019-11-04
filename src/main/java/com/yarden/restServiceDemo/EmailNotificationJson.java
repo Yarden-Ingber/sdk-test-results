@@ -11,9 +11,9 @@ public class EmailNotificationJson {
     @SerializedName("version")
     @Expose
     private String version;
-    @SerializedName("changeLogUrl")
+    @SerializedName("changeLog")
     @Expose
-    private String changeLogUrl;
+    private String changeLog;
 
     public String getSdk() {
         return sdk;
@@ -31,12 +31,12 @@ public class EmailNotificationJson {
         this.version = version;
     }
 
-    public String getChangeLogUrl() {
-        return changeLogUrl;
+    public String getChangeLog() {
+        return changeLog;
     }
 
-    public void setChangeLogUrl(String changeLogUrl) {
-        this.changeLogUrl = changeLogUrl;
+    public void setChangeLogUrl(String changeLog) {
+        this.changeLog = changeLog;
     }
 
 }

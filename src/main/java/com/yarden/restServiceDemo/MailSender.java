@@ -15,6 +15,7 @@ public class MailSender {
 
     StringBuilder htmlReportStringBuilder = new StringBuilder();
     String sdk;
+    String changeLog;
     String version;
 
     public void send(EmailNotificationJson requestJson) throws MailjetSocketTimeoutException, MailjetException {
@@ -23,6 +24,7 @@ public class MailSender {
         MailjetResponse response;
         sdk = requestJson.getSdk();
         version = requestJson.getVersion().replaceAll("[^\\d.]", "");
+        changeLog = requestJson.getChangeLog();
         client = new MailjetClient("d163f65725fda1781f7728f93ced7e67", "01156141f47b51d311a4b71409b1704a", new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
@@ -32,7 +34,7 @@ public class MailSender {
                                         .put("Name", "Yarden Ingber"))
                                 .put(Emailv31.Message.TO, getRecipientsJsonArray())
                                 .put(Emailv31.Message.SUBJECT, "SDK Release")
-                                .put(Emailv31.Message.TEXTPART, "SDK: " + sdk + "\nVersion: " + version)
+                                .put(Emailv31.Message.TEXTPART, "SDK: " + sdk + "\nVersion: " + version + "\nChange Log: " + changeLog)
                                 .put(Emailv31.Message.ATTACHMENTS, new JSONArray()
                                     .put(new JSONObject()
                                         .put("ContentType", "text/plain")

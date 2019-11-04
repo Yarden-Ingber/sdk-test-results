@@ -61,7 +61,9 @@ Send a `POST` to `/send_mail` with the JSON payload (below) - returns a `200`.
 ```
 {  
   "sdk":"java",
-  "version":"RELEASE_CANDIDATE-4.1.13"
+  "version":"RELEASE_CANDIDATE-4.1.13",
+  "changeLog":"### Fixed
+                - Updated accessibility enums (experimental)."
 }
 ```
 

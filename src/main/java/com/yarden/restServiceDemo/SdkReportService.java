@@ -1,15 +1,12 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.*;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.*;
 
 @RestController
@@ -90,8 +87,8 @@ public class SdkReportService {
             newRequestPrint(json);
             EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
             new MailSender().send(requestJson);
-        } catch (MailjetSocketTimeoutException | MailjetException e) {
-            new ResponseEntity("Failed sending email", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Throwable e) {
+            return new ResponseEntity("Failed sending email", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity("Mail sent", HttpStatus.OK);
     }

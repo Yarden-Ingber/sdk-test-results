@@ -33,4 +33,11 @@ dependencies {
 	implementation 'com.google.apis:google-api-services-sheets:v4-rev516-1.23.0'
 	compile group: 'javax.mail', name: 'mail', version: '1.4.1'
 	compile group: 'com.mailjet', name: 'mailjet-client', version: '4.2.0'
+	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf', version: '9.1.18'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf-itext5', version: '9.1.18'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf-openpdf', version: '9.1.18'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-swt', version: '9.1.18'
+	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-log4j', version: '9.1.18'
 }

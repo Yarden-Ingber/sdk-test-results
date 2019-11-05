@@ -63,7 +63,13 @@ public class HTMLTableBuilder {
                 StringBuilder sb = new StringBuilder();
                 sb.append(ROW_START);
                 for (String value : values) {
-                    sb.append(COLUMN_START);
+                    if (value.toLowerCase().equals("pass")) {
+                        sb.append(COLUMN_START.replace("td", "td class=\"pass\""));
+                    } else if (value.toLowerCase().equals("fail")) {
+                        sb.append(COLUMN_START.replace("td", "td class=\"fail\""));
+                    } else {
+                        sb.append(COLUMN_START);
+                    }
                     sb.append(value);
                     sb.append(COLUMN_END);
                 }

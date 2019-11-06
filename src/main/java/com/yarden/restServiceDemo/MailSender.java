@@ -99,7 +99,7 @@ public class MailSender {
                 "<h2>Change log:<br/>" + changeLog.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br/>");
-        htmlReportStringBuilder.append("<h2>Unimplemented Tests:</h2>");
+        htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");
         htmlReportStringBuilder.append(getDetailedMissingTestsTable());
         htmlReportStringBuilder.append("<br/>");
         htmlReportStringBuilder.append("<h2>Passed Tests:</h2>");
@@ -115,15 +115,16 @@ public class MailSender {
                 "    }\n" +
                 "    .content {\n" +
                 "        background:#ffffff;\n" +
-                "        margin: 40px auto;\n" +
+//                "        margin: 10px 10px 10px 10px;\n" +
                 "        width: 700px;\n" +
                 "        padding: 30px;\n" +
-                "        box-shadow: 0 10px 10px #c7ced0;\n" +
+//                "        box-shadow: 0 10px 10px #c7ced0;\n" +
                 "        border:1px solid #c7ced0;\n" +
                 "    }\n" +
                 "    .wrapper {\n" +
                 "        background: #e4f0f4;\n" +
-                "        padding: 1px;\n" +
+                "        padding: 10px;\n" +
+//                "        margin: 10px 10px 10px 10px;\n" +
                 "        font-family: sans-serif;\n" +
                 "    }\n" +
                 "    .header {\n" +

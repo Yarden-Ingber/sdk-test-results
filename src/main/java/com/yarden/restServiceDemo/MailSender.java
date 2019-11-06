@@ -41,7 +41,7 @@ public class MailSender {
                                     .put(new JSONObject()
                                         .put("ContentType", "application/pdf")
                                             .put("Filename", "test_report.pdf")
-                                            .put("Base64Content", getHtmlReportAsBase64())))
+                                            .put("Base64Content", getPdfReportAsBase64())))
                                 .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
         response = client.post(request);
         System.out.println(response.getStatus());
@@ -60,30 +60,31 @@ public class MailSender {
 //                        .put("Email", "daniel.puterman@applitools.com")
 //                        .put("Name", "Daniel Puterman"))
 //                .put(new JSONObject()
-//                        .put("Email", "amit.zur@applitools.com")
-//                        .put("Name", "Amit Zur"))
-//                .put(new JSONObject()
-//                        .put("Email", "patrick.mccartney@applitools.com")
-//                        .put("Name", "Patrick McCartney"))
-//                .put(new JSONObject()
 //                        .put("Email", "yarden.naveh@applitools.com")
 //                        .put("Name", "Yarden Naveh"));
     }
 
-    private String getHtmlReportAsBase64() throws IOException, InterruptedException, DocumentException {
-        PrintWriter writer = new PrintWriter("test_report.html", "UTF-8");
+    private String getPdfReportAsBase64() throws IOException, InterruptedException, DocumentException {
+        final String htmlReportFileName = "test_report.html";
+        final String pdfReportFileName = "test_report.pdf";
+        PrintWriter writer = new PrintWriter(htmlReportFileName, "UTF-8");
         writer.println(getHtmlReportAsPlainSting());
         writer.close();
-        String inputFile = "test_report.html";
+        String inputFile = htmlReportFileName;
         String url = new File(inputFile).toURI().toURL().toString();
-        String outputFile = "test_report.pdf";
+        String outputFile = pdfReportFileName;
         OutputStream os = new FileOutputStream(outputFile);
         ITextRenderer renderer = new ITextRenderer();
         renderer.setDocument(url);
         renderer.layout();
         renderer.createPDF(os);
         os.close();
-        return Base64.encode(IOUtils.toByteArray(new FileInputStream("test_report.pdf")));
+        String result = Base64.encode(IOUtils.toByteArray(new FileInputStream(pdfReportFileName)));
+        try {
+            new File(htmlReportFileName).delete();
+            new File(pdfReportFileName).delete();
+        } catch (Throwable t) {t.printStackTrace();}
+        return result;
     }
 
     private String getHtmlReportAsPlainSting(){
@@ -98,7 +99,7 @@ public class MailSender {
                 "<h2>Change log:<br/>" + changeLog.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br/>");
-        htmlReportStringBuilder.append("<h2>Missing Tests:</h2>");
+        htmlReportStringBuilder.append("<h2>Unimplemented Tests:</h2>");
         htmlReportStringBuilder.append(getDetailedMissingTestsTable());
         htmlReportStringBuilder.append("<br/>");
         htmlReportStringBuilder.append("<h2>Passed Tests:</h2>");

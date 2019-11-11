@@ -1,4 +1,5 @@
 package com.yarden.restServiceDemo;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.lowagie.text.DocumentException;
@@ -6,6 +7,7 @@ import com.mailjet.client.*;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
+import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,6 +22,11 @@ public class MailSender {
     String changeLog;
     String version;
 
+    public void sendMailRequest(String json) throws Throwable{
+        EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
+        send(requestJson);
+    }
+
     public void send(EmailNotificationJson requestJson) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
         MailjetClient client;
         MailjetRequest request;
@@ -27,7 +34,7 @@ public class MailSender {
         sdk = requestJson.getSdk();
         version = requestJson.getVersion().replaceAll("[^\\d.]", "");
         changeLog = requestJson.getChangeLog();
-        client = new MailjetClient("d163f65725fda1781f7728f93ced7e67", "01156141f47b51d311a4b71409b1704a", new ClientOptions("v3.1"));
+        client = new MailjetClient(System.getenv("MJ_APIKEY_PUBLIC"), System.getenv("MJ_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
                         .put(new JSONObject()

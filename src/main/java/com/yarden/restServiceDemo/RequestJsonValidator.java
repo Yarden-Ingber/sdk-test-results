@@ -1,8 +1,7 @@
 package com.yarden.restServiceDemo;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.yarden.restServiceDemo.pojos.RequestJson;
 
 public class RequestJsonValidator {
 
@@ -12,12 +11,12 @@ public class RequestJsonValidator {
         this.requestJson = requestJson;
     }
 
-    public void validate(SheetData sheetData) throws JsonParseException {
+    public void validate(SheetData sheetData) throws JsonSyntaxException {
         if (requestJson.getSdk() == null) {
-            throw new JsonParseException("Missing sdk in the request json");
+            throw new JsonSyntaxException("Missing sdk in the request json");
         }
         if (!sheetData.getSheetData().get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
-            throw new JsonParseException("No SDK named " + requestJson.getSdk() + " in the sheet");
+            throw new JsonSyntaxException("No SDK named " + requestJson.getSdk() + " in the sheet");
         }
     }
 }

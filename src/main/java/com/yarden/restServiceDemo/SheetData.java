@@ -3,6 +3,7 @@ package com.yarden.restServiceDemo;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.yarden.restServiceDemo.pojos.RequestJson;
 
 import java.util.List;
 

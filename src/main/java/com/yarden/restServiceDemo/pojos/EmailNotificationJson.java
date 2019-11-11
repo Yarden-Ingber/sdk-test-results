@@ -1,4 +1,4 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.pojos;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

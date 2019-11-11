@@ -1,10 +1,10 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.pojos;
 
 import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RequestJson {
+public class ExtraDataRequestJson {
 
     @SerializedName("sdk")
     @Expose
@@ -15,9 +15,9 @@ public class RequestJson {
     @SerializedName("sandbox")
     @Expose
     private Boolean sandbox;
-    @SerializedName("results")
+    @SerializedName("extra_data")
     @Expose
-    private JsonArray results;
+    private JsonArray extraData;
 
     public String getSdk() {
         return sdk;
@@ -43,12 +43,12 @@ public class RequestJson {
         this.sandbox = sandbox;
     }
 
-    public JsonArray getResults() {
-        return results;
+    public JsonArray getExtraData() {
+        return extraData;
     }
 
-    public void setResults(JsonArray results) {
-        this.results = results;
+    public void setExtraData(JsonArray results) {
+        this.extraData = results;
     }
 
 }

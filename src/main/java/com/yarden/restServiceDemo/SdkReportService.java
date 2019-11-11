@@ -1,15 +1,12 @@
 package com.yarden.restServiceDemo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.*;
+import com.yarden.restServiceDemo.pojos.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
-@RestController
 public class SdkReportService {
 
     private RequestJson requestJson;
@@ -19,26 +16,16 @@ public class SdkReportService {
     private SheetData highLevelSheetData = null;
     public static final String lock = "LOCK";
 
-    @RequestMapping(method = RequestMethod.POST, path = "/result")
-    public ResponseEntity postResults(@RequestBody String json) {
+    public void postResults(String json) throws JsonSyntaxException, InternalError{
         synchronized (lock) {
-            newRequestPrint(json);
             googleSheetTabName = Enums.SheetTabsNames.Report.value;
-            try {
-                requestJson = new Gson().fromJson(json, RequestJson.class);
-            } catch (JsonSyntaxException e) {
-                return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
-            }
+            requestJson = new Gson().fromJson(json, RequestJson.class);
             if (isSandbox()) {
                 googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
             }
             sheetData = new SheetData(googleSheetTabName);
             highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
-            try {
-                new RequestJsonValidator(requestJson).validate(sheetData);
-            } catch (JsonParseException e) {
-                return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+            new RequestJsonValidator(requestJson).validate(sheetData);
             try {
                 deleteColumnForNewTestId();
                 updateSheetWithNewResults();
@@ -49,48 +36,23 @@ public class SdkReportService {
                     writeEntireSheetData(highLevelSheetData);
                 }
             } catch (Throwable t) {
-                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new InternalError();
             }
-            return new ResponseEntity(json, HttpStatus.OK);
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/health")
-    public ResponseEntity getHealth(){
-        return new ResponseEntity("Up and running!", HttpStatus.OK);
-    }
-
-    @RequestMapping(method = RequestMethod.POST, path = "/extra_test_data")
-    public ResponseEntity postExtraTestData(@RequestBody String json){
+    public void postExtraTestData(String json) throws JsonSyntaxException, InternalError{
         synchronized (lock) {
-            newRequestPrint(json);
             googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
-            try {
-                extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
-            } catch (JsonSyntaxException e) {
-                return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
-            }
+            extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
             sheetData = new SheetData(googleSheetTabName);
             try {
                 updateSheetWithExtraTestData();
                 writeEntireSheetData(sheetData);
             } catch (Throwable t) {
-                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new InternalError();
             }
-            return new ResponseEntity(json, HttpStatus.OK);
         }
-    }
-
-    @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
-    public ResponseEntity SendMail(@RequestBody String json){
-        try {
-            newRequestPrint(json);
-            EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
-            new MailSender().send(requestJson);
-        } catch (Throwable e) {
-            return new ResponseEntity("Failed sending email", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity("Mail sent", HttpStatus.OK);
     }
 
     private void updateLocalCachedHighLevelReport(){
@@ -333,12 +295,6 @@ public class SdkReportService {
     private boolean isSandbox(){
         return (requestJson.getSandbox() != null) &&
                 (requestJson.getSandbox());
-    }
-
-    private void newRequestPrint(String json){
-        Logger.info("**********************************************************************************************");
-        Logger.info("**********************************************************************************************");
-        Logger.info("New result request detected: " + json);
     }
 
 }

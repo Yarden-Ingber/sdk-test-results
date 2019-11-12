@@ -108,7 +108,7 @@ public class MailSender {
                 "<h2>Change log:<br/>" + changeLog.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br/>");
-        htmlReportStringBuilder.append("<h2>Test coverage gap:<br/>" + testCoverageGap.replace("\n", "<br/>") + "</h2><br/>");
+        htmlReportStringBuilder.append("<h2>Test coverage gap:<br/><br/>" + testCoverageGap.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");
         htmlReportStringBuilder.append(getDetailedMissingTestsTable());
         htmlReportStringBuilder.append("<br/>");

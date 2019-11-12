@@ -20,6 +20,7 @@ public class MailSender {
     StringBuilder htmlReportStringBuilder = new StringBuilder();
     String sdk;
     String changeLog;
+    String testCoverageGap;
     String version;
 
     public void sendMailRequest(String json) throws Throwable{
@@ -34,6 +35,7 @@ public class MailSender {
         sdk = requestJson.getSdk();
         version = requestJson.getVersion().replaceAll("[^\\d.]", "");
         changeLog = requestJson.getChangeLog();
+        testCoverageGap = requestJson.getTestCoverageGap();
         client = new MailjetClient(System.getenv("MJ_APIKEY_PUBLIC"), System.getenv("MJ_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
@@ -106,6 +108,7 @@ public class MailSender {
                 "<h2>Change log:<br/>" + changeLog.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append(getHighLevelReportTable());
         htmlReportStringBuilder.append("<br/>");
+        htmlReportStringBuilder.append("<h2>Test coverage gap:<br/>" + testCoverageGap.replace("\n", "<br/>") + "</h2><br/>");
         htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");
         htmlReportStringBuilder.append(getDetailedMissingTestsTable());
         htmlReportStringBuilder.append("<br/>");

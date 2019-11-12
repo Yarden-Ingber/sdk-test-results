@@ -15,6 +15,10 @@ public class EmailNotificationJson {
     @Expose
     private String changeLog;
 
+    @SerializedName("testCoverageGap")
+    @Expose
+    private String testCoverageGap;
+
     public String getSdk() {
         return sdk;
     }
@@ -39,4 +43,11 @@ public class EmailNotificationJson {
         this.changeLog = changeLog;
     }
 
+    public String getTestCoverageGap() {
+        return testCoverageGap;
+    }
+
+    public void setTestCoverageGap(String testCoverageGap) {
+        this.testCoverageGap = testCoverageGap;
+    }
 }

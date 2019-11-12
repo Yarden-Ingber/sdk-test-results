@@ -34,6 +34,7 @@ public class MailSender {
         MailjetRequest request;
         MailjetResponse response;
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
+            Logger.error("Failed sending mail report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
         } else {
             sdk = requestJson.getSdk();

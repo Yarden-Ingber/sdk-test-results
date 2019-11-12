@@ -11,17 +11,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RestCalls {
 
+    private static final String lock = "LOCK";
+
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
-        newRequestPrint(json);
-        try {
-            new SdkReportService().postResults(json);
-        } catch (InternalError e) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (JsonSyntaxException e) {
-            return new ResponseEntity("Failed parsing the json: " + json + e.getMessage(), HttpStatus.BAD_REQUEST);
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new SdkReportService().postResults(json);
+            } catch (InternalError e) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (JsonSyntaxException e) {
+                return new ResponseEntity("Failed parsing the json: " + json + e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
         }
-        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/health")
@@ -31,26 +35,30 @@ public class RestCalls {
 
     @RequestMapping(method = RequestMethod.POST, path = "/extra_test_data")
     public ResponseEntity postExtraTestData(@RequestBody String json){
-        newRequestPrint(json);
-        try {
-            new SdkReportService().postExtraTestData(json);
-        } catch (JsonSyntaxException e) {
-            return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
-        } catch (InternalError internalError) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new SdkReportService().postExtraTestData(json);
+            } catch (JsonSyntaxException e) {
+                return new ResponseEntity("Failed parsing the json: " + json, HttpStatus.BAD_REQUEST);
+            } catch (InternalError internalError) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
         }
-        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
     public ResponseEntity SendMail(@RequestBody String json){
-        newRequestPrint(json);
-        try {
-            new MailSender().sendMailRequest(json);
-        } catch (Throwable throwable) {
-            return new ResponseEntity("Failed sending email", HttpStatus.INTERNAL_SERVER_ERROR);
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new MailSender().sendMailRequest(json);
+            } catch (Throwable throwable) {
+                return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Mail sent", HttpStatus.OK);
         }
-        return new ResponseEntity("Mail sent", HttpStatus.OK);
     }
 
     private void newRequestPrint(String json){

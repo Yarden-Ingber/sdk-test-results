@@ -2,6 +2,7 @@ package com.yarden.restServiceDemo;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.*;
 import com.mailjet.client.errors.MailjetException;
@@ -32,7 +33,11 @@ public class MailSender {
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
-        sdk = requestJson.getSdk();
+        if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
+            throw new JsonParseException("No SDK in request JSON");
+        } else {
+            sdk = requestJson.getSdk();
+        }
         version = requestJson.getVersion().replaceAll("[^\\d.]", "");
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();

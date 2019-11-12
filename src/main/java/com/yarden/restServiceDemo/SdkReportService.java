@@ -1,10 +1,7 @@
 package com.yarden.restServiceDemo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.*;
 import com.yarden.restServiceDemo.pojos.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import java.util.*;
 
 public class SdkReportService {
@@ -14,44 +11,39 @@ public class SdkReportService {
     private String googleSheetTabName = Enums.SheetTabsNames.Report.value;
     private SheetData sheetData = null;
     private SheetData highLevelSheetData = null;
-    public static final String lock = "LOCK";
 
     public void postResults(String json) throws JsonSyntaxException, InternalError{
-        synchronized (lock) {
-            googleSheetTabName = Enums.SheetTabsNames.Report.value;
-            requestJson = new Gson().fromJson(json, RequestJson.class);
-            if (isSandbox()) {
-                googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+        googleSheetTabName = Enums.SheetTabsNames.Report.value;
+        requestJson = new Gson().fromJson(json, RequestJson.class);
+        if (isSandbox()) {
+            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+        }
+        sheetData = new SheetData(googleSheetTabName);
+        highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
+        new RequestJsonValidator(requestJson).validate(sheetData);
+        try {
+            deleteColumnForNewTestId();
+            updateSheetWithNewResults();
+            sheetData.validateThereIsIdRowOnSheet(requestJson);
+            writeEntireSheetData(sheetData);
+            if (!isSandbox()) {
+                updateLocalCachedHighLevelReport();
+                writeEntireSheetData(highLevelSheetData);
             }
-            sheetData = new SheetData(googleSheetTabName);
-            highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
-            new RequestJsonValidator(requestJson).validate(sheetData);
-            try {
-                deleteColumnForNewTestId();
-                updateSheetWithNewResults();
-                sheetData.validateThereIsIdRowOnSheet(requestJson);
-                writeEntireSheetData(sheetData);
-                if (!isSandbox()) {
-                    updateLocalCachedHighLevelReport();
-                    writeEntireSheetData(highLevelSheetData);
-                }
-            } catch (Throwable t) {
-                throw new InternalError();
-            }
+        } catch (Throwable t) {
+            throw new InternalError();
         }
     }
 
     public void postExtraTestData(String json) throws JsonSyntaxException, InternalError{
-        synchronized (lock) {
-            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
-            extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
-            sheetData = new SheetData(googleSheetTabName);
-            try {
-                updateSheetWithExtraTestData();
-                writeEntireSheetData(sheetData);
-            } catch (Throwable t) {
-                throw new InternalError();
-            }
+        googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+        extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
+        sheetData = new SheetData(googleSheetTabName);
+        try {
+            updateSheetWithExtraTestData();
+            writeEntireSheetData(sheetData);
+        } catch (Throwable t) {
+            throw new InternalError();
         }
     }
 

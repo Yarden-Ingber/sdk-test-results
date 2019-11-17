@@ -12,6 +12,7 @@ http://sdk-test-results.herokuapp.com
 
 Send a `GET` to `/health` - returns a `200`
 
+#### Post new test results
 Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and the requested JSON.
 
 ```
@@ -23,14 +24,16 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
     {  
       "test_name": "test7",
       "parameters":{
-        "browser":"chrome"
+        "browser":"chrome",
+        "stitching":"css"
       },
       "passed":true
     },
     {  
       "test_name": "test7",
       "parameters":{
-        "browser":"firefox"
+        "browser":"firefox",
+        "stitching":"scroll"
       },
       "passed":false
     }

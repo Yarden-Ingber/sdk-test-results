@@ -5,7 +5,7 @@ This is a Rest API for the web service to post sdk test results to a unified rep
 Below you can find a link to the google sheets report and all the endpoints of the web service. <br>
 There are 2 main sheets in the report showing results: Coverage comparing, sandbox.
 To toggle the results posting between the two sheets use the "sandbox" boolean field in the result json.
-#### Please use the Coverage comparing sheet only for RELEASE test runs. for Dev use sandbox sheet.
+#### Please use the Coverage comparing sheet only for RELEASE test runs. For Dev, use sandbox sheet.
 
 ### Report
 

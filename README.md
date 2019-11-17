@@ -1,5 +1,12 @@
 # sdk-test-results
 
+### Instructions
+This is a Rest API for the web service to post sdk test results to a unified report.
+Below you can find a link to the google sheets report and all the endpoints of the web service. <br>
+There are 2 main sheets in the report showing results: Coverage comparing, sandbox.
+To toggle the results posting between the two sheets use the "sandbox" boolean field in the result json.
+#### Please use the Coverage comparing sheet only for RELEASE test runs. for Dev use sandbox sheet.
+
 ### Report
 
 https://docs.google.com/spreadsheets/d/1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY
@@ -77,6 +84,7 @@ Send a `POST` to `/send_mail` with the JSON payload (below) - returns a `200`.
 <u>`id` - UUID<u>
 
 If it matches the previous run ID for a given SDK, then it will add the currently provided results to the previous ones. Otherwise, all of the results for the target SDK will be overwritten.
+Use this to group together multiple results POST to a single report
 
 <u>`sandbox` - Boolean<u>
 

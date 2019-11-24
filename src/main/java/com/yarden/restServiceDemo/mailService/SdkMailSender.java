@@ -1,4 +1,4 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.mailService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -7,6 +7,9 @@ import com.google.gson.JsonParseException;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
 import org.json.JSONArray;
@@ -16,10 +19,10 @@ import java.io.IOException;
 
 public class SdkMailSender {
 
-    String sdk;
-    String changeLog;
-    String testCoverageGap;
-    String version;
+    private String sdk;
+    private String changeLog;
+    private String testCoverageGap;
+    private String version;
 
     public void send(String json) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
         EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);

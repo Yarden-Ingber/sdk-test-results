@@ -1,4 +1,4 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.mailService;
 
 public class HTMLTableBuilder {
 

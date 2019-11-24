@@ -1,6 +1,6 @@
 package com.yarden.restServiceDemo.pojos;
 
-import com.yarden.restServiceDemo.HTMLTableBuilder;
+import com.yarden.restServiceDemo.mailService.HTMLTableBuilder;
 import org.json.JSONArray;
 
 public class ReportMailData {

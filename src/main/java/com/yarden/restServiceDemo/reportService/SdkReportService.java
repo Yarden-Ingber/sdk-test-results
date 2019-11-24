@@ -1,6 +1,8 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.reportService;
 
 import com.google.gson.*;
+import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.pojos.*;
 import java.util.*;
 

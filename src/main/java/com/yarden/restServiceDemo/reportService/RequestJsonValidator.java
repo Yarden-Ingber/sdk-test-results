@@ -1,4 +1,4 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.reportService;
 
 import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.pojos.RequestJson;

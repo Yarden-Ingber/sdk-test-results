@@ -1,6 +1,4 @@
-package com.yarden.restServiceDemo;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+package com.yarden.restServiceDemo.mailService;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.*;
 import com.mailjet.client.errors.MailjetException;
@@ -45,7 +43,7 @@ public class MailSender {
         System.out.println(response.getData());
     }
 
-    private String getPdfReportAsBase64() throws IOException, InterruptedException, DocumentException {
+    private String getPdfReportAsBase64() throws IOException, DocumentException {
         final String htmlReportFileName = "test_report.html";
         final String pdfReportFileName = "test_report.pdf";
         PrintWriter writer = new PrintWriter(htmlReportFileName, "UTF-8");

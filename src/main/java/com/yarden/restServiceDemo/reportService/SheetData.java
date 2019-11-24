@@ -1,8 +1,9 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.reportService;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.RequestJson;
 
 import java.util.List;

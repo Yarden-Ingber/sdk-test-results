@@ -1,7 +1,6 @@
-package com.yarden.restServiceDemo;
+package com.yarden.restServiceDemo.mailService;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;

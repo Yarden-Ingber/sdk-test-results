@@ -33,7 +33,7 @@ public class SdkMailSender {
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("SDK: \" + sdk + \"\\nVersion: \" + version + \"\\nChange Log:\\n\\n\" + changeLog")
+                .setMailTextPart("SDK: " + sdk + "\nVersion: " + version + "\nChange Log:\n\n" + changeLog)
                 .setReportTitle("Test Report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)

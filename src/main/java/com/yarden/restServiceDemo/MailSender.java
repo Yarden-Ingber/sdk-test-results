@@ -48,20 +48,8 @@ public class MailSender {
     private JSONArray getRecipientsJsonArray(){
         return new JSONArray()
                 .put(new JSONObject()
-                        .put("Email", "yarden.ingber@applitools.com")
-                        .put("Name", "Yarden Ingber"))
-                .put(new JSONObject()
-                        .put("Email", "dave.haeffner@applitools.com")
-                        .put("Name", "Dave Haeffner"));
-//                .put(new JSONObject()
-//                        .put("Email", "adam.carmi@applitools.com")
-//                        .put("Name", "Adam Carmi"))
-//                .put(new JSONObject()
-//                        .put("Email", "daniel.puterman@applitools.com")
-//                        .put("Name", "Daniel Puterman"))
-//                .put(new JSONObject()
-//                        .put("Email", "yarden.naveh@applitools.com")
-//                        .put("Name", "Yarden Naveh"));
+                        .put("Email", "release.reports@applitools.com")
+                        .put("Name", "Release Report"));
     }
 
     private String getPdfReportAsBase64() throws IOException, InterruptedException, DocumentException {

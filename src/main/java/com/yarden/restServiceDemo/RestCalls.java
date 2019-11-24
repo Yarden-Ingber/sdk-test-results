@@ -1,5 +1,4 @@
 package com.yarden.restServiceDemo;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.JsonSyntaxException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,11 +48,24 @@ public class RestCalls {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
-    public ResponseEntity SendMail(@RequestBody String json){
+    public ResponseEntity sendMail(@RequestBody String json){
         synchronized (lock) {
             newRequestPrint(json);
             try {
-                new MailSender().sendMailRequest(json);
+                new SdkMailSender().send(json);
+            } catch (Throwable throwable) {
+                return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Mail sent", HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/send_mail_report")
+    public ResponseEntity sendMailReport(@RequestBody String json){
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new NonTestTableMailSender().send(json);
             } catch (Throwable throwable) {
                 return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

@@ -18,6 +18,12 @@ public class EmailNotificationJson {
     @SerializedName("testCoverageGap")
     @Expose
     private String testCoverageGap;
+    @SerializedName("reportTitle")
+    @Expose
+    private String reportTitle;
+    @SerializedName("mailTextPart")
+    @Expose
+    private String mailTextPart;
 
     public String getSdk() {
         return sdk;
@@ -49,5 +55,21 @@ public class EmailNotificationJson {
 
     public void setTestCoverageGap(String testCoverageGap) {
         this.testCoverageGap = testCoverageGap;
+    }
+
+    public String getReportTitle() {
+        return reportTitle;
+    }
+
+    public void setReportTitle(String reportTitle) {
+        this.reportTitle = reportTitle;
+    }
+
+    public String getMailTextPart() {
+        return mailTextPart;
+    }
+
+    public void setMailTextPart(String mailTextPart) {
+        this.mailTextPart = mailTextPart;
     }
 }

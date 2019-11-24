@@ -79,6 +79,20 @@ Send a `POST` to `/send_mail` with the JSON payload (below) - returns a `200`.
 }
 ```
 
+##### Send a `POST` to `/send_mail_report` with the JSON payload (below) - returns a `200`.
+
+```
+{  
+  "sdk":"java",
+  "mailTextPart":"Hello World!",
+  "reportTitle":"Test Report for: Selenium IDE",
+  "version":"RELEASE_CANDIDATE-4.1.13",
+  "changeLog":"### Fixed
+                - Updated accessibility enums (experimental).",
+  "testCoverageGap": "coverage gap"
+}
+```
+
 ### Optional Routes
 
 <u>`id` - UUID<u>

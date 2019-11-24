@@ -1,26 +1,26 @@
 package com.yarden.restServiceDemo.pojos;
 
 import com.yarden.restServiceDemo.HTMLTableBuilder;
+import org.json.JSONArray;
 
 public class ReportMailData {
 
     private String mailTextPart;
-    HTMLTableBuilder detailedMissingTestsTable = null;
-    HTMLTableBuilder highLevelReportTable = null;
-    HTMLTableBuilder detailedPassedTestsTable = null;
+    private HTMLTableBuilder detailedMissingTestsTable = null;
+    private HTMLTableBuilder highLevelReportTable = null;
+    private HTMLTableBuilder detailedPassedTestsTable = null;
     private String reportTitle = "";
     private String changeLog = "";
     private String version = "";
     private String coverageGap = "";
-    private boolean shouldAddTestResults = false;
-    private boolean shouldAddCoverageGap = false;
+    private JSONArray recipientsJsonArray = null;
 
     public String getReportTitle() {
         return reportTitle;
     }
 
     public ReportMailData setReportTitle(String reportTitle) {
-        this.reportTitle = reportTitle;
+        this.reportTitle = fixNewLineForHtml(reportTitle);
         return this;
     }
 
@@ -29,7 +29,7 @@ public class ReportMailData {
     }
 
     public ReportMailData setChangeLog(String changeLog) {
-        this.changeLog = changeLog;
+        this.changeLog = fixNewLineForHtml(changeLog);
         return this;
     }
 
@@ -38,7 +38,7 @@ public class ReportMailData {
     }
 
     public ReportMailData setVersion(String version) {
-        this.version = version;
+        this.version = version.replaceAll("[^\\d.]", "");
         return this;
     }
 
@@ -47,25 +47,7 @@ public class ReportMailData {
     }
 
     public ReportMailData setCoverageGap(String coverageGap) {
-        this.coverageGap = coverageGap;
-        return this;
-    }
-
-    public Boolean isShouldAddTestResults() {
-        return shouldAddTestResults;
-    }
-
-    public ReportMailData setShouldAddTestResults(Boolean shouldAddTestResults) {
-        this.shouldAddTestResults = shouldAddTestResults;
-        return this;
-    }
-
-    public boolean isShouldAddCoverageGap() {
-        return shouldAddCoverageGap;
-    }
-
-    public ReportMailData setShouldAddCoverageGap(boolean shouldAddCoverageGap) {
-        this.shouldAddCoverageGap = shouldAddCoverageGap;
+        this.coverageGap = fixNewLineForHtml(coverageGap);
         return this;
     }
 
@@ -103,5 +85,18 @@ public class ReportMailData {
     public ReportMailData setDetailedPassedTestsTable(HTMLTableBuilder detailedPassedTestsTable) {
         this.detailedPassedTestsTable = detailedPassedTestsTable;
         return this;
+    }
+
+    public JSONArray getRecipientsJsonArray() {
+        return recipientsJsonArray;
+    }
+
+    public ReportMailData setRecipientsJsonArray(JSONArray recipientsJsonArray) {
+        this.recipientsJsonArray = recipientsJsonArray;
+        return this;
+    }
+
+    private String fixNewLineForHtml(String string){
+        return string.replace("\n", "<br/>");
     }
 }

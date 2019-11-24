@@ -31,7 +31,7 @@ public class MailSender {
                                 .put(Emailv31.Message.FROM, new JSONObject()
                                         .put("Email", "yarden.ingber@applitools.com")
                                         .put("Name", "Yarden Ingber"))
-                                .put(Emailv31.Message.TO, getRecipientsJsonArray())
+                                .put(Emailv31.Message.TO, reportMailData.getRecipientsJsonArray())
                                 .put(Emailv31.Message.SUBJECT, "SDK Release")
                                 .put(Emailv31.Message.TEXTPART, reportMailData.getMailTextPart())
                                 .put(Emailv31.Message.ATTACHMENTS, new JSONArray()
@@ -43,13 +43,6 @@ public class MailSender {
         response = client.post(request);
         System.out.println(response.getStatus());
         System.out.println(response.getData());
-    }
-
-    private JSONArray getRecipientsJsonArray(){
-        return new JSONArray()
-                .put(new JSONObject()
-                        .put("Email", "release.reports@applitools.com")
-                        .put("Name", "Release Report"));
     }
 
     private String getPdfReportAsBase64() throws IOException, InterruptedException, DocumentException {
@@ -82,19 +75,25 @@ public class MailSender {
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h2>" + reportMailData.getReportTitle() + "</h2>");
-        htmlReportStringBuilder.append("<h2>" + reportMailData.getVersion() + "</h2><br/>");
-        htmlReportStringBuilder.append("<h2>" + reportMailData.getChangeLog() + "</h2><br/>");
-        if (reportMailData.isShouldAddTestResults()) {
+        htmlReportStringBuilder.append("<h2>Version: " + reportMailData.getVersion() + "</h2><br/>");
+        if (reportMailData.getChangeLog() != null) {
+            htmlReportStringBuilder.append("Change log:<br/>");
+            htmlReportStringBuilder.append("<h2>" + reportMailData.getChangeLog() + "</h2><br/>");
+            htmlReportStringBuilder.append("<br/>");
+        }
+        if (reportMailData.getHighLevelReportTable() != null) {
             htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
         }
-        if (reportMailData.isShouldAddCoverageGap()) {
-            htmlReportStringBuilder.append("<br/>");
+        if (reportMailData.getCoverageGap() != null) {
+            htmlReportStringBuilder.append("<br/>Test coverage gap:<br/><br/>");
             htmlReportStringBuilder.append("<h2>" + reportMailData.getCoverageGap() + "</h2><br/>");
         }
-        if (reportMailData.isShouldAddTestResults()) {
+        if (reportMailData.getDetailedMissingTestsTable() != null){
             htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");
             htmlReportStringBuilder.append(reportMailData.getDetailedMissingTestsTable());
             htmlReportStringBuilder.append("<br/>");
+        }
+        if (reportMailData.getDetailedPassedTestsTable() != null) {
             htmlReportStringBuilder.append("<h2>Passed Tests:</h2>");
             htmlReportStringBuilder.append(reportMailData.getDetailedPassedTestsTable());
         }

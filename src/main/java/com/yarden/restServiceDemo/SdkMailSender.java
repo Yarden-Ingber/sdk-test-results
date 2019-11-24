@@ -9,6 +9,8 @@ import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -27,20 +29,22 @@ public class SdkMailSender {
         } else {
             sdk = requestJson.getSdk();
         }
-        version = requestJson.getVersion().replaceAll("[^\\d.]", "");
+        version = requestJson.getVersion();
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         ReportMailData reportMailData = new ReportMailData()
                 .setMailTextPart("SDK: \" + sdk + \"\\nVersion: \" + version + \"\\nChange Log:\\n\\n\" + changeLog")
                 .setReportTitle("Test Report for SDK: " + sdk)
-                .setVersion("SDK Version: " + version)
-                .setChangeLog("Change log:<br/>" + changeLog.replace("\n", "<br/>"))
-                .setCoverageGap("Test coverage gap:<br/><br/>" + testCoverageGap.replace("\n", "<br/>"))
-                .setShouldAddTestResults(true)
-                .setShouldAddCoverageGap(true)
+                .setVersion(version)
+                .setChangeLog(changeLog)
+                .setCoverageGap(testCoverageGap)
                 .setHighLevelReportTable(getHighLevelReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
-                .setDetailedPassedTestsTable(getDetailedPassedTestsTable());
+                .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
+                .setRecipientsJsonArray(new JSONArray()
+                    .put(new JSONObject()
+                            .put("Email", "yarden.ingber@applitools.com")
+                            .put("Name", "Release_Report")));
         new MailSender().send(reportMailData);
     }
 

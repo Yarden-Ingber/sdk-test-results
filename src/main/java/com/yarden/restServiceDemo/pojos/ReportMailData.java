@@ -97,6 +97,6 @@ public class ReportMailData {
     }
 
     private String fixNewLineForHtml(String string){
-        return string.replace("\n", "<br/>");
+        return string.replace("\n", "<br/>").replace(" ", "&nbsp;");
     }
 }

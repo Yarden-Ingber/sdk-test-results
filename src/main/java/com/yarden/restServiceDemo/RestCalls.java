@@ -76,6 +76,14 @@ public class RestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/api/sessions/running")
+    public ResponseEntity setProxyTestServer(@RequestBody String json){
+        synchronized (lock) {
+            newRequestPrint(json);
+            return new ResponseEntity("Mail sent", HttpStatus.OK);
+        }
+    }
+
     private void newRequestPrint(String json){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

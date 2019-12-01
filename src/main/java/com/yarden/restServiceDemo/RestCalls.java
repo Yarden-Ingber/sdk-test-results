@@ -51,7 +51,12 @@ public class RestCalls {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail")
-    public ResponseEntity sendMail(@RequestBody String json){
+    public ResponseEntity sendSdkMailReport(@RequestBody String json){
+        return sendSdkMailReportOverload(json);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/send_mail/sdks")
+    public ResponseEntity sendSdkMailReportOverload(@RequestBody String json){
         synchronized (lock) {
             newRequestPrint(json);
             try {
@@ -63,8 +68,8 @@ public class RestCalls {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/send_mail_report")
-    public ResponseEntity sendMailReport(@RequestBody String json){
+    @RequestMapping(method = RequestMethod.POST, path = "/send_mail/generic")
+    public ResponseEntity sendGenericMailReport(@RequestBody String json){
         synchronized (lock) {
             newRequestPrint(json);
             try {

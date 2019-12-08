@@ -97,7 +97,11 @@ public class SheetDBApiService {
             resultMatrix.add(new LinkedList<>());
             for (String key: keys){
                 try {
-                    resultMatrix.get(rowIndex).add(jsonElement.getAsJsonObject().get(key).getAsString());
+                    try {
+                        resultMatrix.get(rowIndex).add(jsonElement.getAsJsonObject().get(key).getAsInt());
+                    } catch (ClassCastException | NumberFormatException e) {
+                        resultMatrix.get(rowIndex).add(jsonElement.getAsJsonObject().get(key).getAsString());
+                    }
                 } catch (Throwable t) {
                     resultMatrix.get(rowIndex).add("");
                 }

@@ -68,16 +68,16 @@ public class HtmlReportGenerator {
         htmlReportStringBuilder.append("<h2>" + reportMailData.getReportTitle() + "</h2>");
         htmlReportStringBuilder.append("<h2>Version: " + reportMailData.getVersion() + "</h2><br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
-            htmlReportStringBuilder.append("Change log:<br/>");
-            htmlReportStringBuilder.append("<h2>" + reportMailData.getChangeLog() + "</h2><br/>");
+            htmlReportStringBuilder.append("<h2>Change log:</h2>");
+            htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
             htmlReportStringBuilder.append("<br/>");
         }
         if (reportMailData.getHighLevelReportTable() != null) {
             htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
         }
         if (reportMailData.getCoverageGap() != null && !reportMailData.getCoverageGap().isEmpty()) {
-            htmlReportStringBuilder.append("<br/>Test coverage gap:<br/><br/>");
-            htmlReportStringBuilder.append("<h2>" + reportMailData.getCoverageGap() + "</h2><br/>");
+            htmlReportStringBuilder.append("<br/><h2>Test coverage gap:</h2>");
+            htmlReportStringBuilder.append(reportMailData.getCoverageGap() + "<br/><br/>");
         }
         if (reportMailData.getDetailedMissingTestsTable() != null){
             htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");

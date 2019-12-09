@@ -1,6 +1,9 @@
 package com.yarden.restServiceDemo.pojos;
 
 import com.yarden.restServiceDemo.mailService.HTMLTableBuilder;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 import org.json.JSONArray;
 
 public class ReportMailData {
@@ -29,7 +32,10 @@ public class ReportMailData {
     }
 
     public ReportMailData setChangeLog(String changeLog) {
-        this.changeLog = fixNewLineForHtml(changeLog);
+        Parser parser = Parser.builder().build();
+        Node document = parser.parse(changeLog);
+        HtmlRenderer renderer = HtmlRenderer.builder().build();
+        this.changeLog = renderer.render(document).replace(" ", "&nbsp;");
         return this;
     }
 

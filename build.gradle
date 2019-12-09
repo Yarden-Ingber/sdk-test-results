@@ -17,6 +17,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	jcenter()
 }
 
 dependencies {
@@ -43,4 +44,5 @@ dependencies {
 	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf-openpdf', version: '9.1.18'
 	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-swt', version: '9.1.18'
 	compile group: 'org.xhtmlrenderer', name: 'flying-saucer-log4j', version: '9.1.18'
+	compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.13.1'
 }

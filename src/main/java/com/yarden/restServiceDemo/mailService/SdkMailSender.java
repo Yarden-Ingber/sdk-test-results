@@ -46,7 +46,7 @@ public class SdkMailSender {
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setRecipientsJsonArray(new JSONArray()
                     .put(new JSONObject()
-                            .put("Email", "yarden.ingber@applitools.com")
+                            .put("Email", "release.reports@applitools.com")
                             .put("Name", "Release_Report")));
         new MailSender().send(reportMailData);
     }

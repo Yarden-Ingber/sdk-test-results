@@ -1,50 +1,53 @@
-package com.yarden.restServiceDemo.mailService;
+package com.yarden.restServiceDemo;
+
 import com.lowagie.text.DocumentException;
-import com.mailjet.client.*;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
-import com.mailjet.client.resource.Emailv31;
-import com.yarden.restServiceDemo.HtmlReportGenerator;
+import com.mailjet.client.Base64;
+import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.*;
 
-public class MailSender {
+public class HtmlReportGenerator {
 
     StringBuilder htmlReportStringBuilder = new StringBuilder();
     ReportMailData reportMailData;
+    private final String htmlReportFileName = "test_report.html";
+    private final String pdfReportFileName = "test_report.pdf";
+    private final String sdkHtmlReportFileName = "sdk_report";
 
-    public void send(ReportMailData reportMailData) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
+    public HtmlReportGenerator(ReportMailData reportMailData){
         this.reportMailData = reportMailData;
-        MailjetClient client;
-        MailjetRequest request;
-        MailjetResponse response;
-        client = new MailjetClient(System.getenv("MJ_APIKEY_PUBLIC"), System.getenv("MJ_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
-        request = new MailjetRequest(Emailv31.resource)
-                .property(Emailv31.MESSAGES, new JSONArray()
-                        .put(new JSONObject()
-                                .put(Emailv31.Message.FROM, new JSONObject()
-                                        .put("Email", "yarden.ingber@applitools.com")
-                                        .put("Name", "Yarden Ingber"))
-                                .put(Emailv31.Message.TO, reportMailData.getRecipientsJsonArray())
-                                .put(Emailv31.Message.SUBJECT, "SDK Release")
-                                .put(Emailv31.Message.TEXTPART, reportMailData.getMailTextPart() + "\n\nHTML Report:\n" + new HtmlReportGenerator(reportMailData).getHtmlReportUrlInAwsS3())
-                                .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
-        response = client.post(request);
-        System.out.println(response.getStatus());
-        System.out.println(response.getData());
     }
 
-    private String getPdfReportAsBase64() throws IOException, DocumentException {
-        final String htmlReportFileName = "test_report.html";
-        final String pdfReportFileName = "test_report.pdf";
+    public String getHtmlReportUrlInAwsS3() throws FileNotFoundException, UnsupportedEncodingException {
+        generateHtmlReportFile();
+        String fileUrl = AwsS3Provider.uploadFileToS3(sdkHtmlReportFileName + "_" + Logger.getTimaStamp(), htmlReportFileName);
+        try {
+            new File(htmlReportFileName).delete();
+        } catch (Throwable t) {t.printStackTrace();}
+        return fileUrl;
+    }
+
+    public String getPdfReportAsBase64() throws IOException, DocumentException {
+        generateHtmlReportFile();
+        convertHtmlToPdfFile();
+        String result = Base64.encode(IOUtils.toByteArray(new FileInputStream(pdfReportFileName)));
+        try {
+            new File(htmlReportFileName).delete();
+            new File(pdfReportFileName).delete();
+        } catch (Throwable t) {t.printStackTrace();}
+        return result;
+    }
+
+    private void generateHtmlReportFile() throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(htmlReportFileName, "UTF-8");
         writer.println(getHtmlReportAsPlainSting());
         writer.close();
+    }
+
+    private void convertHtmlToPdfFile() throws IOException, DocumentException{
         String inputFile = htmlReportFileName;
         String url = new File(inputFile).toURI().toURL().toString();
         String outputFile = pdfReportFileName;
@@ -54,12 +57,6 @@ public class MailSender {
         renderer.layout();
         renderer.createPDF(os);
         os.close();
-        String result = Base64.encode(IOUtils.toByteArray(new FileInputStream(pdfReportFileName)));
-        try {
-            new File(htmlReportFileName).delete();
-            new File(pdfReportFileName).delete();
-        } catch (Throwable t) {t.printStackTrace();}
-        return result;
     }
 
     private String getHtmlReportAsPlainSting(){
@@ -70,7 +67,7 @@ public class MailSender {
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h2>" + reportMailData.getReportTitle() + "</h2>");
         htmlReportStringBuilder.append("<h2>Version: " + reportMailData.getVersion() + "</h2><br/>");
-        if (reportMailData.getChangeLog() != null) {
+        if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("Change log:<br/>");
             htmlReportStringBuilder.append("<h2>" + reportMailData.getChangeLog() + "</h2><br/>");
             htmlReportStringBuilder.append("<br/>");
@@ -78,7 +75,7 @@ public class MailSender {
         if (reportMailData.getHighLevelReportTable() != null) {
             htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
         }
-        if (reportMailData.getCoverageGap() != null) {
+        if (reportMailData.getCoverageGap() != null && !reportMailData.getCoverageGap().isEmpty()) {
             htmlReportStringBuilder.append("<br/>Test coverage gap:<br/><br/>");
             htmlReportStringBuilder.append("<h2>" + reportMailData.getCoverageGap() + "</h2><br/>");
         }
@@ -102,16 +99,15 @@ public class MailSender {
                 "    }\n" +
                 "    .content {\n" +
                 "        background:#ffffff;\n" +
-//                "        margin: 10px 10px 10px 10px;\n" +
-                "        width: 700px;\n" +
+                "        margin: 40px auto;\n" +
+                "        width: 65%;\n" +
                 "        padding: 30px;\n" +
-//                "        box-shadow: 0 10px 10px #c7ced0;\n" +
+                "        box-shadow: 0 10px 10px #c7ced0;\n" +
                 "        border:1px solid #c7ced0;\n" +
                 "    }\n" +
                 "    .wrapper {\n" +
                 "        background: #e4f0f4;\n" +
-                "        padding: 10px;\n" +
-//                "        margin: 10px 10px 10px 10px;\n" +
+                "        padding: 1px;\n" +
                 "        font-family: sans-serif;\n" +
                 "    }\n" +
                 "    .header {\n" +
@@ -126,7 +122,7 @@ public class MailSender {
                 "        margin: 0;\n" +
                 "    }\n" +
                 "    table {\n" +
-                "        width: 400px;\n" +
+                "        width: 70%;\n" +
                 "    }\n" +
                 "    tr {\n" +
                 "        background: #f8f8f8;\n" +
@@ -146,4 +142,5 @@ public class MailSender {
                 "    }\n" +
                 "</style>";
     }
+
 }

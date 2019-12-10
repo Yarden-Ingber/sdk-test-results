@@ -80,13 +80,14 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append(reportMailData.getCoverageGap() + "<br/><br/>");
         }
         if (reportMailData.getDetailedMissingTestsTable() != null){
-            htmlReportStringBuilder.append("<h2>Unexecuted Tests:</h2>");
+            htmlReportStringBuilder.append("<details><summary><b>Unexecuted Tests:</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getDetailedMissingTestsTable());
-            htmlReportStringBuilder.append("<br/>");
+            htmlReportStringBuilder.append("</details><br/>");
         }
         if (reportMailData.getDetailedPassedTestsTable() != null) {
-            htmlReportStringBuilder.append("<h2>Passed Tests:</h2>");
+            htmlReportStringBuilder.append("<details><summary><b>Passed Tests:</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getDetailedPassedTestsTable());
+            htmlReportStringBuilder.append("</details>");
         }
         htmlReportStringBuilder.append("</div></div></body></html>");
         return htmlReportStringBuilder.toString();

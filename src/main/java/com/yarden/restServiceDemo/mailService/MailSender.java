@@ -4,6 +4,7 @@ import com.mailjet.client.*;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
 import org.apache.commons.io.IOUtils;
@@ -23,7 +24,7 @@ public class MailSender {
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
-        client = new MailjetClient(System.getenv("MJ_APIKEY_PUBLIC"), System.getenv("MJ_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
+        client = new MailjetClient(Enums.EnvVariables.MailjetApiKeyPublic.value, Enums.EnvVariables.MailjetApiKeyPrivate.value, new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
                         .put(new JSONObject()

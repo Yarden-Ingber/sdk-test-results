@@ -42,4 +42,15 @@ public class Enums {
         }
     }
 
+    public enum EnvVariables {
+        MailjetApiKeyPublic(System.getenv("MJ_APIKEY_PUBLIC")), MailjetApiKeyPrivate(System.getenv("MJ_APIKEY_PRIVATE")), AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET"));
+
+        public final String value;
+
+        EnvVariables(String value){
+            this.value = value;
+        }
+
+    }
+
 }

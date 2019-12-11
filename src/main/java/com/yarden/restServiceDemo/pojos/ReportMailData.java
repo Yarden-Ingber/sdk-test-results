@@ -35,7 +35,7 @@ public class ReportMailData {
         Parser parser = Parser.builder().build();
         Node document = parser.parse(changeLog);
         HtmlRenderer renderer = HtmlRenderer.builder().build();
-        this.changeLog = renderer.render(document).replace(" ", "&nbsp;");
+        this.changeLog = renderer.render(document);
         return this;
     }
 

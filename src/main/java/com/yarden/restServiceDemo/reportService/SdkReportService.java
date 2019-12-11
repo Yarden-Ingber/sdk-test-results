@@ -20,6 +20,9 @@ public class SdkReportService {
         if (isSandbox() || isTestedLocally()) {
             googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
         }
+        if (requestJson.getId().contains("f82431")) {
+            googleSheetTabName = Enums.SheetTabsNames.Report.value;
+        }
         sheetData = new SheetData(googleSheetTabName);
         highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
         new RequestJsonValidator(requestJson).validate(sheetData);

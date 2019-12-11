@@ -247,7 +247,6 @@ public class SdkReportService {
             int maxRetry = 5;
             while (retryCount < maxRetry) {
                 try {
-                    Logger.info("Writing local cached sheet to google sheet: " + sheetData.getSheetData());
                     SheetDBApiService.updateSheet(sheetData);
                     return;
                 } catch (Throwable t1) {

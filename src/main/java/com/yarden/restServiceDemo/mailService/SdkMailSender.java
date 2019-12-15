@@ -23,9 +23,10 @@ public class SdkMailSender {
     private String changeLog;
     private String testCoverageGap;
     private String version;
+    private EmailNotificationJson requestJson;
 
     public void send(String json) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
-        EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
+        requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending mail report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
@@ -44,6 +45,7 @@ public class SdkMailSender {
                 .setHighLevelReportTable(getHighLevelReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
+                .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value)
                 .setRecipientsJsonArray(new JSONArray()
                     .put(new JSONObject()
                             .put("Email", "release.reports@applitools.com")
@@ -61,7 +63,7 @@ public class SdkMailSender {
             }
         }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
-        tableBuilder.addTableHeader("SDK", "Success Percentage", "Amount of Tests");
+        tableBuilder.addTableHeader("SDK", "Success Percentage", "Test Count");
         tableBuilder.addRowValues(lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString(),
                 lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.SuccessPercentage.value).getAsString(),
                 lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.AmountOfTests.value).getAsString());
@@ -85,17 +87,22 @@ public class SdkMailSender {
 
     private HTMLTableBuilder getDetailedPassedTestsTable() {
         JsonArray reportSheet = new SheetData(Enums.SheetTabsNames.Report.value).getSheetData();
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 2);
-        tableBuilder.addTableHeader("Test Name", "Result");
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
+        tableBuilder.addTableHeader("Test Name", "Result", "Permutation Count");
         for (JsonElement row: reportSheet) {
             if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Passed.value)) {
                 if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
                 } else {
-                    tableBuilder.addRowValues(row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS");
+                    tableBuilder.addRowValues(row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
+                            getSumOfPermutationsForTest(row));
                 }
             }
         }
         return tableBuilder;
+    }
+
+    private String getSumOfPermutationsForTest(JsonElement row){
+        return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value).getAsInt());
     }
 
 }

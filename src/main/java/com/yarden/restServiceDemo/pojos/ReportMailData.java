@@ -1,5 +1,6 @@
 package com.yarden.restServiceDemo.pojos;
 
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.mailService.HTMLTableBuilder;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -17,6 +18,7 @@ public class ReportMailData {
     private String version = "";
     private String coverageGap = "";
     private JSONArray recipientsJsonArray = null;
+    private String htmlReportS3BucketName = "";
 
     public String getReportTitle() {
         return reportTitle;
@@ -104,5 +106,14 @@ public class ReportMailData {
 
     private String fixNewLineForHtml(String string){
         return string.replace("\n", "<br/>").replace(" ", "&nbsp;");
+    }
+
+    public String getHtmlReportS3BucketName() {
+        return htmlReportS3BucketName;
+    }
+
+    public ReportMailData setHtmlReportS3BucketName(String htmlReportS3BucketName) {
+        this.htmlReportS3BucketName = htmlReportS3BucketName;
+        return this;
     }
 }

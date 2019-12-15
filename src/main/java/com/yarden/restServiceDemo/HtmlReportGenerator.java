@@ -21,9 +21,11 @@ public class HtmlReportGenerator {
         this.reportMailData = reportMailData;
     }
 
-    public String getHtmlReportUrlInAwsS3() throws FileNotFoundException, UnsupportedEncodingException {
+    public String getHtmlReportUrlInAwsS3(String bucketName) throws FileNotFoundException, UnsupportedEncodingException {
         generateHtmlReportFile();
-        String fileUrl = AwsS3Provider.uploadFileToS3(sdkHtmlReportFileName + "_" + Logger.getTimaStamp(), htmlReportFileName);
+        String fileNameInBucket = sdkHtmlReportFileName + "_" + Logger.getTimaStamp();
+        AwsS3Provider.uploadFileToS3(bucketName, fileNameInBucket, htmlReportFileName);
+        String fileUrl = AwsS3Provider.getUrlToFileInS3(bucketName, fileNameInBucket);
         try {
             new File(htmlReportFileName).delete();
         } catch (Throwable t) {t.printStackTrace();}
@@ -43,8 +45,11 @@ public class HtmlReportGenerator {
 
     private void generateHtmlReportFile() throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter(htmlReportFileName, "UTF-8");
-        writer.println(getHtmlReportAsPlainSting());
-        writer.close();
+        try {
+            writer.println(getHtmlReportAsPlainSting());
+        } finally {
+            writer.close();
+        }
     }
 
     private void convertHtmlToPdfFile() throws IOException, DocumentException{
@@ -52,11 +57,14 @@ public class HtmlReportGenerator {
         String url = new File(inputFile).toURI().toURL().toString();
         String outputFile = pdfReportFileName;
         OutputStream os = new FileOutputStream(outputFile);
-        ITextRenderer renderer = new ITextRenderer();
-        renderer.setDocument(url);
-        renderer.layout();
-        renderer.createPDF(os);
-        os.close();
+        try {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocument(url);
+            renderer.layout();
+            renderer.createPDF(os);
+        } finally {
+            os.close();
+        }
     }
 
     private String getHtmlReportAsPlainSting(){

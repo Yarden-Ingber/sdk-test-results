@@ -61,8 +61,9 @@ public class RestCalls {
             newRequestPrint(json);
             try {
                 new SdkMailSender().send(json);
-            } catch (Throwable throwable) {
-                return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return new ResponseEntity("Failed sending email: " + t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity("Mail sent", HttpStatus.OK);
         }

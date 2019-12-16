@@ -17,7 +17,7 @@ public class SdkReportService {
     public void postResults(String json) throws JsonSyntaxException, InternalError{
         googleSheetTabName = Enums.SheetTabsNames.Report.value;
         requestJson = new Gson().fromJson(json, RequestJson.class);
-        if (isSandbox() || isTestedLocally()) {
+        if (isSandbox()) {
             googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
         }
         sheetData = new SheetData(googleSheetTabName);
@@ -286,8 +286,8 @@ public class SdkReportService {
     }
 
     private boolean isSandbox(){
-        return (requestJson.getSandbox() != null) &&
-                (requestJson.getSandbox());
+        return (((requestJson.getSandbox() != null) && requestJson.getSandbox())
+                || isTestedLocally());
     }
 
     private boolean isTestedLocally(){

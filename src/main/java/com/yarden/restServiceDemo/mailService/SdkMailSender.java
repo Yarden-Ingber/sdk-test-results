@@ -48,7 +48,7 @@ public class SdkMailSender {
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value)
                 .setRecipientsJsonArray(new JSONArray()
                     .put(new JSONObject()
-                            .put("Email", "release.reports@applitools.com")
+                            .put("Email", Enums.EnvVariables.MailReportRecipient.value)
                             .put("Name", "Release_Report")));
         new MailSender().send(reportMailData);
     }

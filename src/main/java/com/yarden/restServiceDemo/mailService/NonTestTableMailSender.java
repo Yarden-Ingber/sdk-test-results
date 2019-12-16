@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
 import org.json.JSONArray;
@@ -28,7 +29,7 @@ public class NonTestTableMailSender {
                 .setCoverageGap(testCoverageGap)
                 .setRecipientsJsonArray(new JSONArray()
                         .put(new JSONObject()
-                                .put("Email", "release.reports@applitools.com")
+                                .put("Email", Enums.EnvVariables.MailReportRecipient.value)
                                 .put("Name", "Release_Report")));
         new MailSender().send(reportMailData);
     }

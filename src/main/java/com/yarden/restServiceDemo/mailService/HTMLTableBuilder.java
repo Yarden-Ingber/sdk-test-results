@@ -53,7 +53,7 @@ public class HTMLTableBuilder {
     /**
      * @param values
      */
-    public void addRowValues(String... values) {
+    public void addRowValues(boolean isCenter, String... values) {
         if (values.length != columns) {
             System.out.println("Error column lenth");
         } else {
@@ -64,9 +64,11 @@ public class HTMLTableBuilder {
                 sb.append(ROW_START);
                 for (String value : values) {
                     if (value.toLowerCase().equals("pass")) {
-                        sb.append(COLUMN_START.replace("td", "td class=\"pass\""));
+                        sb.append(COLUMN_START.replace("td", "td align=\"center\" class=\"pass\""));
                     } else if (value.toLowerCase().equals("fail")) {
-                        sb.append(COLUMN_START.replace("td", "td class=\"fail\""));
+                        sb.append(COLUMN_START.replace("td", "td align=\"center\" class=\"fail\""));
+                    } else if (isCenter){
+                        sb.append(COLUMN_START.replace("td", "td align=\"center\""));
                     } else {
                         sb.append(COLUMN_START);
                     }

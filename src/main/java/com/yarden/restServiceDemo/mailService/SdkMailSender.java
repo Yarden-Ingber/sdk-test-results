@@ -9,6 +9,7 @@ import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
 import com.yarden.restServiceDemo.pojos.ReportMailData;
@@ -62,11 +63,18 @@ public class SdkMailSender {
                 break;
             }
         }
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
-        tableBuilder.addTableHeader("SDK", "Success Percentage", "Test Count");
-        tableBuilder.addRowValues(lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString(),
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 4);
+        tableBuilder.addTableHeader("SDK", "Success percentage", "Test count", "Previous release test count");
+        String previousTestCountFileName = requestJson.getSdk() + "previousTestCount.txt";
+        String previousTestCount = "";
+        String currentTestCount = lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.AmountOfTests.value).getAsString();
+        try {
+            previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName);
+        } catch (Throwable t) { t.printStackTrace(); }
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
+        tableBuilder.addRowValues(true, requestJson.getSdk(),
                 lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.SuccessPercentage.value).getAsString(),
-                lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.AmountOfTests.value).getAsString());
+                currentTestCount, previousTestCount);
         return tableBuilder;
     }
 
@@ -78,7 +86,7 @@ public class SdkMailSender {
             if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
                 if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
                 } else {
-                    tableBuilder.addRowValues(row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString());
+                    tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString());
                 }
             }
         }
@@ -93,7 +101,7 @@ public class SdkMailSender {
             if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Passed.value)) {
                 if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
                 } else {
-                    tableBuilder.addRowValues(row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
+                    tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
                             getSumOfPermutationsForTest(row));
                 }
             }

@@ -46,7 +46,7 @@ public class ReportMailData {
     }
 
     public ReportMailData setVersion(String version) {
-        this.version = version.replaceAll("[^\\d.]", "");
+        this.version = version.replaceAll("RELEASE_CANDIDATE-", "").replaceAll("RELEASE_CANDIDATE", "");
         return this;
     }
 

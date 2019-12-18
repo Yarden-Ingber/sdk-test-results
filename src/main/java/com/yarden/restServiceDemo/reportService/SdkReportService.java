@@ -286,15 +286,14 @@ public class SdkReportService {
     }
 
     private boolean isSandbox(){
-        return (((requestJson.getSandbox() != null) && requestJson.getSandbox())
+        boolean result = (((requestJson.getSandbox() != null) && requestJson.getSandbox())
                 || isTestedLocally());
+        Logger.info("isSandbox = " + result);
+        return result;
     }
 
     private boolean isTestedLocally(){
-        if (requestJson.getId().equals("0000-0000")) {
-            return true;
-        }
-        return false;
+        return requestJson.getId().equals("0000-0000");
     }
 
 }

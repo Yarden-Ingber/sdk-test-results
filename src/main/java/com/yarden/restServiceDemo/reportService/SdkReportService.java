@@ -227,6 +227,7 @@ public class SdkReportService {
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}");
         Logger.info("Adding new entry to high level sheet: " + newEntry.toString());
         highLevelSheetData.getSheetData().add(newEntry);
+        writeEntireSheetData(highLevelSheetData);
     }
 
     private void deleteEntireSdkColumn(String sdk){

@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 
 import java.io.*;

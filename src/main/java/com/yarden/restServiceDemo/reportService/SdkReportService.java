@@ -149,6 +149,8 @@ public class SdkReportService {
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
             if (!isSandbox()) {
                 addLocalCachedHighLevelReportEntry(requestJson.getSdk(), requestJson.getId());
+                Logger.info("Writing new entry in high level sheet");
+                writeEntireSheetData(highLevelSheetData);
             }
         }
     }
@@ -227,7 +229,6 @@ public class SdkReportService {
                 "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}");
         Logger.info("Adding new entry to high level sheet: " + newEntry.toString());
         highLevelSheetData.getSheetData().add(newEntry);
-        writeEntireSheetData(highLevelSheetData);
     }
 
     private void deleteEntireSdkColumn(String sdk){

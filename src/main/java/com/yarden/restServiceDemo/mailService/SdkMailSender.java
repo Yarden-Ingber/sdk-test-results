@@ -65,7 +65,7 @@ public class SdkMailSender {
         }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 4);
         tableBuilder.addTableHeader("SDK", "Success percentage", "Test count", "Previous release test count");
-        String previousTestCountFileName = requestJson.getSdk() + "previousTestCount.txt";
+        String previousTestCountFileName = requestJson.getSdk() + "PreviousTestCount.txt";
         String previousTestCount = "";
         String currentTestCount = lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.AmountOfTests.value).getAsString();
         try {

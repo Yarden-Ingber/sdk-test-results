@@ -13,7 +13,7 @@ public class Enums {
     }
 
     public enum SheetTabsNames {
-        Report("Coverage comparison"), HighLevel("Results history"), Sandbox("sandbox");
+        Report("Coverage comparison"), HighLevel("Results history"), Sandbox("sandbox"), RawData("Raw data");
 
         public final String value;
 

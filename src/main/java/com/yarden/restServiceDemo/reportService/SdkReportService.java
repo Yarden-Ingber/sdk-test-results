@@ -25,13 +25,26 @@ public class SdkReportService {
         new RequestJsonValidator(requestJson).validate(sheetData);
         try {
             deleteColumnForNewTestId();
-            updateSheetWithNewResults();
+            updateSheetWithNewResults(false);
             sheetData.validateThereIsIdRowOnSheet(requestJson);
             writeEntireSheetData(sheetData);
             if (!isSandbox()) {
                 updateLocalCachedHighLevelReport();
                 writeEntireSheetData(highLevelSheetData);
             }
+        } catch (Throwable t) {
+            throw new InternalError();
+        }
+        postResultToRawData();
+    }
+
+    private void postResultToRawData(){
+        sheetData = new SheetData(Enums.SheetTabsNames.RawData.value);
+        try {
+            deleteColumnForNewTestId();
+            updateSheetWithNewResults(true);
+            sheetData.validateThereIsIdRowOnSheet(requestJson);
+            writeEntireSheetData(sheetData);
         } catch (Throwable t) {
             throw new InternalError();
         }
@@ -63,15 +76,16 @@ public class SdkReportService {
         }
     }
 
-    private void updateSheetWithNewResults(){
+    private void updateSheetWithNewResults(boolean shouldAddTestParams){
         Logger.info("Updating results in local cached sheet");
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
-//            Ignore parameters until we fix issue with java parameter names
-//            String paramsString = getTestParamsAsString(testResult);
             String paramsString = "";
+            if (shouldAddTestParams) {
+                paramsString = getTestParamsAsString(testResult);
+            }
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
         }
     }

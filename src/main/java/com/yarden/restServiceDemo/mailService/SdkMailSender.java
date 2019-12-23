@@ -37,8 +37,9 @@ public class SdkMailSender {
         version = requestJson.getVersion();
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
+        String newVersionInstructions = getNewVersionInstructions();
         ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("SDK: " + sdk + "\nVersion: " + version + "\nChange Log:\n\n" + changeLog)
+                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n" + newVersionInstructions +"\n\nChange Log:\n" + changeLog)
                 .setReportTitle("Test Report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -107,6 +108,13 @@ public class SdkMailSender {
             }
         }
         return tableBuilder;
+    }
+
+    private String getNewVersionInstructions(){
+        if (sdk.equals("csharp")) {
+            return "Instructions and dependencies:\nhttps://www.nuget.org/packages/Eyes.Selenium/";
+        }
+        return "";
     }
 
     private String getSumOfPermutationsForTest(JsonElement row){

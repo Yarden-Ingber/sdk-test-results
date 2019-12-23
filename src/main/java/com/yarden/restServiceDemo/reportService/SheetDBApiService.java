@@ -123,7 +123,7 @@ public class SheetDBApiService {
 
     public static void updateSheet(SheetData sheetData) throws IOException {
         getService().spreadsheets().values()
-                .update(spreadsheetId, sheetData.getSheetTabName() + "!A1:Z1000", new ValueRange().setValues(jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames())))
+                .update(spreadsheetId, sheetData.getSheetTabName() + "!A1:AD1000", new ValueRange().setValues(jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames())))
                 .setValueInputOption("RAW").execute();
     }
 

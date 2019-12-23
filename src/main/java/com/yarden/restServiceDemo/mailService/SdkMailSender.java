@@ -39,7 +39,7 @@ public class SdkMailSender {
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
         ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n" + newVersionInstructions +"\n\nChange Log:\n" + changeLog)
+                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n\n" + newVersionInstructions +"\n\nChange Log:\n" + changeLog)
                 .setReportTitle("Test Report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -112,7 +112,7 @@ public class SdkMailSender {
 
     private String getNewVersionInstructions(){
         if (sdk.equals("csharp")) {
-            return "Instructions and dependencies:\nhttps://www.nuget.org/packages/Eyes.Selenium/";
+            return "Instructions and dependencies: https://www.nuget.org/packages/Eyes.Selenium/";
         }
         return "";
     }

@@ -25,6 +25,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
 ```
 {  
   "sdk":"java",
+  "group":"selenium",
   "id":"1234",
   "sandbox":true,
   "results":[  

@@ -1,7 +1,11 @@
 package com.yarden.restServiceDemo.reportService;
 
 import com.google.gson.JsonSyntaxException;
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.RequestJson;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class RequestJsonValidator {
 
@@ -17,6 +21,20 @@ public class RequestJsonValidator {
         }
         if (!sheetData.getSheetData().get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
             throw new JsonSyntaxException("No SDK named " + requestJson.getSdk() + " in the sheet");
+        }
+        checkGroupNameValid();
+    }
+
+    private void checkGroupNameValid(){
+        boolean isFound = false;
+        for (Enums.SdkGroupsSheetTabNames tab: Enums.SdkGroupsSheetTabNames.values()) {
+            if (tab.value.equals(requestJson.getGroup())){
+                isFound = true;
+                break;
+            }
+        }
+        if (!isFound) {
+            throw new JsonSyntaxException("No tab named " + requestJson.getGroup() + " in the report");
         }
     }
 }

@@ -9,6 +9,9 @@ public class RequestJson {
     @SerializedName("sdk")
     @Expose
     private String sdk;
+    @SerializedName("group")
+    @Expose
+    private String group;
     @SerializedName("id")
     @Expose
     private String id;
@@ -51,4 +54,11 @@ public class RequestJson {
         this.results = results;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
 }

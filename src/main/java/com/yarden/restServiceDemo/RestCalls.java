@@ -24,7 +24,7 @@ public class RestCalls {
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
-                return new ResponseEntity("Failed parsing the json: " + json + e.getMessage(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity("Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage(), HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity(json, HttpStatus.OK);
         }

@@ -56,38 +56,32 @@ public class SdkMailSender {
     }
 
     private HTMLTableBuilder getHighLevelReportTable() {
-        JsonArray highLevelSheet = new SheetData(Enums.SheetTabsNames.HighLevel.value).getSheetData();
-        JsonElement lastSdkResult = null;
-        for (int i = highLevelSheet.size()-1; i >= 0; i--){
-            lastSdkResult = highLevelSheet.get(i);
-            if (lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(sdk)) {
-                break;
-            }
-        }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 4);
         tableBuilder.addTableHeader("SDK", "Success percentage", "Test count", "Previous release test count");
         String previousTestCountFileName = requestJson.getSdk() + "PreviousTestCount.txt";
         String previousTestCount = "";
-        String currentTestCount = lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.AmountOfTests.value).getAsString();
+        String currentTestCount = Integer.toString(getTotalTestCountForSdk());
         try {
             previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName);
         } catch (Throwable t) { t.printStackTrace(); }
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
-        tableBuilder.addRowValues(true, requestJson.getSdk(),
-                lastSdkResult.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.SuccessPercentage.value).getAsString(),
-                currentTestCount, previousTestCount);
+        tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentTestCount, previousTestCount);
         return tableBuilder;
     }
 
     private HTMLTableBuilder getDetailedMissingTestsTable() {
-        JsonArray reportSheet = new SheetData(Enums.SheetTabsNames.Report.value).getSheetData();
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 1);
         tableBuilder.addTableHeader("Test Name");
-        for (JsonElement row: reportSheet) {
-            if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
-                if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
-                } else {
-                    tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString());
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
+                        if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
+                        } else {
+                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString());
+                        }
+                    }
                 }
             }
         }
@@ -95,19 +89,43 @@ public class SdkMailSender {
     }
 
     private HTMLTableBuilder getDetailedPassedTestsTable() {
-        JsonArray reportSheet = new SheetData(Enums.SheetTabsNames.Report.value).getSheetData();
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
         tableBuilder.addTableHeader("Test Name", "Result", "Permutation Count");
-        for (JsonElement row: reportSheet) {
-            if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Passed.value)) {
-                if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
-                } else {
-                    tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
-                            getSumOfPermutationsForTest(row));
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Passed.value)) {
+                        if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
+                        } else {
+                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
+                                    getSumOfPermutationsForTest(row));
+                        }
+                    }
                 }
             }
         }
         return tableBuilder;
+    }
+
+    private int getTotalTestCountForSdk(){
+        int totalAmount = 0;
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            for (JsonElement sheetEntry: reportSheet){
+                int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
+                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+                totalAmount += passedValueInteger + failedValueInteger;
+            }
+        }
+        return totalAmount;
+    }
+
+    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
+        JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
+        return (passedValue == null || passedValue.getAsString().isEmpty()) ?
+                0 :
+                sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
     }
 
     private String getNewVersionInstructions(){
@@ -118,7 +136,11 @@ public class SdkMailSender {
     }
 
     private String getSumOfPermutationsForTest(JsonElement row){
-        return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value).getAsInt());
+        try {
+            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value).getAsInt());
+        } catch (Exception e) {
+            return "0";
+        }
     }
 
 }

@@ -10,28 +10,26 @@ public class SdkReportService {
 
     private RequestJson requestJson;
     private ExtraDataRequestJson extraDataRequestJson;
-    private String googleSheetTabName = Enums.SheetTabsNames.Report.value;
+    private String googleSheetTabName;
     private SheetData sheetData = null;
-    private SheetData highLevelSheetData = null;
 
     public void postResults(String json) throws JsonSyntaxException, InternalError{
-        googleSheetTabName = Enums.SheetTabsNames.Report.value;
         requestJson = new Gson().fromJson(json, RequestJson.class);
+        if (requestJson.getGroup() == null || requestJson.getGroup().isEmpty()){
+            throw new JsonSyntaxException("Missing group parameter in json");
+        }
+        requestJson.setGroup(capitalize(requestJson.getGroup()));
+        googleSheetTabName = requestJson.getGroup();
         if (isSandbox()) {
-            googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+            googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
         }
         sheetData = new SheetData(googleSheetTabName);
-        highLevelSheetData = new SheetData(Enums.SheetTabsNames.HighLevel.value);
         new RequestJsonValidator(requestJson).validate(sheetData);
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults(false);
             sheetData.validateThereIsIdRowOnSheet(requestJson);
             writeEntireSheetData(sheetData);
-            if (!isSandbox()) {
-                updateLocalCachedHighLevelReport();
-                writeEntireSheetData(highLevelSheetData);
-            }
         } catch (Throwable t) {
             throw new InternalError();
         }
@@ -39,7 +37,7 @@ public class SdkReportService {
     }
 
     private void postResultToRawData(){
-        sheetData = new SheetData(Enums.SheetTabsNames.RawData.value);
+        sheetData = new SheetData(Enums.GeneralSheetTabsNames.RawData.value);
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults(true);
@@ -51,7 +49,7 @@ public class SdkReportService {
     }
 
     public void postExtraTestData(String json) throws JsonSyntaxException, InternalError{
-        googleSheetTabName = Enums.SheetTabsNames.Sandbox.value;
+        googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
         extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
         sheetData = new SheetData(googleSheetTabName);
         try {
@@ -60,11 +58,6 @@ public class SdkReportService {
         } catch (Throwable t) {
             throw new InternalError();
         }
-    }
-
-    private void updateLocalCachedHighLevelReport(){
-        updateLocalCachedHighLevelSuccessPercentage();
-        updateLocalCachedHighLevelTestCount();
     }
 
     private void updateSheetWithExtraTestData(){
@@ -87,29 +80,6 @@ public class SdkReportService {
                 paramsString = getTestParamsAsString(testResult);
             }
             updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
-        }
-    }
-
-    private void updateLocalCachedHighLevelSuccessPercentage(){
-        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
-            if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
-                    sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
-                float calculatedSuccessPercentage = calculateCurrentRunIdSuccessPercentage();
-                Logger.info("Updating success percentage for sdk: " + requestJson.getSdk() + " and id: " + requestJson.getId() + " to: " + calculatedSuccessPercentage);
-                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.SuccessPercentage.value, calculatedSuccessPercentage);
-            }
-        }
-    }
-
-    private void updateLocalCachedHighLevelTestCount(){
-        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
-            if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(requestJson.getSdk()) &&
-                    sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(requestJson.getId())) {
-                int amountOfTests = getTotalAmountOfTests();
-                Logger.info("Updating test count in high level sheet for entry: " + sheetEntry.toString() + " to: " + amountOfTests);
-                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.AmountOfTests.value, amountOfTests);
-                sheetEntry.getAsJsonObject().addProperty(Enums.HighLevelSheetColumnNames.LastUpdate.value, Logger.getTimaStamp());
-            }
         }
     }
 
@@ -161,11 +131,6 @@ public class SdkReportService {
             Logger.info("Updating id for sdk: " + requestJson.getSdk());
             deleteEntireSdkColumn(requestJson.getSdk());
             updateTestResultId(requestJson.getSdk(), requestJson.getId());
-            if (!isSandbox()) {
-                addLocalCachedHighLevelReportEntry(requestJson.getSdk(), requestJson.getId());
-                Logger.info("Writing new entry in high level sheet");
-                writeEntireSheetData(highLevelSheetData);
-            }
         }
     }
 
@@ -229,20 +194,6 @@ public class SdkReportService {
             int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
             sheetEntry.getAsJsonObject().addProperty(failedColumn, valueBeforeIncrementInteger + 1);
         }
-    }
-
-    private void addLocalCachedHighLevelReportEntry(String sdk, String id){
-        for (JsonElement sheetEntry: highLevelSheetData.getSheetData()) {
-            if (sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.ID.value).getAsString().equals(id) &&
-                    sheetEntry.getAsJsonObject().get(Enums.HighLevelSheetColumnNames.Sdk.value).getAsString().equals(sdk)){
-                return;
-            }
-        }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.HighLevelSheetColumnNames.Sdk.value + "\":\"" + sdk + "\"," +
-                "\"" + Enums.HighLevelSheetColumnNames.StartTimestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +
-                "\"" + Enums.HighLevelSheetColumnNames.ID.value + "\":\"" + id + "\"}");
-        Logger.info("Adding new entry to high level sheet: " + newEntry.toString());
-        highLevelSheetData.getSheetData().add(newEntry);
     }
 
     private void deleteEntireSdkColumn(String sdk){

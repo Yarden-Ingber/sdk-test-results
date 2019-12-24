@@ -12,12 +12,22 @@ public class Enums {
         }
     }
 
-    public enum SheetTabsNames {
-        Report("Coverage comparison"), HighLevel("Results history"), Sandbox("sandbox"), RawData("Raw data");
+    public enum SdkGroupsSheetTabNames {
+        Selenium("Selenium"), Images("Images"), Appium("Appium");
 
         public final String value;
 
-        SheetTabsNames(String value){
+        SdkGroupsSheetTabNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum GeneralSheetTabsNames {
+        Sandbox("sandbox"), RawData("Raw data");
+
+        public final String value;
+
+        GeneralSheetTabsNames(String value){
             this.value = value;
         }
     }
@@ -28,16 +38,6 @@ public class Enums {
         public final String value;
 
         SheetColumnNames(String value){
-            this.value = value;
-        }
-    }
-
-    public enum HighLevelSheetColumnNames {
-        Sdk("sdk"), StartTimestamp("start timestamp"), LastUpdate("last update"), ID("id"), SuccessPercentage("success percentage"), AmountOfTests("amount of tests");
-
-        public final String value;
-
-        HighLevelSheetColumnNames(String value){
             this.value = value;
         }
     }

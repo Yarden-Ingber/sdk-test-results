@@ -34,7 +34,7 @@ public class SdkMailSender {
         } else {
             sdk = requestJson.getSdk();
         }
-        version = requestJson.getVersion();
+        version = requestJson.getVersion().replace("RELEASE_CANDIDATE;", "").replaceAll("@", " ").replaceAll(";", ", ");
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();

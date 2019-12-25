@@ -35,7 +35,8 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"chrome",
         "stitching":"css"
       },
-      "passed":true
+      "passed":true,
+      "mandatory":true
     },
     {  
       "test_name": "test7",
@@ -43,7 +44,8 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"firefox",
         "stitching":"scroll"
       },
-      "passed":false
+      "passed":false,
+      "mandatory":true
     }
   ]
 }
@@ -65,6 +67,11 @@ Set it to `false`, or stop sending it in your request, to start using the shared
 Each result json will be classified to one of the Sheet tabs names. The `group` parameter should be equal to one of the tabs according to the test cases it most resembles.
 
 Java Selenium, Javascript Selenium and WDIO should all group to Selenium tab.
+
+<u>`mandatory` - Boolean<u>
+  
+If set to true && the reporting sdk is DotNet, the mandatory column will be updated. posted results with the same id will accumulate also on the mandatory column.
+Non DotNet sdks can't update the mandatory column.
 
 #### Add any string data to a result in sandbox sheet
 Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `200` and the requested JSON.

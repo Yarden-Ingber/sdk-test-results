@@ -12,6 +12,16 @@ public class Enums {
         }
     }
 
+    public enum MandatoryTest{
+        Mandatory("1");
+
+        public final String value;
+
+        MandatoryTest(String value){
+            this.value = value;
+        }
+    }
+
     public enum SdkGroupsSheetTabNames {
         Selenium("Selenium"), Images("Images"), Appium("Appium");
 
@@ -33,7 +43,7 @@ public class Enums {
     }
 
     public enum SheetColumnNames {
-        TestName("Test name"), IDRow("id"), Fail("_fail"), Pass("_pass"), ExtraData("_extra");
+        TestName("Test name"), Mandatory("mandatory"), IDRow("id"), Fail("_fail"), Pass("_pass"), ExtraData("_extra");
 
         public final String value;
 

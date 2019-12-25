@@ -4,9 +4,6 @@ import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.RequestJson;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class RequestJsonValidator {
 
     RequestJson requestJson;

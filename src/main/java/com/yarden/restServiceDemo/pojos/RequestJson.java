@@ -21,6 +21,9 @@ public class RequestJson {
     @SerializedName("results")
     @Expose
     private JsonArray results;
+    @SerializedName("mandatory")
+    @Expose
+    private Boolean mandatory;
 
     public String getSdk() {
         return sdk;
@@ -60,5 +63,16 @@ public class RequestJson {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public Boolean getMandatory() {
+        if (this.mandatory == null) {
+            return false;
+        }
+        return mandatory;
+    }
+
+    public void setMandatory(Boolean mandatory) {
+        this.mandatory = mandatory;
     }
 }

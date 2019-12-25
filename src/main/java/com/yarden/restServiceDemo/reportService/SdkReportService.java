@@ -78,20 +78,13 @@ public class SdkReportService {
             String paramsString = "";
             if (shouldAddTestParams) {
                 paramsString = getTestParamsAsString(testResult);
+                testName = testName + paramsString;
             }
-            updateSingleTestResult(requestJson.getSdk(), testName + paramsString, testResult.getPassed());
+            updateSingleTestResult(requestJson.getSdk(), testName, testResult.getPassed());
+            if (shouldAddTestParams && requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+                markTestAsMandatory(testName);
+            }
         }
-    }
-
-    private float calculateCurrentRunIdSuccessPercentage(){
-        int countPassedTests = 0; int countFailedTests = 0;
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
-            int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-            int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
-            countPassedTests += passedValueInteger;
-            countFailedTests += failedValueInteger;
-        }
-        return (countPassedTests*100)/(countPassedTests+countFailedTests);
     }
 
     private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
@@ -99,16 +92,6 @@ public class SdkReportService {
         return (passedValue == null || passedValue.getAsString().isEmpty()) ?
                 0 :
                 sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
-    }
-
-    private int getTotalAmountOfTests(){
-        int totalAmount = 0;
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
-            int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-            int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
-            totalAmount += passedValueInteger + failedValueInteger;
-        }
-        return totalAmount;
     }
 
     private String getTestParamsAsString(TestResultData testResult){
@@ -182,6 +165,16 @@ public class SdkReportService {
         incrementPassFailColumn(sdk, newEntry, passed);
     }
 
+    private void markTestAsMandatory(String testName){
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
+            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName) && isAllowedToUpdateMandatory()){
+                Logger.info("Marking test: " + testName + " as mandatory");
+                sheetEntry.getAsJsonObject().addProperty(Enums.SheetColumnNames.Mandatory.value, Enums.MandatoryTest.Mandatory.value);
+                return;
+            }
+        }
+    }
+
     private void incrementPassFailColumn(String sdk, JsonElement sheetEntry, boolean passed){
         if (passed) {
             String passedColumn = sdk + Enums.SheetColumnNames.Pass.value;
@@ -204,6 +197,11 @@ public class SdkReportService {
             sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, "");
             if (isSandbox()) {
                 sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.ExtraData.value, "");
+            }
+            if (requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+                try {
+                    sheetEntry.getAsJsonObject().addProperty(Enums.SheetColumnNames.Mandatory.value, "");
+                } catch (Exception e) {}
             }
         }
     }
@@ -255,6 +253,10 @@ public class SdkReportService {
     private boolean isSandbox(){
         return (((requestJson.getSandbox() != null) && requestJson.getSandbox())
                 || isTestedLocally());
+    }
+
+    private boolean isAllowedToUpdateMandatory(){
+        return requestJson.getSdk().toLowerCase().equals("dotnet");
     }
 
     private boolean isTestedLocally(){

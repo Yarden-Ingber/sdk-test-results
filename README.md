@@ -28,6 +28,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
   "group":"selenium",
   "id":"1234",
   "sandbox":true,
+  "mandatory":false,
   "results":[  
     {  
       "test_name": "test7",
@@ -36,7 +37,6 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "stitching":"css"
       },
       "passed":true,
-      "mandatory":true
     },
     {  
       "test_name": "test7",
@@ -44,8 +44,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"firefox",
         "stitching":"scroll"
       },
-      "passed":false,
-      "mandatory":true
+      "passed":false
     }
   ]
 }

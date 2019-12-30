@@ -3,12 +3,16 @@ import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.mailService.NonTestTableMailSender;
 import com.yarden.restServiceDemo.mailService.SdkMailSender;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
+import com.yarden.restServiceDemo.reportService.SheetData;
+import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 public class RestCalls {
@@ -18,8 +22,11 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
         synchronized (lock) {
+            WriteEntireSheetsPeriodically.shouldClearSheets = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json);
             try {
+                handleResultsCounter();
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,6 +67,7 @@ public class RestCalls {
         synchronized (lock) {
             newRequestPrint(json);
             try {
+                SheetData.writeAllTabsToSheet();
                 new SdkMailSender().send(json);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -87,5 +95,21 @@ public class RestCalls {
         Logger.info("**********************************************************************************************");
         Logger.info("New result request detected: " + json);
     }
+
+    private static void handleResultsCounter(){
+        try {
+            if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
+                resultsCount.set(0);
+                SheetData.clearCachedSheetData();
+            } else {
+                resultsCount.set(resultsCount.get() + 1);
+            }
+        } catch (Throwable t) {
+            resultsCount.set(1);
+        }
+    }
+
+    public static final int NumOfPostResultsBeforeWriteSheet = 10;
+    public static AtomicReference<Integer> resultsCount = new AtomicReference<>();
 
 }

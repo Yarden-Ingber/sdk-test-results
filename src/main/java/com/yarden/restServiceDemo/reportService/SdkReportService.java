@@ -212,7 +212,7 @@ public class SdkReportService {
             int maxRetry = 5;
             while (retryCount < maxRetry) {
                 try {
-                    SheetDBApiService.updateSheet(sheetData);
+                    sheetData.writeSheet();
                     return;
                 } catch (Throwable t1) {
                     Logger.warn("Failed writing sheet. retrying...");

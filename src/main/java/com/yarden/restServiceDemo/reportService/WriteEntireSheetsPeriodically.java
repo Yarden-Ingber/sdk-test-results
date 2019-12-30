@@ -33,6 +33,7 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            cancel();
             return;
         }
         shouldClearSheets = true;

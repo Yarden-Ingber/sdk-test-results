@@ -33,6 +33,7 @@ public class RestCalls {
             } catch (JsonSyntaxException e) {
                 return new ResponseEntity("Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage(), HttpStatus.BAD_REQUEST);
             }
+            Logger.info("Test result count is: " + resultsCount.get());
             return new ResponseEntity(json, HttpStatus.OK);
         }
     }

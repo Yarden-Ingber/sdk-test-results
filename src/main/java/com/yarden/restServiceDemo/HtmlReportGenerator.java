@@ -75,7 +75,7 @@ public class HtmlReportGenerator {
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
         htmlReportStringBuilder.append("<h2>Version</h2>");
-        htmlReportStringBuilder.append(reportMailData.getVersion() + "<br/>");
+        htmlReportStringBuilder.append(reportMailData.getVersion() + "<br/><br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("<details><summary><b>Change log</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
@@ -105,9 +105,9 @@ public class HtmlReportGenerator {
 
     private String getCSS(){
         return "<style type=\"text/css\">\n" +
-                "    h1, h2, h3 {\n" +
-                "        font-size: 1em;\n" +
-                "    }\n" +
+//                "    h1, h2, h3 {\n" +
+//                "        font-size: 1em;\n" +
+//                "    }\n" +
                 "    .content {\n" +
                 "        background:#ffffff;\n" +
                 "        margin: 40px auto;\n" +

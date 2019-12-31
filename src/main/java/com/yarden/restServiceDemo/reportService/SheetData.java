@@ -41,6 +41,7 @@ public class SheetData {
     }
 
     public void writeSheet() throws IOException {
+        Logger.info("Writing entire sheet for tab: " + sheetTabName);
         if (RestCalls.resultsCount.get() == RestCalls.NumOfPostResultsBeforeWriteSheet) {
             this.columnNames = columnsNamesMap.get(sheetTabName);
             SheetDBApiService.updateSheet(this);

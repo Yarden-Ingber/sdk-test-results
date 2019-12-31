@@ -41,8 +41,8 @@ public class SheetData {
     }
 
     public void writeSheet() throws IOException {
-        Logger.info("Writing entire sheet for tab: " + sheetTabName);
-        if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
+        if (resultsCount.get() == PostResultsBufferSize) {
+            Logger.info("Writing entire sheet for tab: " + sheetTabName);
             this.columnNames = columnsNamesMap.get(sheetTabName);
             SheetDBApiService.updateSheet(this);
         }
@@ -101,23 +101,29 @@ public class SheetData {
     public static void clearCachedSheetData(){
         sheetDataPerTabMap.clear();
         columnsNamesMap.clear();
-        resultsCount.set(1);
+        resultsCount.set(0);
     }
 
-    public static void handleResultsCounter(){
+    public static void incrementResultsCounter(){
         try {
-            if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
-                resultsCount.set(1);
-                SheetData.clearCachedSheetData();
-            } else {
-                resultsCount.set(resultsCount.get() + 1);
-            }
+            resultsCount.set(resultsCount.get() + 1);
         } catch (Throwable t) {
             resultsCount.set(1);
         }
     }
 
-    public static final int NumOfPostResultsBeforeWriteSheet = 10;
+    public static void resetResultsCounter(){
+        try {
+            if (resultsCount.get() == PostResultsBufferSize) {
+                SheetData.clearCachedSheetData();
+                resultsCount.set(0);
+            }
+        } catch (Throwable t) {
+            resultsCount.set(0);
+        }
+    }
+
+    public static final int PostResultsBufferSize = 10;
     public static AtomicReference<Integer> resultsCount = new AtomicReference<>();
 
 }

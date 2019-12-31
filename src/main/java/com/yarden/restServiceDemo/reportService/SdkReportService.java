@@ -14,7 +14,7 @@ public class SdkReportService {
     private SheetData sheetData = null;
 
     public void postResults(String json) throws JsonSyntaxException, InternalError{
-        SheetData.handleResultsCounter();
+        SheetData.incrementResultsCounter();
         requestJson = new Gson().fromJson(json, RequestJson.class);
         if (requestJson.getGroup() == null || requestJson.getGroup().isEmpty()){
             throw new JsonSyntaxException("Missing group parameter in json");
@@ -35,10 +35,8 @@ public class SdkReportService {
             throw new InternalError();
         }
         postResultToRawData();
-        if (SheetData.resultsCount.get() == SheetData.NumOfPostResultsBeforeWriteSheet) {
-            SheetData.clearCachedSheetData();
-        }
         Logger.info("Test result count is: " + SheetData.resultsCount.get());
+        SheetData.resetResultsCounter();
     }
 
     private void postResultToRawData(){

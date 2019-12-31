@@ -20,12 +20,13 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
     }
 
     public static void stop(){
-        timer.cancel();
         isRunning = false;
+        timer.cancel();
     }
 
     @Override
     public void run() {
+        Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
         if (shouldClearSheets) {
             try {
                 Logger.info("Timer timeout. writing all sheets to google.");
@@ -33,7 +34,7 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            cancel();
+            stop();
             return;
         }
         shouldClearSheets = true;

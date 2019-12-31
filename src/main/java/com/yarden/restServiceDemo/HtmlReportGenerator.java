@@ -105,8 +105,14 @@ public class HtmlReportGenerator {
 
     private String getCSS(){
         return "<style type=\"text/css\">\n" +
+                "    h2 {\n" +
+                "        font-size: 1.3em;\n" +
+                "    }\n" +
+                "    h3 {\n" +
+                "        font-size: 1em;\n" +
+                "    }\n" +
                 "    summary {\n" +
-                "        font-size: 1.5em;\n" +
+                "        font-size: 1.3em;\n" +
                 "    }\n" +
                 "    .content {\n" +
                 "        background:#ffffff;\n" +

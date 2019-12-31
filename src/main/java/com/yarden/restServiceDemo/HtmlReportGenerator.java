@@ -73,8 +73,8 @@ public class HtmlReportGenerator {
         htmlReportStringBuilder.append("</head><body><div class=\"wrapper\">\n" +
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
-        htmlReportStringBuilder.append("<h2>" + reportMailData.getReportTitle() + "</h2>");
-        htmlReportStringBuilder.append("<h3>Version</h3>");
+        htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
+        htmlReportStringBuilder.append("<h2>Version</h2>");
         htmlReportStringBuilder.append(reportMailData.getVersion() + "<br/><br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("<details><summary><b>Change log</b></summary>");
@@ -82,11 +82,11 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append("</details><br/>");
         }
         if (reportMailData.getHighLevelReportTable() != null) {
-            htmlReportStringBuilder.append("<h3>Test summary</h3><br/>");
+            htmlReportStringBuilder.append("<h2>Test summary</h2><br/>");
             htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
         }
         if (reportMailData.getCoverageGap() != null && !reportMailData.getCoverageGap().isEmpty()) {
-            htmlReportStringBuilder.append("<br/><h3>Test coverage gap</h3>");
+            htmlReportStringBuilder.append("<br/><h2>Test coverage gap</h2>");
             htmlReportStringBuilder.append(reportMailData.getCoverageGap() + "<br/><br/>");
         }
         if (reportMailData.getDetailedMissingTestsTable() != null){
@@ -105,14 +105,17 @@ public class HtmlReportGenerator {
 
     private String getCSS(){
         return "<style type=\"text/css\">\n" +
+                "    h1 {\n" +
+                "        font-size: 1.5em;\n" +
+                "    }\n" +
                 "    h2 {\n" +
-                "        font-size: 1.3em;\n" +
+                "        font-size: 1.25em;\n" +
                 "    }\n" +
                 "    h3 {\n" +
                 "        font-size: 1em;\n" +
                 "    }\n" +
                 "    summary {\n" +
-                "        font-size: 1.3em;\n" +
+                "        font-size: 1.25em;\n" +
                 "    }\n" +
                 "    .content {\n" +
                 "        background:#ffffff;\n" +

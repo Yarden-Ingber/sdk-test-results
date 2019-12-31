@@ -74,10 +74,10 @@ public class HtmlReportGenerator {
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
-        htmlReportStringBuilder.append("<h2>Version</h2><br/>");
-        htmlReportStringBuilder.append(reportMailData.getVersion());
+        htmlReportStringBuilder.append("<h2>Version</h2>");
+        htmlReportStringBuilder.append(reportMailData.getVersion() + "<br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
-            htmlReportStringBuilder.append("<details><summary><b>Change log<b></summary>");
+            htmlReportStringBuilder.append("<details><summary><b>Change log</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
             htmlReportStringBuilder.append("</details><br/>");
         }

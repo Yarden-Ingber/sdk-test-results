@@ -90,7 +90,7 @@ public class SdkMailSender {
 
     private HTMLTableBuilder getDetailedPassedTestsTable() {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
-        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result", "Permutation");
+        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result", "Permutations");
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {

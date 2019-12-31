@@ -5,11 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.pojos.RequestJson;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SheetData {
 
@@ -42,7 +42,7 @@ public class SheetData {
 
     public void writeSheet() throws IOException {
         Logger.info("Writing entire sheet for tab: " + sheetTabName);
-        if (RestCalls.resultsCount.get() == RestCalls.NumOfPostResultsBeforeWriteSheet) {
+        if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
             this.columnNames = columnsNamesMap.get(sheetTabName);
             SheetDBApiService.updateSheet(this);
         }
@@ -101,6 +101,23 @@ public class SheetData {
     public static void clearCachedSheetData(){
         sheetDataPerTabMap.clear();
         columnsNamesMap.clear();
+        resultsCount.set(1);
     }
+
+    public static void handleResultsCounter(){
+        try {
+            if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
+                resultsCount.set(1);
+                SheetData.clearCachedSheetData();
+            } else {
+                resultsCount.set(resultsCount.get() + 1);
+            }
+        } catch (Throwable t) {
+            resultsCount.set(1);
+        }
+    }
+
+    public static final int NumOfPostResultsBeforeWriteSheet = 10;
+    public static AtomicReference<Integer> resultsCount = new AtomicReference<>();
 
 }

@@ -26,14 +26,12 @@ public class RestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json);
             try {
-                handleResultsCounter();
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 return new ResponseEntity("Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage(), HttpStatus.BAD_REQUEST);
             }
-            Logger.info("Test result count is: " + resultsCount.get());
             return new ResponseEntity(json, HttpStatus.OK);
         }
     }
@@ -96,21 +94,5 @@ public class RestCalls {
         Logger.info("**********************************************************************************************");
         Logger.info("New result request detected: " + json);
     }
-
-    private static void handleResultsCounter(){
-        try {
-            if (resultsCount.get() == NumOfPostResultsBeforeWriteSheet) {
-                resultsCount.set(0);
-                SheetData.clearCachedSheetData();
-            } else {
-                resultsCount.set(resultsCount.get() + 1);
-            }
-        } catch (Throwable t) {
-            resultsCount.set(1);
-        }
-    }
-
-    public static final int NumOfPostResultsBeforeWriteSheet = 10;
-    public static AtomicReference<Integer> resultsCount = new AtomicReference<>();
 
 }

@@ -14,35 +14,28 @@ public class SdkReportService {
     private SheetData sheetData = null;
 
     public void postResults(String json) throws JsonSyntaxException, InternalError{
-        Logger.info("log 1");
+        SheetData.handleResultsCounter();
         requestJson = new Gson().fromJson(json, RequestJson.class);
         if (requestJson.getGroup() == null || requestJson.getGroup().isEmpty()){
             throw new JsonSyntaxException("Missing group parameter in json");
         }
-        Logger.info("log 2");
         requestJson.setGroup(capitalize(requestJson.getGroup()));
         googleSheetTabName = requestJson.getGroup();
         if (isSandbox()) {
             googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
         }
-        Logger.info("log 3");
         sheetData = new SheetData(googleSheetTabName);
         new RequestJsonValidator(requestJson).validate(sheetData);
-        Logger.info("log 4");
         try {
             deleteColumnForNewTestId();
-            Logger.info("log 5");
             updateSheetWithNewResults(false);
-            Logger.info("log 6");
             sheetData.validateThereIsIdRowOnSheet(requestJson);
             writeEntireSheetData(sheetData);
-            Logger.info("log 7");
         } catch (Throwable t) {
             throw new InternalError();
         }
-        Logger.info("log 8");
         postResultToRawData();
-        Logger.info("log 9");
+        Logger.info("Test result count is: " + SheetData.resultsCount.get());
     }
 
     private void postResultToRawData(){

@@ -39,7 +39,7 @@ public class SdkMailSender {
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
         ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n\n" + newVersionInstructions +"\n\nChange Log:\n" + changeLog)
+                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n\n" + newVersionInstructions)
                 .setReportTitle("Test Report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -71,7 +71,7 @@ public class SdkMailSender {
 
     private HTMLTableBuilder getDetailedMissingTestsTable() {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 1);
-        tableBuilder.addTableHeader("Test Name");
+        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>");
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
@@ -90,7 +90,7 @@ public class SdkMailSender {
 
     private HTMLTableBuilder getDetailedPassedTestsTable() {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
-        tableBuilder.addTableHeader("Test Name", "Result", "Permutation Count");
+        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result", "Permutation");
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {

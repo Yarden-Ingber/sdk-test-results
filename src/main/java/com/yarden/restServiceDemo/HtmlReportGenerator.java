@@ -73,27 +73,29 @@ public class HtmlReportGenerator {
         htmlReportStringBuilder.append("</head><body><div class=\"wrapper\">\n" +
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
-        htmlReportStringBuilder.append("<h2>" + reportMailData.getReportTitle() + "</h2>");
-        htmlReportStringBuilder.append("<h2>Version: " + reportMailData.getVersion() + "</h2><br/>");
+        htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
+        htmlReportStringBuilder.append("<h2>Version</h2><br/>");
+        htmlReportStringBuilder.append(reportMailData.getVersion());
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
-            htmlReportStringBuilder.append("<h2>Change log:</h2>");
+            htmlReportStringBuilder.append("<details><summary><h2>Change log</h2></summary>");
             htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
-            htmlReportStringBuilder.append("<br/>");
+            htmlReportStringBuilder.append("</details><br/>");
         }
         if (reportMailData.getHighLevelReportTable() != null) {
+            htmlReportStringBuilder.append("<h2>Test summary</h2><br/>");
             htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
         }
         if (reportMailData.getCoverageGap() != null && !reportMailData.getCoverageGap().isEmpty()) {
-            htmlReportStringBuilder.append("<br/><h2>Test coverage gap:</h2>");
+            htmlReportStringBuilder.append("<br/><h2>Test coverage gap</h2>");
             htmlReportStringBuilder.append(reportMailData.getCoverageGap() + "<br/><br/>");
         }
         if (reportMailData.getDetailedMissingTestsTable() != null){
-            htmlReportStringBuilder.append("<details><summary><b>Unexecuted Tests:</b></summary>");
+            htmlReportStringBuilder.append("<details><summary><b>Unexecuted tests</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getDetailedMissingTestsTable());
             htmlReportStringBuilder.append("</details><br/>");
         }
         if (reportMailData.getDetailedPassedTestsTable() != null) {
-            htmlReportStringBuilder.append("<details><summary><b>Passed Tests:</b></summary>");
+            htmlReportStringBuilder.append("<details><summary><b>Passed tests</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getDetailedPassedTestsTable());
             htmlReportStringBuilder.append("</details>");
         }

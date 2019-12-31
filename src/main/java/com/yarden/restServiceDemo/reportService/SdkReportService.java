@@ -35,6 +35,9 @@ public class SdkReportService {
             throw new InternalError();
         }
         postResultToRawData();
+        if (SheetData.resultsCount.get() == SheetData.NumOfPostResultsBeforeWriteSheet) {
+            SheetData.clearCachedSheetData();
+        }
         Logger.info("Test result count is: " + SheetData.resultsCount.get());
     }
 

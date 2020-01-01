@@ -41,7 +41,7 @@ public class SheetData {
     }
 
     public void writeSheet() throws IOException {
-        if (resultsCount.get() == PostResultsBufferSize) {
+        if (resultsCount.get() >= PostResultsBufferSize) {
             Logger.info("Writing entire sheet for tab: " + sheetTabName);
             this.columnNames = columnsNamesMap.get(sheetTabName);
             SheetDBApiService.updateSheet(this);
@@ -114,7 +114,7 @@ public class SheetData {
 
     public static void resetResultsCounter(){
         try {
-            if (resultsCount.get() == PostResultsBufferSize) {
+            if (resultsCount.get() >= PostResultsBufferSize) {
                 SheetData.clearCachedSheetData();
                 resultsCount.set(0);
             }

@@ -77,7 +77,7 @@ public class HtmlReportGenerator {
         htmlReportStringBuilder.append("<h2>Version</h2>");
         htmlReportStringBuilder.append(versionToList(reportMailData.getVersion()) + "<br/><br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
-            htmlReportStringBuilder.append("<details><summary><b>Change log</b></summary>");
+            htmlReportStringBuilder.append("<details open><summary><b>Change log</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
             htmlReportStringBuilder.append("</details><br/>");
         }

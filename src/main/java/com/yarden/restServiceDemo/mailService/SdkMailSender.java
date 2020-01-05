@@ -34,7 +34,7 @@ public class SdkMailSender {
         } else {
             sdk = requestJson.getSdk();
         }
-        version = requestJson.getVersion().replace("RELEASE_CANDIDATE;", "").replaceAll("@", " ").replaceAll(";", ", ");
+        version = getVersion();
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
@@ -53,6 +53,12 @@ public class SdkMailSender {
                             .put("Email", Enums.EnvVariables.MailReportRecipient.value)
                             .put("Name", "Release_Report")));
         new MailSender().send(reportMailData);
+    }
+
+    private String getVersion(){
+        requestJson.getVersion().replace("RELEASE_CANDIDATE;", "")
+                .replaceAll("@", " ")
+                .replaceAll(";", "\n*");
     }
 
     private HTMLTableBuilder getHighLevelReportTable() {

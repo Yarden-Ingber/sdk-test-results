@@ -39,7 +39,7 @@ public class SdkMailSender {
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
         ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion: " + version + "\n\n" + newVersionInstructions)
+                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n" + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
                 .setReportTitle("Test Report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -56,9 +56,10 @@ public class SdkMailSender {
     }
 
     private String getVersion(){
-        return requestJson.getVersion().replace("RELEASE_CANDIDATE;", "")
-                .replaceAll("@", " ")
-                .replaceAll(";", "\n*");
+        return requestJson.getVersion()
+                .replace("RELEASE_CANDIDATE;", "")
+                .replaceAll("RELEASE_CANDIDATE-", "")
+                .replaceAll("@", " ");
     }
 
     private HTMLTableBuilder getHighLevelReportTable() {

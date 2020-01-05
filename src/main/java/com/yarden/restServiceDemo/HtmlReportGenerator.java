@@ -75,7 +75,7 @@ public class HtmlReportGenerator {
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
         htmlReportStringBuilder.append("<h2>Version</h2>");
-        htmlReportStringBuilder.append(reportMailData.getVersion() + "<br/><br/>");
+        htmlReportStringBuilder.append(versionToList(reportMailData.getVersion()) + "<br/><br/>");
         if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("<details><summary><b>Change log</b></summary>");
             htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
@@ -161,6 +161,16 @@ public class HtmlReportGenerator {
                 "       font-family: sans-serif;\n" +
                 "    }\n" +
                 "</style>";
+    }
+
+    private String versionToList(String version){
+        String result = "<ul>";
+        String[] versionParts = version.split(";");
+        for (String part: versionParts) {
+            result = result + "<li>" + part + "</li>";
+        }
+        result = result + "</ul>";
+        return result;
     }
 
 }

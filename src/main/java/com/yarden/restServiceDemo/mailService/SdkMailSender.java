@@ -129,8 +129,12 @@ public class SdkMailSender {
     }
 
     private String getNewVersionInstructions(){
-        if (sdk.equals("csharp")) {
-            return "Instructions and dependencies: https://www.nuget.org/packages/Eyes.Selenium/";
+        String text = "Instructions and dependencies: ";
+        if (sdk.equals("dotnet")) {
+            return text + "https://www.nuget.org/packages/Eyes.Selenium/";
+        }
+        if (sdk.equals("java")) {
+            return text + "https://mvnrepository.com/artifact/com.applitools/eyes-common-java3/" + version;
         }
         return "";
     }

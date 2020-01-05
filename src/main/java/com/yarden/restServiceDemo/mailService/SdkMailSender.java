@@ -40,7 +40,7 @@ public class SdkMailSender {
         String newVersionInstructions = getNewVersionInstructions();
         ReportMailData reportMailData = new ReportMailData()
                 .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
-                .setReportTitle("Test Report for SDK: " + sdk)
+                .setReportTitle("Test report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
                 .setCoverageGap(testCoverageGap)

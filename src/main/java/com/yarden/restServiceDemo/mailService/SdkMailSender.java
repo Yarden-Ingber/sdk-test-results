@@ -56,7 +56,7 @@ public class SdkMailSender {
     }
 
     private String getVersion(){
-        requestJson.getVersion().replace("RELEASE_CANDIDATE;", "")
+        return requestJson.getVersion().replace("RELEASE_CANDIDATE;", "")
                 .replaceAll("@", " ")
                 .replaceAll(";", "\n*");
     }

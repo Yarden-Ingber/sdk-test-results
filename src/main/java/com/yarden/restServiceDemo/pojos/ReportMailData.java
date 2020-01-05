@@ -1,6 +1,6 @@
 package com.yarden.restServiceDemo.pojos;
 
-import com.yarden.restServiceDemo.Enums;
+import org.apache.commons.lang3.StringUtils;
 import com.yarden.restServiceDemo.mailService.HTMLTableBuilder;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -55,7 +55,7 @@ public class ReportMailData {
     }
 
     public ReportMailData setCoverageGap(String coverageGap) {
-        this.coverageGap = fixNewLineForHtml(coverageGap);
+        this.coverageGap = fixNewLineForHtml(multilineCapitalize(coverageGap));
         return this;
     }
 
@@ -106,6 +106,15 @@ public class ReportMailData {
 
     private String fixNewLineForHtml(String string){
         return string.replace("\n", "<br/>").replace(" ", "&nbsp;");
+    }
+
+    private String multilineCapitalize(String text){
+        String result = "";
+        String[] lines = text.split("\n");
+        for (String line: lines) {
+            result = result + StringUtils.capitalize(line) + "\n";
+        }
+        return result;
     }
 
     public String getHtmlReportS3BucketName() {

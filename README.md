@@ -99,7 +99,9 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
   "version":"RELEASE_CANDIDATE-4.1.13",
   "changeLog":"### Fixed
                 - Updated accessibility enums (experimental).",
-  "testCoverageGap": "coverage gap"
+  "testCoverageGap": "coverage gap",
+  "isTestRequest":true,
+  "specificRecipient":"optional_specific_mail@applitools.com"
 }
 ```
 
@@ -112,6 +114,8 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
   "version":"RELEASE_CANDIDATE-4.1.13",
   "changeLog":"### Fixed
                 - Updated accessibility enums (experimental).",
-  "testCoverageGap": "coverage gap"
+  "testCoverageGap": "coverage gap",
+  "isTestRequest":true,
+  "specificRecipient":"optional_specific_mail@applitools.com"
 }
 ```

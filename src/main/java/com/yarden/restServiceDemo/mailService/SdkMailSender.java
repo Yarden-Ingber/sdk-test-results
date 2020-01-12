@@ -47,11 +47,8 @@ public class SdkMailSender {
                 .setHighLevelReportTable(getHighLevelReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
-                .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value)
-                .setRecipientsJsonArray(new JSONArray()
-                    .put(new JSONObject()
-                            .put("Email", Enums.EnvVariables.MailReportRecipient.value)
-                            .put("Name", "Release_Report")));
+                .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
+        setRecipientMail(reportMailData);
         new MailSender().send(reportMailData);
     }
 
@@ -133,6 +130,16 @@ public class SdkMailSender {
         return (passedValue == null || passedValue.getAsString().isEmpty()) ?
                 0 :
                 sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
+    }
+
+    private void setRecipientMail(ReportMailData reportMailData) {
+        String recipientMail = "";
+        if (requestJson.isTestRequest() && requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
+            recipientMail = requestJson.getSpecificRecipient();
+        } else {
+            recipientMail = Enums.EnvVariables.MailReportRecipient.value;
+        }
+        reportMailData.setRecipientsJsonArray(new JSONArray().put(new JSONObject().put("Email", recipientMail).put("Name", "Release_Report")));
     }
 
     private String getNewVersionInstructions(){

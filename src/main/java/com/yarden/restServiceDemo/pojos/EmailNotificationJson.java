@@ -24,6 +24,16 @@ public class EmailNotificationJson {
     @SerializedName("mailTextPart")
     @Expose
     private String mailTextPart;
+    @SerializedName("isTestRequest")
+    @Expose
+    private boolean isTestRequest;
+    @SerializedName("specificRecipient")
+    @Expose
+    private String specificRecipient;
+
+    public EmailNotificationJson(boolean isTestRequest) {
+        this.isTestRequest = isTestRequest;
+    }
 
     public String getSdk() {
         return sdk;
@@ -71,5 +81,21 @@ public class EmailNotificationJson {
 
     public void setMailTextPart(String mailTextPart) {
         this.mailTextPart = mailTextPart;
+    }
+
+    public boolean isTestRequest() {
+        return isTestRequest;
+    }
+
+    public void setTestRequest(boolean testRequest) {
+        isTestRequest = testRequest;
+    }
+
+    public String getSpecificRecipient() {
+        return specificRecipient;
+    }
+
+    public void setSpecificRecipient(String specificRecipient) {
+        this.specificRecipient = specificRecipient;
     }
 }

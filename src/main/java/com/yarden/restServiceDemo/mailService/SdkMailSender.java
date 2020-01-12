@@ -134,7 +134,7 @@ public class SdkMailSender {
 
     private void setRecipientMail(ReportMailData reportMailData) {
         String recipientMail = "";
-        if (requestJson.isTestRequest() && requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
+        if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
             recipientMail = requestJson.getSpecificRecipient();
         } else {
             recipientMail = Enums.EnvVariables.MailReportRecipient.value;

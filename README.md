@@ -96,7 +96,7 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
 ```
 {  
   "sdk":"java",
-  "version":"RELEASE_CANDIDATE-4.1.13",
+  "version":"RELEASE_CANDIDATE;Eyes.Appium@4.0.5;Eyes.Images@2.4.4",
   "changeLog":"### Fixed
                 - Updated accessibility enums (experimental).",
   "testCoverageGap": "coverage gap",
@@ -111,7 +111,7 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
 {  
   "mailTextPart":"Hello World!",
   "reportTitle":"Test Report for: Selenium IDE",
-  "version":"RELEASE_CANDIDATE-4.1.13",
+  "version":"RELEASE_CANDIDATE;Eyes.Appium@4.0.5;Eyes.Images@2.4.4",
   "changeLog":"### Fixed
                 - Updated accessibility enums (experimental).",
   "testCoverageGap": "coverage gap",

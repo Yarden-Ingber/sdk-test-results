@@ -51,12 +51,18 @@ public class SdkReportService {
     }
 
     public void postExtraTestData(String json) throws JsonSyntaxException, InternalError{
+        System.out.println("debug 1");
         googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
+        System.out.println("debug 2");
         extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
+        System.out.println("debug 3");
         sheetData = new SheetData(googleSheetTabName);
+        System.out.println("debug 4");
         try {
             updateSheetWithExtraTestData();
+            System.out.println("debug 5");
             writeEntireSheetData(sheetData);
+            System.out.println("debug 6");
         } catch (Throwable t) {
             throw new InternalError();
         }

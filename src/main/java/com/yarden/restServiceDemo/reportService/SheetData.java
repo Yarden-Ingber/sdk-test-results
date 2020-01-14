@@ -112,7 +112,7 @@ public class SheetData {
         }
     }
 
-    public static void resetResultsCounter(){
+    public static void resetResultsCounterIfBiggerThankResultsBufferSize(){
         try {
             if (resultsCount.get() >= PostResultsBufferSize) {
                 SheetData.clearCachedSheetData();

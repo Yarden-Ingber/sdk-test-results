@@ -20,10 +20,7 @@ public class SdkReportService {
             throw new JsonSyntaxException("Missing group parameter in json");
         }
         requestJson.setGroup(capitalize(requestJson.getGroup()));
-        googleSheetTabName = requestJson.getGroup();
-        if (isSandbox()) {
-            googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
-        }
+        setGoogleSheetTabName();
         sheetData = new SheetData(googleSheetTabName);
         new RequestJsonValidator(requestJson).validate(sheetData);
         try {
@@ -32,11 +29,13 @@ public class SdkReportService {
             sheetData.validateThereIsIdRowOnSheet(requestJson);
             writeEntireSheetData(sheetData);
         } catch (Throwable t) {
+            System.out.println("Something went wrong: " + t.getMessage());
+            t.printStackTrace();
             throw new InternalError();
         }
         postResultToRawData();
         Logger.info("Test result count is: " + SheetData.resultsCount.get());
-        SheetData.resetResultsCounter();
+        SheetData.resetResultsCounterIfBiggerThankResultsBufferSize();
     }
 
     private void postResultToRawData(){
@@ -72,19 +71,19 @@ public class SdkReportService {
         }
     }
 
-    private void updateSheetWithNewResults(boolean shouldAddTestParams){
+    private void updateSheetWithNewResults(boolean shouldAddTestParamsToTestName){
         Logger.info("Updating results in local cached sheet");
         JsonArray resultsArray = requestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
             String paramsString = "";
-            if (shouldAddTestParams) {
+            if (shouldAddTestParamsToTestName) {
                 paramsString = getTestParamsAsString(testResult);
                 testName = testName + paramsString;
             }
             updateSingleTestResult(requestJson.getSdk(), testName, testResult.getPassed());
-            if (shouldAddTestParams && requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+            if (shouldAddTestParamsToTestName && requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
                 markTestAsMandatory(testName);
             }
         }
@@ -250,6 +249,13 @@ public class SdkReportService {
             if (rhs == null)
                 return 1;
             return capitalize(lhs.getKey()).compareTo(capitalize(rhs.getKey()));
+        }
+    }
+
+    private void setGoogleSheetTabName(){
+        googleSheetTabName = requestJson.getGroup();
+        if (isSandbox()) {
+            googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
         }
     }
 

@@ -11,7 +11,7 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
     private static boolean isRunning = false;
     private static Timer timer;
 
-    public static void start() {
+    public static  synchronized void start() {
         if (!isRunning) {
             timer = new Timer("MyTimer");
             timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 5 * 1000 * 60);
@@ -19,7 +19,7 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
         }
     }
 
-    public static void stop(){
+    public static synchronized void stop(){
         isRunning = false;
         timer.cancel();
     }

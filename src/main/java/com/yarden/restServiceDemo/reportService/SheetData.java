@@ -99,6 +99,7 @@ public class SheetData {
     }
 
     public static void clearCachedSheetData(){
+        Logger.info("Clearing cached sheet maps");
         sheetDataPerTabMap.clear();
         columnsNamesMap.clear();
         resultsCount.set(0);

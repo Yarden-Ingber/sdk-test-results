@@ -3,7 +3,7 @@ package com.yarden.restServiceDemo.pojos;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class EmailNotificationJson {
+public class SlackReportNotificationJson {
 
     @SerializedName("sdk")
     @Expose

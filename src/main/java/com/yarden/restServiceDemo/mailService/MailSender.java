@@ -6,7 +6,7 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
-import com.yarden.restServiceDemo.pojos.ReportMailData;
+import com.yarden.restServiceDemo.pojos.SlackReportData;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,10 +16,10 @@ import java.io.*;
 
 public class MailSender {
 
-    ReportMailData reportMailData;
+    SlackReportData slackReportData;
 
-    public void send(ReportMailData reportMailData) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
-        this.reportMailData = reportMailData;
+    public void send(SlackReportData slackReportData) throws IOException, MailjetSocketTimeoutException, MailjetException {
+        this.slackReportData = slackReportData;
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
@@ -30,10 +30,10 @@ public class MailSender {
                                 .put(Emailv31.Message.FROM, new JSONObject()
                                         .put("Email", "yarden.ingber@applitools.com")
                                         .put("Name", "Yarden Ingber"))
-                                .put(Emailv31.Message.TO, reportMailData.getRecipientsJsonArray())
+                                .put(Emailv31.Message.TO, slackReportData.getRecipientsJsonArray())
                                 .put(Emailv31.Message.SUBJECT, "SDK Release")
                                 .put(Emailv31.Message.TEXTPART,
-                                        reportMailData.getMailTextPart() + "\n\nHTML Report:\n" + new HtmlReportGenerator(reportMailData).getHtmlReportUrlInAwsS3(reportMailData.getHtmlReportS3BucketName()))
+                                        slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()))
                                 .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
         response = client.post(request);
         System.out.println(response.getStatus());

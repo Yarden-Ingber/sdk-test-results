@@ -3,7 +3,7 @@ package com.yarden.restServiceDemo;
 import com.lowagie.text.DocumentException;
 import com.mailjet.client.Base64;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
-import com.yarden.restServiceDemo.pojos.ReportMailData;
+import com.yarden.restServiceDemo.pojos.SlackReportData;
 import org.apache.commons.io.IOUtils;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -12,13 +12,13 @@ import java.io.*;
 public class HtmlReportGenerator {
 
     StringBuilder htmlReportStringBuilder = new StringBuilder();
-    ReportMailData reportMailData;
+    SlackReportData slackReportData;
     private final String htmlReportFileName = "test_report.html";
     private final String pdfReportFileName = "test_report.pdf";
     private final String sdkHtmlReportFileName = "sdk_report";
 
-    public HtmlReportGenerator(ReportMailData reportMailData){
-        this.reportMailData = reportMailData;
+    public HtmlReportGenerator(SlackReportData slackReportData){
+        this.slackReportData = slackReportData;
     }
 
     public String getHtmlReportUrlInAwsS3(String bucketName) throws FileNotFoundException, UnsupportedEncodingException {
@@ -73,30 +73,30 @@ public class HtmlReportGenerator {
         htmlReportStringBuilder.append("</head><body><div class=\"wrapper\">\n" +
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
-        htmlReportStringBuilder.append("<h1>" + reportMailData.getReportTitle() + "</h1>");
+        htmlReportStringBuilder.append("<h1>" + slackReportData.getReportTitle() + "</h1>");
         htmlReportStringBuilder.append("<h2>Version</h2>");
-        htmlReportStringBuilder.append(versionToList(reportMailData.getVersion()) + "<br/><br/>");
-        if (reportMailData.getChangeLog() != null && !reportMailData.getChangeLog().isEmpty()) {
+        htmlReportStringBuilder.append(versionToList(slackReportData.getVersion()) + "<br/><br/>");
+        if (slackReportData.getChangeLog() != null && !slackReportData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("<details open><summary><b>Change log</b></summary>");
-            htmlReportStringBuilder.append(reportMailData.getChangeLog() + "<br/>");
+            htmlReportStringBuilder.append(slackReportData.getChangeLog() + "<br/>");
             htmlReportStringBuilder.append("</details><br/>");
         }
-        if (reportMailData.getHighLevelReportTable() != null) {
+        if (slackReportData.getHighLevelReportTable() != null) {
             htmlReportStringBuilder.append("<h2>Test summary</h2><br/>");
-            htmlReportStringBuilder.append(reportMailData.getHighLevelReportTable());
+            htmlReportStringBuilder.append(slackReportData.getHighLevelReportTable());
         }
-        if (reportMailData.getCoverageGap() != null && !reportMailData.getCoverageGap().isEmpty()) {
+        if (slackReportData.getCoverageGap() != null && !slackReportData.getCoverageGap().isEmpty()) {
             htmlReportStringBuilder.append("<br/><h2>Test coverage gap</h2>");
-            htmlReportStringBuilder.append(reportMailData.getCoverageGap() + "<br/><br/>");
+            htmlReportStringBuilder.append(slackReportData.getCoverageGap() + "<br/><br/>");
         }
-        if (reportMailData.getDetailedMissingTestsTable() != null){
+        if (slackReportData.getDetailedMissingTestsTable() != null){
             htmlReportStringBuilder.append("<details><summary><b>Unexecuted tests</b></summary>");
-            htmlReportStringBuilder.append(reportMailData.getDetailedMissingTestsTable());
+            htmlReportStringBuilder.append(slackReportData.getDetailedMissingTestsTable());
             htmlReportStringBuilder.append("</details><br/>");
         }
-        if (reportMailData.getDetailedPassedTestsTable() != null) {
+        if (slackReportData.getDetailedPassedTestsTable() != null) {
             htmlReportStringBuilder.append("<details><summary><b>Passed tests</b></summary>");
-            htmlReportStringBuilder.append(reportMailData.getDetailedPassedTestsTable());
+            htmlReportStringBuilder.append(slackReportData.getDetailedPassedTestsTable());
             htmlReportStringBuilder.append("</details>");
         }
         htmlReportStringBuilder.append("</div></div></body></html>");

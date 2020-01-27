@@ -1,15 +1,15 @@
 package com.yarden.restServiceDemo.pojos;
 
 import org.apache.commons.lang3.StringUtils;
-import com.yarden.restServiceDemo.mailService.HTMLTableBuilder;
+import com.yarden.restServiceDemo.slackService.HTMLTableBuilder;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import org.json.JSONArray;
 
-public class ReportMailData {
+public class SlackReportData {
 
-    private String mailTextPart;
+    private String reportTextPart;
     private HTMLTableBuilder detailedMissingTestsTable = null;
     private HTMLTableBuilder highLevelReportTable = null;
     private HTMLTableBuilder detailedPassedTestsTable = null;
@@ -24,7 +24,7 @@ public class ReportMailData {
         return reportTitle;
     }
 
-    public ReportMailData setReportTitle(String reportTitle) {
+    public SlackReportData setReportTitle(String reportTitle) {
         this.reportTitle = fixNewLineForHtml(reportTitle);
         return this;
     }
@@ -33,7 +33,7 @@ public class ReportMailData {
         return changeLog;
     }
 
-    public ReportMailData setChangeLog(String changeLog) {
+    public SlackReportData setChangeLog(String changeLog) {
         Parser parser = Parser.builder().build();
         Node document = parser.parse(changeLog);
         HtmlRenderer renderer = HtmlRenderer.builder().build();
@@ -45,7 +45,7 @@ public class ReportMailData {
         return version;
     }
 
-    public ReportMailData setVersion(String version) {
+    public SlackReportData setVersion(String version) {
         this.version = version.replaceAll("RELEASE_CANDIDATE-", "").replaceAll("RELEASE_CANDIDATE", "");
         return this;
     }
@@ -54,17 +54,17 @@ public class ReportMailData {
         return coverageGap;
     }
 
-    public ReportMailData setCoverageGap(String coverageGap) {
+    public SlackReportData setCoverageGap(String coverageGap) {
         this.coverageGap = fixNewLineForHtml(multilineCapitalize(coverageGap));
         return this;
     }
 
-    public String getMailTextPart() {
-        return mailTextPart;
+    public String getReportTextPart() {
+        return reportTextPart;
     }
 
-    public ReportMailData setMailTextPart(String mailTextPart) {
-        this.mailTextPart = mailTextPart;
+    public SlackReportData setReportTextPart(String reportTextPart) {
+        this.reportTextPart = reportTextPart;
         return this;
     }
 
@@ -72,7 +72,7 @@ public class ReportMailData {
         return detailedMissingTestsTable;
     }
 
-    public ReportMailData setDetailedMissingTestsTable(HTMLTableBuilder detailedMissingTestsTable) {
+    public SlackReportData setDetailedMissingTestsTable(HTMLTableBuilder detailedMissingTestsTable) {
         this.detailedMissingTestsTable = detailedMissingTestsTable;
         return this;
     }
@@ -81,7 +81,7 @@ public class ReportMailData {
         return highLevelReportTable;
     }
 
-    public ReportMailData setHighLevelReportTable(HTMLTableBuilder highLevelReportTable) {
+    public SlackReportData setHighLevelReportTable(HTMLTableBuilder highLevelReportTable) {
         this.highLevelReportTable = highLevelReportTable;
         return this;
     }
@@ -90,7 +90,7 @@ public class ReportMailData {
         return detailedPassedTestsTable;
     }
 
-    public ReportMailData setDetailedPassedTestsTable(HTMLTableBuilder detailedPassedTestsTable) {
+    public SlackReportData setDetailedPassedTestsTable(HTMLTableBuilder detailedPassedTestsTable) {
         this.detailedPassedTestsTable = detailedPassedTestsTable;
         return this;
     }
@@ -99,7 +99,7 @@ public class ReportMailData {
         return recipientsJsonArray;
     }
 
-    public ReportMailData setRecipientsJsonArray(JSONArray recipientsJsonArray) {
+    public SlackReportData setRecipientsJsonArray(JSONArray recipientsJsonArray) {
         this.recipientsJsonArray = recipientsJsonArray;
         return this;
     }
@@ -121,7 +121,7 @@ public class ReportMailData {
         return htmlReportS3BucketName;
     }
 
-    public ReportMailData setHtmlReportS3BucketName(String htmlReportS3BucketName) {
+    public SlackReportData setHtmlReportS3BucketName(String htmlReportS3BucketName) {
         this.htmlReportS3BucketName = htmlReportS3BucketName;
         return this;
     }

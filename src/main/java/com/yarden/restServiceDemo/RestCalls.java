@@ -1,15 +1,13 @@
 package com.yarden.restServiceDemo;
 import com.google.gson.JsonSyntaxException;
-import com.yarden.restServiceDemo.mailService.NonTestTableMailSender;
-import com.yarden.restServiceDemo.mailService.SdkMailSender;
+import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
+import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 public class RestCalls {
@@ -66,7 +64,7 @@ public class RestCalls {
             newRequestPrint(json);
             try {
                 SheetData.writeAllTabsToSheet();
-                new SdkMailSender().send(json);
+                new SdkSlackReportSender().send(json);
             } catch (Throwable t) {
                 t.printStackTrace();
                 return new ResponseEntity("Failed sending email: " + t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,7 +78,7 @@ public class RestCalls {
         synchronized (lock) {
             newRequestPrint(json);
             try {
-                new NonTestTableMailSender().send(json);
+                new NonTestTableSlackReportSender().send(json);
             } catch (Throwable throwable) {
                 return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

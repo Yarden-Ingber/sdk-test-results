@@ -1,28 +1,25 @@
-package com.yarden.restServiceDemo.mailService;
+package com.yarden.restServiceDemo.slackService;
 
 import com.google.gson.Gson;
-import com.lowagie.text.DocumentException;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
-import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
-import com.yarden.restServiceDemo.pojos.ReportMailData;
+import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
+import com.yarden.restServiceDemo.pojos.SlackReportData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class NonTestTableMailSender {
+public class NonTestTableSlackReportSender {
 
-    public void send(String json) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
-        EmailNotificationJson requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
+    public void send(String json) throws IOException {
+        SlackReportNotificationJson requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         String reportTitle = requestJson.getReportTitle();
         String mailTextPart = requestJson.getMailTextPart();
         String version = requestJson.getVersion();
         String changeLog = requestJson.getChangeLog();
         String testCoverageGap = requestJson.getTestCoverageGap();
-        ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart(mailTextPart)
+        SlackReportData slackReportData = new SlackReportData()
+                .setReportTextPart(mailTextPart)
                 .setReportTitle(reportTitle)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -31,7 +28,7 @@ public class NonTestTableMailSender {
                         .put(new JSONObject()
                                 .put("Email", Enums.EnvVariables.MailReportRecipient.value)
                                 .put("Name", "Release_Report")));
-        new MailSender().send(reportMailData);
+        new SlackReporter().report(slackReportData);
     }
 
 }

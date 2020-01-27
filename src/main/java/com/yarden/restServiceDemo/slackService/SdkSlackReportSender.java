@@ -1,35 +1,32 @@
-package com.yarden.restServiceDemo.mailService;
+package com.yarden.restServiceDemo.slackService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.lowagie.text.DocumentException;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.reportService.SheetData;
-import com.yarden.restServiceDemo.pojos.EmailNotificationJson;
-import com.yarden.restServiceDemo.pojos.ReportMailData;
+import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
+import com.yarden.restServiceDemo.pojos.SlackReportData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class SdkMailSender {
+public class SdkSlackReportSender {
 
     private String sdk;
     private String changeLog;
     private String testCoverageGap;
     private String version;
-    private EmailNotificationJson requestJson;
+    private SlackReportNotificationJson requestJson;
 
-    public void send(String json) throws InterruptedException, DocumentException, IOException, MailjetSocketTimeoutException, MailjetException {
-        requestJson = new Gson().fromJson(json, EmailNotificationJson.class);
+    public void send(String json) throws IOException {
+        requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
-            Logger.error("Failed sending mail report, Missing SDK in request json.");
+            Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
         } else {
             sdk = requestJson.getSdk();
@@ -38,8 +35,8 @@ public class SdkMailSender {
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
-        ReportMailData reportMailData = new ReportMailData()
-                .setMailTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
+        SlackReportData slackReportData = new SlackReportData()
+                .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
@@ -48,8 +45,8 @@ public class SdkMailSender {
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
-        setRecipientMail(reportMailData);
-        new MailSender().send(reportMailData);
+        setRecipientMail(slackReportData);
+        new SlackReporter().report(slackReportData);
     }
 
     private String getVersion(){
@@ -132,14 +129,14 @@ public class SdkMailSender {
                 sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
     }
 
-    private void setRecipientMail(ReportMailData reportMailData) {
+    private void setRecipientMail(SlackReportData slackReportData) {
         String recipientMail = "";
         if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
             recipientMail = requestJson.getSpecificRecipient();
         } else {
             recipientMail = Enums.EnvVariables.MailReportRecipient.value;
         }
-        reportMailData.setRecipientsJsonArray(new JSONArray().put(new JSONObject().put("Email", recipientMail).put("Name", "Release_Report")));
+        slackReportData.setRecipientsJsonArray(new JSONArray().put(new JSONObject().put("Email", recipientMail).put("Name", "Release_Report")));
     }
 
     private String getNewVersionInstructions(){

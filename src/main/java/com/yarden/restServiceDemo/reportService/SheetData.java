@@ -42,9 +42,7 @@ public class SheetData {
 
     public void writeSheet() throws IOException {
         if (resultsCount.get() >= PostResultsBufferSize) {
-            Logger.info("Writing entire sheet for tab: " + sheetTabName);
-            this.columnNames = columnsNamesMap.get(sheetTabName);
-            SheetDBApiService.updateSheet(this);
+            writeAllTabsToSheet();
         }
     }
 

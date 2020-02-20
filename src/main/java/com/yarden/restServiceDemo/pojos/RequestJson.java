@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.UUID;
+
 public class RequestJson {
 
     @SerializedName("sdk")
@@ -34,6 +36,9 @@ public class RequestJson {
     }
 
     public String getId() {
+        if (id == null) {
+            id = UUID.randomUUID().toString().substring(0, 6);
+        }
         return id;
     }
 

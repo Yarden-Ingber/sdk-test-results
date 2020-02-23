@@ -3,9 +3,17 @@
 ### Instructions
 This is a Rest API for the web service to post sdk test results to a unified report.
 Below you can find a link to the google sheets report and all the endpoints of the web service. <br>
-There are 2 main sheets in the report showing results: Coverage comparing, sandbox.
-To toggle the results posting between the two sheets use the "sandbox" boolean field in the result json.
-#### Please use the Coverage comparing sheet only for RELEASE test runs. For Dev, use sandbox sheet.
+Sandbox tab is for everyday testing. Raw data tab spans the different permutations. Other tabs are the recent status of the tests for each testing package released to customers.
+To toggle the results posting between Sandbox and the release tabs toggle "sandbox" boolean field in the result json.
+All results are also posted to Raw data tab.
+#### Please use the release sheets only for RELEASE test runs. For Dev, use sandbox sheet.
+
+### Results queue mechanism
+The sheet checks for an input every five minutes.
+If between two checks there’s no new update then the queue gets dumped to the sheet.
+Any sdk sending new results resets the counter.
+After 10 results in the queue it is dumped immediately to the sheet and the queue is emptied.<br>
+In the worst case it can take 10 min for the data to get to the sheet (one result right after a periodical check and no more results after it)
 
 ### Report
 

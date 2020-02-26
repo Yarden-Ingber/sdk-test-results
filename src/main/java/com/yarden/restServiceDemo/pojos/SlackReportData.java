@@ -19,6 +19,7 @@ public class SlackReportData {
     private String coverageGap = "";
     private JSONArray recipientsJsonArray = null;
     private String htmlReportS3BucketName = "";
+    private String htmlReportUrl = "";
 
     public String getReportTitle() {
         return reportTitle;
@@ -34,6 +35,9 @@ public class SlackReportData {
     }
 
     public SlackReportData setChangeLog(String changeLog) {
+        if (changeLog == null) {
+            throw new NullPointerException("Change log value is null");
+        }
         Parser parser = Parser.builder().build();
         Node document = parser.parse(changeLog);
         HtmlRenderer renderer = HtmlRenderer.builder().build();
@@ -123,6 +127,15 @@ public class SlackReportData {
 
     public SlackReportData setHtmlReportS3BucketName(String htmlReportS3BucketName) {
         this.htmlReportS3BucketName = htmlReportS3BucketName;
+        return this;
+    }
+
+    public String getHtmlReportUrl() {
+        return htmlReportUrl;
+    }
+
+    public SlackReportData setHtmlReportUrl(String htmlReportUrl) {
+        this.htmlReportUrl = htmlReportUrl;
         return this;
     }
 }

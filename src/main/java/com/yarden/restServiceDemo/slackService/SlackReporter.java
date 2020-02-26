@@ -10,7 +10,7 @@ import java.io.IOException;
 public class SlackReporter {
 
     public void report(SlackReportData slackReportData) throws IOException {
-        SdkReportMessage message = new SdkReportMessage(slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
+        SdkReportMessage message = new SdkReportMessage(slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + slackReportData.getHtmlReportUrl());
         SlackRetrofitClient.getAPIService().sendReport(Enums.EnvVariables.SlackSdkReleaseChannelEndpoint.value, message).execute();
     }
 

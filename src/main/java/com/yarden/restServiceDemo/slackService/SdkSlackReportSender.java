@@ -4,9 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
+import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
@@ -23,7 +27,7 @@ public class SdkSlackReportSender {
     private String version;
     private SlackReportNotificationJson requestJson;
 
-    public void send(String json) throws IOException {
+    public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending report, Missing SDK in request json.");
@@ -45,8 +49,12 @@ public class SdkSlackReportSender {
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
+        slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
         setRecipientMail(slackReportData);
-        new SlackReporter().report(slackReportData);
+        if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()){
+            new SlackReporter().report(slackReportData);
+        }
+        new MailSender().send(slackReportData);
     }
 
     private String getVersion(){

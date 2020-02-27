@@ -51,7 +51,7 @@ public class SdkSlackReportSender {
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
         slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
         setRecipientMail(slackReportData);
-        if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()){
+        if (requestJson.getSpecificRecipient() == null || requestJson.getSpecificRecipient().isEmpty()){
             new SlackReporter().report(slackReportData);
         }
         new MailSender().send(slackReportData);

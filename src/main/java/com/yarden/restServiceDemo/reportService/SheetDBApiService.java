@@ -28,7 +28,6 @@ import java.util.List;
 public class SheetDBApiService {
 
     private static Sheets sheetApiService = null;
-    private static final String spreadsheetId = "1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY";
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     private static final String APPLICATION_NAME = "SDK test report";
@@ -111,10 +110,10 @@ public class SheetDBApiService {
         return resultMatrix;
     }
 
-    public static List<List<Object>> getAllSheet(String sheetName) {
+    public static List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier) {
         ValueRange response = null;
         try {
-            response = getService().spreadsheets().values().get(spreadsheetId, sheetName).execute();
+            response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,7 +122,7 @@ public class SheetDBApiService {
 
     public static void updateSheet(SheetData sheetData) throws IOException {
         getService().spreadsheets().values()
-                .update(spreadsheetId, sheetData.getSheetTabName() + "!A1:AK1000", new ValueRange().setValues(jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames())))
+                .update(sheetData.getSheetTabIdentifier().spreadsheetID, sheetData.getSheetTabIdentifier().sheetTabName + "!A1:AK1000", new ValueRange().setValues(jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames())))
                 .setValueInputOption("RAW").execute();
     }
 

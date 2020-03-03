@@ -32,22 +32,42 @@ public class Enums {
         }
     }
 
-    public enum GeneralSheetTabsNames {
+    public enum SdkGeneralSheetTabsNames {
         Sandbox("sandbox"), RawData("Raw data");
 
         public final String value;
 
-        GeneralSheetTabsNames(String value){
+        SdkGeneralSheetTabsNames(String value){
             this.value = value;
         }
     }
 
-    public enum SheetColumnNames {
+    public enum SdkSheetColumnNames {
         TestName("Test name"), Mandatory("mandatory"), IDRow("id"), Fail("_fail"), Pass("_pass"), ExtraData("_extra");
 
         public final String value;
 
-        SheetColumnNames(String value){
+        SdkSheetColumnNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum EyesSheetTabsNames {
+        VisualTests("Visual tests"), Sandbox("sandbox");
+
+        public final String value;
+
+        EyesSheetTabsNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum EyesSheetColumnNames {
+        TestName("Test name"), Status("Status"), IDRow("id");
+
+        public final String value;
+
+        EyesSheetColumnNames(String value){
             this.value = value;
         }
     }
@@ -63,6 +83,16 @@ public class Enums {
             this.value = value;
         }
 
+    }
+
+    public enum SpreadsheetIDs {
+        SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"), VG("");
+
+        public final String value;
+
+        SpreadsheetIDs(String value){
+            this.value = value;
+        }
     }
 
 }

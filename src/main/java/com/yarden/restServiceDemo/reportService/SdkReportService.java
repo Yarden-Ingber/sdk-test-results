@@ -8,25 +8,25 @@ import java.util.*;
 
 public class SdkReportService {
 
-    private RequestJson requestJson;
+    private SdkResultRequestJson sdkResultRequestJson;
     private ExtraDataRequestJson extraDataRequestJson;
     private String googleSheetTabName;
     private SheetData sheetData = null;
 
     public void postResults(String json) throws JsonSyntaxException, InternalError{
         SheetData.incrementResultsCounter();
-        requestJson = new Gson().fromJson(json, RequestJson.class);
-        if (requestJson.getGroup() == null || requestJson.getGroup().isEmpty()){
+        sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        if (sdkResultRequestJson.getGroup() == null || sdkResultRequestJson.getGroup().isEmpty()){
             throw new JsonSyntaxException("Missing group parameter in json");
         }
-        requestJson.setGroup(capitalize(requestJson.getGroup()));
+        sdkResultRequestJson.setGroup(capitalize(sdkResultRequestJson.getGroup()));
         setGoogleSheetTabName();
-        sheetData = new SheetData(googleSheetTabName);
-        new RequestJsonValidator(requestJson).validate(sheetData);
+        sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, googleSheetTabName));
+        new SdkRequestJsonValidator(sdkResultRequestJson).validate(sheetData);
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults(false);
-            sheetData.validateThereIsIdRowOnSheet(requestJson);
+            validateThereIsIdRowOnSheet(sheetData);
             writeEntireSheetData(sheetData);
         } catch (Throwable t) {
             System.out.println("Something went wrong: " + t.getMessage());
@@ -39,11 +39,11 @@ public class SdkReportService {
     }
 
     private void postResultToRawData(){
-        sheetData = new SheetData(Enums.GeneralSheetTabsNames.RawData.value);
+        sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, Enums.SdkGeneralSheetTabsNames.RawData.value));
         try {
             deleteColumnForNewTestId();
             updateSheetWithNewResults(true);
-            sheetData.validateThereIsIdRowOnSheet(requestJson);
+            validateThereIsIdRowOnSheet(sheetData);
             writeEntireSheetData(sheetData);
         } catch (Throwable t) {
             throw new InternalError();
@@ -51,9 +51,9 @@ public class SdkReportService {
     }
 
     public void postExtraTestData(String json) throws JsonSyntaxException, InternalError{
-        googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
+        googleSheetTabName = Enums.SdkGeneralSheetTabsNames.Sandbox.value;
         extraDataRequestJson = new Gson().fromJson(json, ExtraDataRequestJson.class);
-        sheetData = new SheetData(googleSheetTabName);
+        sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, googleSheetTabName));
         try {
             updateSheetWithExtraTestData();
             writeEntireSheetData(sheetData);
@@ -73,7 +73,7 @@ public class SdkReportService {
 
     private void updateSheetWithNewResults(boolean shouldAddTestParamsToTestName){
         Logger.info("Updating results in local cached sheet");
-        JsonArray resultsArray = requestJson.getResults();
+        JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
             String testName = capitalize(testResult.getTestName());
@@ -82,18 +82,18 @@ public class SdkReportService {
                 paramsString = getTestParamsAsString(testResult);
                 testName = testName + paramsString;
             }
-            updateSingleTestResult(requestJson.getSdk(), testName, testResult.getPassed());
-            if (shouldAddTestParamsToTestName && requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+            updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
+            if (shouldAddTestParamsToTestName && sdkResultRequestJson.getMandatory() && isAllowedToUpdateMandatory()) {
                 markTestAsMandatory(testName);
             }
         }
     }
 
-    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
-        JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
+    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SdkSheetColumnNames permutationResult){
+        JsonElement passedValue = sheetEntry.getAsJsonObject().get(sdkResultRequestJson.getSdk() + permutationResult.value);
         return (passedValue == null || passedValue.getAsString().isEmpty()) ?
                 0 :
-                sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
+                sheetEntry.getAsJsonObject().get(sdkResultRequestJson.getSdk() + permutationResult.value).getAsInt();
     }
 
     private String getTestParamsAsString(TestResultData testResult){
@@ -109,18 +109,19 @@ public class SdkReportService {
     }
 
     private void deleteColumnForNewTestId(){
-        Logger.info("Current id in sheet for sdk " + requestJson.getSdk() + " is: " + getCurrentColumnId(requestJson.getSdk()));
-        Logger.info("New requested id for sdk " + requestJson.getSdk() + " is: " + requestJson.getId());
-        if (!requestJson.getId().equals(getCurrentColumnId(requestJson.getSdk()))){
-            Logger.info("Updating id for sdk: " + requestJson.getSdk());
-            deleteEntireSdkColumn(requestJson.getSdk());
-            updateTestResultId(requestJson.getSdk(), requestJson.getId());
+        String currentColumnId = getCurrentColumnId(sdkResultRequestJson.getSdk());
+        Logger.info("Current id in sheet for sdk " + sdkResultRequestJson.getSdk() + " is: " + currentColumnId);
+        Logger.info("New requested id for sdk " + sdkResultRequestJson.getSdk() + " is: " + sdkResultRequestJson.getId());
+        if (!sdkResultRequestJson.getId().equals(currentColumnId)){
+            Logger.info("Updating id for sdk: " + sdkResultRequestJson.getSdk());
+            deleteEntireSdkColumn(sdkResultRequestJson.getSdk());
+            updateTestResultId(sdkResultRequestJson.getSdk(), sdkResultRequestJson.getId());
         }
     }
 
     private String getCurrentColumnId(String sdk){
         for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)){
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)){
                 return sheetEntry.getAsJsonObject().get(sdk).getAsString();
             }
         }
@@ -129,7 +130,7 @@ public class SdkReportService {
 
     private void updateTestResultId(String sdk, String id){
         for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)){
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)){
                 sheetEntry.getAsJsonObject().addProperty(sdk, id);
                 return;
             }
@@ -139,12 +140,12 @@ public class SdkReportService {
     private void addExtraDataToSingleTestInSandbox(String sdk, String testName, String extraData){
         Logger.info("Adding extra data to test " + testName + " on sdk " + sdk + ": " + extraData);
         for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
-                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.ExtraData.value, extraData);
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName)){
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.ExtraData.value, extraData);
                 return;
             }
         }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + Enums.SheetColumnNames.ExtraData.value + "\":\"" + extraData + "\"}");
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SdkSheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + Enums.SdkSheetColumnNames.ExtraData.value + "\":\"" + extraData + "\"}");
         Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData().add(newEntry);
     }
@@ -152,7 +153,7 @@ public class SdkReportService {
     private void updateSingleTestResult(String sdk, String testName, boolean passed){
         String testResult = passed ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
         for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName)){
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!sheetEntry.getAsJsonObject().get(sdk).getAsString().equals(Enums.TestResults.Failed.value)) {
                     Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
                     sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
@@ -161,7 +162,7 @@ public class SdkReportService {
                 return;
             }
         }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SdkSheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
         Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData().add(newEntry);
         incrementPassFailColumn(sdk, newEntry, passed);
@@ -169,9 +170,9 @@ public class SdkReportService {
 
     private void markTestAsMandatory(String testName){
         for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(testName) && isAllowedToUpdateMandatory()){
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName) && isAllowedToUpdateMandatory()){
                 Logger.info("Marking test: " + testName + " as mandatory");
-                sheetEntry.getAsJsonObject().addProperty(Enums.SheetColumnNames.Mandatory.value, Enums.MandatoryTest.Mandatory.value);
+                sheetEntry.getAsJsonObject().addProperty(Enums.SdkSheetColumnNames.Mandatory.value, Enums.MandatoryTest.Mandatory.value);
                 return;
             }
         }
@@ -179,14 +180,14 @@ public class SdkReportService {
 
     private void incrementPassFailColumn(String sdk, JsonElement sheetEntry, boolean passed){
         if (passed) {
-            String passedColumn = sdk + Enums.SheetColumnNames.Pass.value;
-            Logger.info("Adding 1 to " + passedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value));
-            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
+            String passedColumn = sdk + Enums.SdkSheetColumnNames.Pass.value;
+            Logger.info("Adding 1 to " + passedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value));
+            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
             sheetEntry.getAsJsonObject().addProperty(passedColumn, valueBeforeIncrementInteger + 1);
         } else {
-            String failedColumn = sdk + Enums.SheetColumnNames.Fail.value;
-            Logger.info("Adding 1 to " + failedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value));
-            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+            String failedColumn = sdk + Enums.SdkSheetColumnNames.Fail.value;
+            Logger.info("Adding 1 to " + failedColumn + " for test " + sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value));
+            int valueBeforeIncrementInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
             sheetEntry.getAsJsonObject().addProperty(failedColumn, valueBeforeIncrementInteger + 1);
         }
     }
@@ -195,17 +196,29 @@ public class SdkReportService {
         Logger.info("Deleting entire column for sdk: " + sdk);
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             sheetEntry.getAsJsonObject().addProperty(sdk, "");
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Fail.value, "");
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.Pass.value, "");
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Fail.value, "");
+            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Pass.value, "");
             if (isSandbox()) {
-                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SheetColumnNames.ExtraData.value, "");
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.ExtraData.value, "");
             }
-            if (requestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+            if (sdkResultRequestJson.getMandatory() && isAllowedToUpdateMandatory()) {
                 try {
-                    sheetEntry.getAsJsonObject().addProperty(Enums.SheetColumnNames.Mandatory.value, "");
+                    sheetEntry.getAsJsonObject().addProperty(Enums.SdkSheetColumnNames.Mandatory.value, "");
                 } catch (Exception e) {}
             }
         }
+    }
+
+    public void validateThereIsIdRowOnSheet(SheetData sheetData){
+        for (JsonElement sheetEntry : sheetData.getSheetData()) {
+            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
+                return;
+            }
+        }
+        System.out.println("There was no ID row");
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SdkSheetColumnNames.TestName.value + "\":\"" + Enums.SdkSheetColumnNames.IDRow.value + "\",\"" + sdkResultRequestJson.getSdk() + "\":\"" + sdkResultRequestJson.getId() + "\"}");
+        sheetData.addElementToBeginningOfReportSheet(newEntry);
+        System.out.println("Now the cached sheet looks like this: " + sheetData.getSheetData().toString());
     }
 
     private void writeEntireSheetData(SheetData sheetData){
@@ -253,24 +266,24 @@ public class SdkReportService {
     }
 
     private void setGoogleSheetTabName(){
-        googleSheetTabName = requestJson.getGroup();
+        googleSheetTabName = sdkResultRequestJson.getGroup();
         if (isSandbox()) {
-            googleSheetTabName = Enums.GeneralSheetTabsNames.Sandbox.value;
+            googleSheetTabName = Enums.SdkGeneralSheetTabsNames.Sandbox.value;
         }
         Logger.info("Posting result to sheet: " + googleSheetTabName);
     }
 
     private boolean isSandbox(){
-        return (((requestJson.getSandbox() != null) && requestJson.getSandbox())
+        return (((sdkResultRequestJson.getSandbox() != null) && sdkResultRequestJson.getSandbox())
                 || isTestedLocally());
     }
 
     private boolean isAllowedToUpdateMandatory(){
-        return requestJson.getSdk().toLowerCase().equals("dotnet");
+        return sdkResultRequestJson.getSdk().toLowerCase().equals("dotnet");
     }
 
     private boolean isTestedLocally(){
-        return requestJson.getId().equals("0000-0000");
+        return sdkResultRequestJson.getId().equals("0000-0000");
     }
 
 }

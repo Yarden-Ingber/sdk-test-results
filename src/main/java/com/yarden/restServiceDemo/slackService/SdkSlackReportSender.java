@@ -14,6 +14,7 @@ import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
+import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -82,13 +83,13 @@ public class SdkSlackReportSender {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 1);
         tableBuilder.addTableHeader("<div align=\"left\">Test name</div>");
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
                 for (JsonElement row: reportSheet) {
                     if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
-                        if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
+                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
                         } else {
-                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString());
+                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString());
                         }
                     }
                 }
@@ -101,13 +102,13 @@ public class SdkSlackReportSender {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
         tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result", "Permutations");
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
                 for (JsonElement row: reportSheet) {
                     if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Passed.value)) {
-                        if (row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
+                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
                         } else {
-                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString(),"PASS",
+                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(),"PASS",
                                     getSumOfPermutationsForTest(row));
                         }
                     }
@@ -120,17 +121,17 @@ public class SdkSlackReportSender {
     private int getTotalTestCountForSdk(){
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(sdkGroup.value).getSheetData();
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
             for (JsonElement sheetEntry: reportSheet){
-                int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Pass);
-                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SheetColumnNames.Fail);
+                int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
+                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
                 totalAmount += passedValueInteger + failedValueInteger;
             }
         }
         return totalAmount;
     }
 
-    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SheetColumnNames permutationResult){
+    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SdkSheetColumnNames permutationResult){
         JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
         return (passedValue == null || passedValue.getAsString().isEmpty()) ?
                 0 :
@@ -160,7 +161,7 @@ public class SdkSlackReportSender {
 
     private String getSumOfPermutationsForTest(JsonElement row){
         try {
-            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SheetColumnNames.Pass.value).getAsInt());
+            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SdkSheetColumnNames.Pass.value).getAsInt());
         } catch (Exception e) {
             return "0";
         }

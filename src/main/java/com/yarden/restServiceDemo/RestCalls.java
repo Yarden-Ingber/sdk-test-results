@@ -1,5 +1,6 @@
 package com.yarden.restServiceDemo;
 import com.google.gson.JsonSyntaxException;
+import com.yarden.restServiceDemo.reportService.EyesReportService;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
@@ -22,6 +23,25 @@ public class RestCalls {
             newRequestPrint(json);
             try {
                 new SdkReportService().postResults(json);
+            } catch (InternalError e) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (JsonSyntaxException e) {
+                String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
+                System.out.println(errorMessage);
+                return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/eyes_result")
+    public ResponseEntity postEyesResults(@RequestBody String json) {
+        synchronized (lock) {
+            WriteEntireSheetsPeriodically.shouldClearSheets = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json);
+            try {
+                new EyesReportService().postResults(json);
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {

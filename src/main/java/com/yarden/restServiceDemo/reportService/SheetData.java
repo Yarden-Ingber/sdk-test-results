@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.pojos.RequestJson;
+import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 
 import java.io.IOException;
 import java.util.*;
@@ -14,30 +14,30 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SheetData {
 
     private List<String> columnNames = null;
-    private String sheetTabName;
-    private static Map<String, List<String>> columnsNamesMap = new HashMap<>();
-    private static Map<String, JsonArray> sheetDataPerTabMap = new HashMap<>();
+    private SheetTabIdentifier sheetTabIdentifier;
+    private static Map<SheetTabIdentifier, List<String>> columnsNamesMap = new HashMap<>();
+    private static Map<SheetTabIdentifier, JsonArray> sheetDataPerTabMap = new HashMap<>();
 
-    public SheetData(String googleSheetTabName){
-        this.sheetTabName = googleSheetTabName;
+    public SheetData(SheetTabIdentifier sheetTabIdentifier){
+        this.sheetTabIdentifier = sheetTabIdentifier;
     }
 
     public JsonArray getSheetData(){
-        if (!sheetDataPerTabMap.containsKey(sheetTabName)) {
+        if (!sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
             try {
                 try {
-                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabName);
-                    columnsNamesMap.put(sheetTabName, SheetDBApiService.getKeyList(sheet));
-                    sheetDataPerTabMap.put(sheetTabName, SheetDBApiService.listToJsonArray(sheet));
+                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
+                    columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
+                    sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
                 } catch (Throwable t1) {
-                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabName);
-                    sheetDataPerTabMap.put(sheetTabName, SheetDBApiService.listToJsonArray(sheet));
+                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
+                    sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
                 }
             } catch (Throwable t) {
                 System.out.println("ERROR: failed getting sheet:" + t.getMessage());
             }
         }
-        return sheetDataPerTabMap.get(sheetTabName);
+        return sheetDataPerTabMap.get(sheetTabIdentifier);
     }
 
     public void writeSheet() throws IOException {
@@ -48,35 +48,28 @@ public class SheetData {
 
     public static void writeAllTabsToSheet() throws IOException {
         Logger.info("Writing all sheets to google");
-        for (Enums.GeneralSheetTabsNames tab: Enums.GeneralSheetTabsNames.values()) {
-            if (sheetDataPerTabMap.containsKey(tab.value)) {
-                SheetData sheetData = new SheetData(tab.value);
-                sheetData.columnNames = columnsNamesMap.get(tab.value);
-                sheetData.sheetTabName = tab.value;
-                SheetDBApiService.updateSheet(sheetData);
-            }
+        for (Enums.SdkGeneralSheetTabsNames tab: Enums.SdkGeneralSheetTabsNames.values()) {
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, tab.value);
+            writeSpecificSheetTab(sheetTabIdentifier);
         }
         for (Enums.SdkGroupsSheetTabNames tab: Enums.SdkGroupsSheetTabNames.values()) {
-            if (sheetDataPerTabMap.containsKey(tab.value)) {
-                SheetData sheetData = new SheetData(tab.value);
-                sheetData.columnNames = columnsNamesMap.get(tab.value);
-                sheetData.sheetTabName = tab.value;
-                SheetDBApiService.updateSheet(sheetData);
-            }
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, tab.value);
+            writeSpecificSheetTab(sheetTabIdentifier);
+        }
+        for (Enums.EyesSheetTabsNames tab: Enums.EyesSheetTabsNames.values()) {
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, tab.value);
+            writeSpecificSheetTab(sheetTabIdentifier);
         }
         clearCachedSheetData();
     }
 
-    public void validateThereIsIdRowOnSheet(RequestJson requestJson){
-        for (JsonElement sheetEntry : getSheetData()) {
-            if (sheetEntry.getAsJsonObject().get(Enums.SheetColumnNames.TestName.value).getAsString().equals(Enums.SheetColumnNames.IDRow.value)) {
-                return;
-            }
+    private static void writeSpecificSheetTab(SheetTabIdentifier sheetTabIdentifier) throws IOException {
+        if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
+            SheetData sheetData = new SheetData(sheetTabIdentifier);
+            sheetData.columnNames = columnsNamesMap.get(sheetTabIdentifier);
+            sheetData.sheetTabIdentifier = sheetTabIdentifier;
+            SheetDBApiService.updateSheet(sheetData);
         }
-        System.out.println("There was no ID row");
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SheetColumnNames.TestName.value + "\":\"" + Enums.SheetColumnNames.IDRow.value + "\",\"" + requestJson.getSdk() + "\":\"" + requestJson.getId() + "\"}");
-        addElementToBeginningOfReportSheet(newEntry);
-        System.out.println("Now the cached sheet looks like this: " + getSheetData().toString());
     }
 
     public void addElementToBeginningOfReportSheet(JsonElement jsonElement){
@@ -85,15 +78,15 @@ public class SheetData {
         for (JsonElement sheetEntry: getSheetData()){
             jsonArray.add(sheetEntry);
         }
-        sheetDataPerTabMap.put(sheetTabName, jsonArray);
+        sheetDataPerTabMap.put(sheetTabIdentifier, jsonArray);
     }
 
     public List<String> getColumnNames(){
         return columnNames;
     }
 
-    public String getSheetTabName() {
-        return sheetTabName;
+    public SheetTabIdentifier getSheetTabIdentifier(){
+        return this.sheetTabIdentifier;
     }
 
     public static void clearCachedSheetData(){

@@ -86,6 +86,18 @@ public class RestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/dump_results")
+    public ResponseEntity dumpResults(){
+        synchronized (lock) {
+            try {
+                SheetData.writeAllTabsToSheet();
+            } catch (Throwable throwable) {
+                return new ResponseEntity("Failed to dump data to sheet: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Sheet is updated", HttpStatus.OK);
+        }
+    }
+
     private void newRequestPrint(String json){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

@@ -1,5 +1,7 @@
 package com.yarden.restServiceDemo.slackService;
 
+import com.yarden.restServiceDemo.Logger;
+
 public class HTMLTableBuilder {
 
     private int columns;
@@ -32,7 +34,7 @@ public class HTMLTableBuilder {
      */
     public void addTableHeader(String... values) {
         if (values.length != columns) {
-            System.out.println("Error column lenth");
+            Logger.error("column lenth");
         } else {
             int lastIndex = table.lastIndexOf(TABLE_END);
             if (lastIndex > 0) {
@@ -55,7 +57,7 @@ public class HTMLTableBuilder {
      */
     public void addRowValues(boolean isCenter, String... values) {
         if (values.length != columns) {
-            System.out.println("Error column lenth");
+            Logger.error("column lenth");
         } else {
             int lastIndex = table.lastIndexOf(ROW_END);
             if (lastIndex > 0) {

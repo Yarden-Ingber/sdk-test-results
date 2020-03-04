@@ -34,7 +34,7 @@ public class SheetData {
                     sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
                 }
             } catch (Throwable t) {
-                System.out.println("ERROR: failed getting sheet:" + t.getMessage());
+                Logger.error("failed getting sheet:" + t.getMessage());
             }
         }
         return sheetDataPerTabMap.get(sheetTabIdentifier);
@@ -60,6 +60,10 @@ public class SheetData {
             SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, tab.value);
             writeSpecificSheetTab(sheetTabIdentifier);
         }
+        for (Enums.VGSheetTabsNames tab: Enums.VGSheetTabsNames.values()) {
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.VG.value, tab.value);
+            writeSpecificSheetTab(sheetTabIdentifier);
+        }
         clearCachedSheetData();
     }
 
@@ -81,8 +85,12 @@ public class SheetData {
         sheetDataPerTabMap.put(sheetTabIdentifier, jsonArray);
     }
 
+    public void deleteLastRowInSheet() {
+        getSheetData().remove(getSheetData().size() - 1);
+    }
+
     public List<String> getColumnNames(){
-        return columnNames;
+        return columnsNamesMap.get(sheetTabIdentifier);
     }
 
     public SheetTabIdentifier getSheetTabIdentifier(){

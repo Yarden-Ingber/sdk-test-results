@@ -1,11 +1,8 @@
 package com.yarden.restServiceDemo;
 import com.google.gson.JsonSyntaxException;
-import com.yarden.restServiceDemo.reportService.EyesReportService;
+import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
-import com.yarden.restServiceDemo.reportService.SdkReportService;
-import com.yarden.restServiceDemo.reportService.SheetData;
-import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +24,7 @@ public class RestCalls {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
-                System.out.println(errorMessage);
+                Logger.error(errorMessage);
                 return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity(json, HttpStatus.OK);
@@ -46,8 +43,25 @@ public class RestCalls {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
-                System.out.println(errorMessage);
+                Logger.error(errorMessage);
                 return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/vg_status")
+    public ResponseEntity postVGStatus(@RequestBody String json) {
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new VisualGridStatusPageService().postResults(json);
+            } catch (JsonSyntaxException e) {
+                String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
+                Logger.error(errorMessage);
+                return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
+            } catch (Throwable e) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity(json, HttpStatus.OK);
         }

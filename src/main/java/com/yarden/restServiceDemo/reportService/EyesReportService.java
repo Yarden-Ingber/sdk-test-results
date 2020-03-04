@@ -29,7 +29,7 @@ public class EyesReportService {
             validateThereIsIdRowOnSheet(sheetData);
             writeEntireSheetData(sheetData);
         } catch (Throwable t) {
-            System.out.println("Something went wrong: " + t.getMessage());
+            Logger.error("Something went wrong: " + t.getMessage());
             t.printStackTrace();
             throw new InternalError();
         }
@@ -128,10 +128,10 @@ public class EyesReportService {
                 return;
             }
         }
-        System.out.println("There was no ID row");
+        Logger.warn("There was no ID row");
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.EyesSheetColumnNames.TestName.value + "\":\"" + Enums.EyesSheetColumnNames.IDRow.value + "\",\"" + Enums.EyesSheetColumnNames.Status.value + "\":\"" + eyesResultRequestJson.getId() + "\"}");
         sheetData.addElementToBeginningOfReportSheet(newEntry);
-        System.out.println("Now the cached sheet looks like this: " + sheetData.getSheetData().toString());
+        Logger.info("Now the cached sheet looks like this: " + sheetData.getSheetData().toString());
     }
 
     private void writeEntireSheetData(SheetData sheetData){

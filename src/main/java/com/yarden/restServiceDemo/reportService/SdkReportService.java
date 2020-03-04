@@ -3,7 +3,11 @@ package com.yarden.restServiceDemo.reportService;
 import com.google.gson.*;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.pojos.*;
+import com.yarden.restServiceDemo.pojos.ExtraDataPojo;
+import com.yarden.restServiceDemo.pojos.ExtraDataRequestJson;
+import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
+import com.yarden.restServiceDemo.pojos.TestResultData;
+
 import java.util.*;
 
 public class SdkReportService {
@@ -29,7 +33,7 @@ public class SdkReportService {
             validateThereIsIdRowOnSheet(sheetData);
             writeEntireSheetData(sheetData);
         } catch (Throwable t) {
-            System.out.println("Something went wrong: " + t.getMessage());
+            Logger.error("Something went wrong: " + t.getMessage());
             t.printStackTrace();
             throw new InternalError();
         }
@@ -215,10 +219,10 @@ public class SdkReportService {
                 return;
             }
         }
-        System.out.println("There was no ID row");
+        Logger.warn("There was no ID row");
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SdkSheetColumnNames.TestName.value + "\":\"" + Enums.SdkSheetColumnNames.IDRow.value + "\",\"" + sdkResultRequestJson.getSdk() + "\":\"" + sdkResultRequestJson.getId() + "\"}");
         sheetData.addElementToBeginningOfReportSheet(newEntry);
-        System.out.println("Now the cached sheet looks like this: " + sheetData.getSheetData().toString());
+        Logger.info("Now the cached sheet looks like this: " + sheetData.getSheetData().toString());
     }
 
     private void writeEntireSheetData(SheetData sheetData){

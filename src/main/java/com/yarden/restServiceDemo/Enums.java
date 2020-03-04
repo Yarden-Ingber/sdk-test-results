@@ -3,7 +3,7 @@ package com.yarden.restServiceDemo;
 public class Enums {
 
     public enum TestResults{
-        Passed("1"), Failed("-1");
+        Passed("1"), Failed("-1"), Missing("");
 
         public final String value;
 
@@ -72,6 +72,26 @@ public class Enums {
         }
     }
 
+    public enum VGSheetTabsNames {
+        Status("Status");
+
+        public final String value;
+
+        VGSheetTabsNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum VGSheetColumnNames {
+        Timestamp("Timestamp");
+
+        public final String value;
+
+        VGSheetColumnNames(String value){
+            this.value = value;
+        }
+    }
+
     public enum EnvVariables {
         MailjetApiKeyPublic(System.getenv("MJ_APIKEY_PUBLIC")), MailjetApiKeyPrivate(System.getenv("MJ_APIKEY_PRIVATE")),
         AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")),
@@ -86,7 +106,8 @@ public class Enums {
     }
 
     public enum SpreadsheetIDs {
-        SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"), VG("");
+        SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"),
+        VG("1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ");
 
         public final String value;
 

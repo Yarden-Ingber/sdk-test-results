@@ -5,6 +5,7 @@ import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -35,8 +36,8 @@ public class MailSender {
                                         slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + slackReportData.getHtmlReportUrl())
                                 .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
         response = client.post(request);
-        System.out.println(response.getStatus());
-        System.out.println(response.getData());
+        Logger.info(Integer.toString(response.getStatus()));
+        Logger.info(response.getData().toString());
     }
 
     private String getPdfReportAsBase64() throws IOException, DocumentException {

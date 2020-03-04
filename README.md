@@ -18,7 +18,8 @@ In the worst case it can take 10 min for the data to get to the sheet (one resul
 ### Report
 
 SDK: https://docs.google.com/spreadsheets/d/1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY <br>
-Eyes: https://docs.google.com/spreadsheets/d/1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8
+Eyes: https://docs.google.com/spreadsheets/d/1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8 <br>
+Visual grid status page: https://docs.google.com/spreadsheets/d/1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ/edit#gid=0
 
 ### Production Endpoint
 
@@ -45,7 +46,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"chrome",
         "stitching":"css"
       },
-      "passed":true,
+      "passed":true
     },
     {  
       "test_name": "test7",
@@ -95,7 +96,7 @@ Send a `POST` to `/eyes_result` with the JSON payload (below) - returns a `200` 
       "parameters":{
         "browser":"chrome"
       },
-      "passed":true,
+      "passed":true
     },
     {  
       "test_name": "test7",
@@ -176,3 +177,21 @@ By default the mail will be sent to a mail report group release.reports@applitoo
 <u>`specificRecipient` - String - optional<u>
 
 By default the mail will be sent to a mail report group release.reports@applitools.com. To test this endpoint add a specific recipient and it will overwrite the default value.
+
+#### Post results for VG status page
+Send a `POST` to `/vg_status` with the JSON payload (below) - returns a `200`.
+
+```
+{
+  "status": [
+    {
+      "system": "Chrome",
+      "status": true
+    },
+    {
+      "system": "Firefox",
+      "status": true
+    }
+  ]
+}
+```

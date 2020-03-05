@@ -152,9 +152,12 @@ public class SdkSlackReportSender {
         String text = "Instructions and dependencies: ";
         if (sdk.equals("dotnet")) {
             return text + "https://www.nuget.org/packages/Eyes.Selenium/";
-        }
-        if (sdk.equals("java")) {
+        } else if (sdk.equals("java")) {
             return text + "https://mvnrepository.com/artifact/com.applitools/eyes-common-java3/" + version;
+        } else if (sdk.equals("js_selenium_4")) {
+            return text + "https://www.npmjs.com/package/@applitools/eyes-selenium";
+        } else if (sdk.equals("js_wdio_5")) {
+            return text + "https://www.npmjs.com/package/@applitools/eyes-webdriverio";
         }
         return "";
     }

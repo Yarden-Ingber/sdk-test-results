@@ -34,14 +34,14 @@ public class VisualGridStatusPageService {
         String newEntryJsonString = "\"" + Enums.VGSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\",";
         for (String column : sheetData.getColumnNames()) {
             if (!column.equals(Enums.VGSheetColumnNames.Timestamp.value)) {
-                newEntryJsonString = newEntryJsonString + "\"" + column + "\":\"" + getSystemStatus(column) + "\",";
+                newEntryJsonString = newEntryJsonString + "\"" + column + "\":\"" + getSystemStatusFromRequestJson(column) + "\",";
             }
         }
         newEntryJsonString = "{" + newEntryJsonString.substring(0, newEntryJsonString.length() - 1) + "}";
         return new JsonParser().parse(newEntryJsonString);
     }
 
-    private String getSystemStatus(String system) {
+    private String getSystemStatusFromRequestJson(String system) {
         for (VisualGridStatus visualGridStatus : visualGridStatusPageRequestJson.getStatus()) {
             if (visualGridStatus.getSystem().equals(system)) {
                 if (visualGridStatus.getStatus()) {

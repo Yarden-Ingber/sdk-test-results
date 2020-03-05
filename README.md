@@ -103,7 +103,8 @@ Send a `POST` to `/eyes_result` with the JSON payload (below) - returns a `200` 
       "parameters":{
         "browser":"firefox"
       },
-      "passed":false
+      "passed":false,
+      "result_url": "test.result.dashboard.url"
     }
   ]
 }

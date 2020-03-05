@@ -63,7 +63,7 @@ public class Enums {
     }
 
     public enum EyesSheetColumnNames {
-        TestName("Test name"), Status("Status"), IDRow("id");
+        TestName("Test name"), Status("Status"), Url("Url"), IDRow("id");
 
         public final String value;
 

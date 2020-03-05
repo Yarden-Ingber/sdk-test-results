@@ -73,6 +73,7 @@ public class EyesReportService {
         Logger.info("Deleting entire column");
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Status.value, "");
+            sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Url.value, "");
         }
     }
 
@@ -93,7 +94,7 @@ public class EyesReportService {
             String testName = testResult.getTestName();
             String paramsString = getTestParamsAsString(testResult);
             testName = testName + paramsString;
-            updateSingleTestResult(testName, testResult.getPassed());
+            updateSingleTestResult(testName, testResult.getPassed(), testResult.getResultUrl());
         }
     }
 
@@ -108,16 +109,19 @@ public class EyesReportService {
         return paramsString.trim();
     }
 
-    private void updateSingleTestResult(String testName, boolean passed){
+    private void updateSingleTestResult(String testName, boolean passed, String url){
         String testResult = passed ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(testName)){
                 Logger.info("Adding test result: " + testName + "=" + testResult);
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Status.value, testResult);
+                if (!passed) {
+                    sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Url.value, url);
+                }
                 return;
             }
         }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.EyesSheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + Enums.EyesSheetColumnNames.Status.value + "\":\"" + testResult + "\"}");
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.EyesSheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + Enums.EyesSheetColumnNames.Status.value + "\":\"" + testResult + "\",\"" + Enums.EyesSheetColumnNames.Url.value + "\":\"" + url + "\"}");
         Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData().add(newEntry);
     }

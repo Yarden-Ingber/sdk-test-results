@@ -15,6 +15,9 @@ public class TestResultData {
     @SerializedName("passed")
     @Expose
     private Boolean passed;
+    @SerializedName("result_url")
+    @Expose
+    private String resultUrl;
 
     public String getTestName() {
         return testName;
@@ -40,4 +43,15 @@ public class TestResultData {
         this.passed = passed;
     }
 
+    public String getResultUrl() {
+        if (resultUrl == null) {
+            return "";
+        } else {
+            return this.resultUrl;
+        }
+    }
+
+    public void setResultUrl(String resultUrl) {
+        this.resultUrl = resultUrl;
+    }
 }

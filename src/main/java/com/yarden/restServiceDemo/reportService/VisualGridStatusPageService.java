@@ -14,7 +14,7 @@ public class VisualGridStatusPageService {
 
     VisualGridStatusPageRequestJson visualGridStatusPageRequestJson;
     SheetData sheetData;
-    private static final int NumOfResultsToShow = 10;
+    private static final int NumOfResultsToShow = 100;
 
     public void postResults(String json) throws IOException {
         visualGridStatusPageRequestJson = new Gson().fromJson(json, VisualGridStatusPageRequestJson.class);

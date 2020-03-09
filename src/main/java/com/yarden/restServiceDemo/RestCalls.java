@@ -56,12 +56,10 @@ public class RestCalls {
             newRequestPrint(json);
             try {
                 new VisualGridStatusPageService().postResults(json);
-            } catch (JsonSyntaxException e) {
+            } catch (Throwable e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
                 Logger.error(errorMessage);
                 return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
-            } catch (Throwable e) {
-                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity(json, HttpStatus.OK);
         }

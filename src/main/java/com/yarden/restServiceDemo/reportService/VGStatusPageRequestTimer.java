@@ -19,6 +19,7 @@ public class VGStatusPageRequestTimer extends TimerTask {
             timer = new Timer("MyTimer");
             timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 12 * 1000 * 60);
             isRunning = true;
+            Logger.info("VGStatusPageRequestTimer started");
         }
     }
 

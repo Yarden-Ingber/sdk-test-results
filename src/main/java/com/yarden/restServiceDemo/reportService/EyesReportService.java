@@ -81,6 +81,12 @@ public class EyesReportService {
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.IDRow.value)){
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Status.value, id);
+                break;
+            }
+        }
+        for (JsonElement sheetEntry: sheetData.getSheetData()){
+            if (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.TimestampRow.value)){
+                sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Status.value, Logger.getTimaStamp());
                 return;
             }
         }

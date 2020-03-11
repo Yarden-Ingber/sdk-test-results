@@ -15,18 +15,18 @@ public class VisualGridStatusPageRequestTimer extends TimerTask {
     public static synchronized void start() {
         if (!isRunning) {
             isRequestReceived = true;
-            timer = new Timer("VGStatusPageRequestTimer");
+            timer = new Timer("VisualGridStatusPageRequestTimer");
             timer.scheduleAtFixedRate(new VisualGridStatusPageRequestTimer(), 30, 12 * 1000 * 60);
             isRunning = true;
-            Logger.info("VGStatusPageRequestTimer started");
+            Logger.info("VisualGridStatusPageRequestTimer started");
         }
     }
 
     @Override
     public void run() {
-        Logger.info("VGStatusPageRequestTimer saying: \"tick...\"");
+        Logger.info("VisualGridStatusPageRequestTimer saying: \"tick...\"");
         if (!isRequestReceived) {
-            Logger.info("VGStatusPageRequestTimer timeout. adding empty row to VG status page.");
+            Logger.info("VisualGridStatusPageRequestTimer timeout. adding empty row to Visual Grid status page.");
             String json = "{\"status\": []}";
             try {
                 new VisualGridStatusPageService().postResults(json);

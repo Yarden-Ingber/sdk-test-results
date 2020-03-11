@@ -47,25 +47,22 @@ public class SheetData {
     public static void writeAllTabsToSheet() throws IOException {
         Logger.info("Writing all sheets to google");
         for (Enums.SdkGeneralSheetTabsNames tab: Enums.SdkGeneralSheetTabsNames.values()) {
-            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, tab.value);
-            writeSpecificSheetTab(sheetTabIdentifier);
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.SDK.value, tab.value);
         }
         for (Enums.SdkGroupsSheetTabNames tab: Enums.SdkGroupsSheetTabNames.values()) {
-            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, tab.value);
-            writeSpecificSheetTab(sheetTabIdentifier);
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.SDK.value, tab.value);
         }
         for (Enums.EyesSheetTabsNames tab: Enums.EyesSheetTabsNames.values()) {
-            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, tab.value);
-            writeSpecificSheetTab(sheetTabIdentifier);
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.Eyes.value, tab.value);
         }
         for (Enums.VisualGridSheetTabsNames tab: Enums.VisualGridSheetTabsNames.values()) {
-            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, tab.value);
-            writeSpecificSheetTab(sheetTabIdentifier);
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.VisualGrid.value, tab.value);
         }
         clearCachedSheetData();
     }
 
-    private static void writeSpecificSheetTab(SheetTabIdentifier sheetTabIdentifier) throws IOException {
+    private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) throws IOException {
+        SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(spreadsheetID, sheetTabName);
         if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
             SheetData sheetData = new SheetData(sheetTabIdentifier);
             sheetData.columnNames = columnsNamesMap.get(sheetTabIdentifier);

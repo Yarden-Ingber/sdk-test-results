@@ -1,13 +1,12 @@
 package com.yarden.restServiceDemo.reportService;
 
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.RestCalls;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class VGStatusPageRequestTimer extends TimerTask {
+public class VisualGridStatusPageRequestTimer extends TimerTask {
 
     public static boolean isRequestReceived;
     private static boolean isRunning = false;
@@ -17,7 +16,7 @@ public class VGStatusPageRequestTimer extends TimerTask {
         if (!isRunning) {
             isRequestReceived = true;
             timer = new Timer("VGStatusPageRequestTimer");
-            timer.scheduleAtFixedRate(new VGStatusPageRequestTimer(), 30, 12 * 1000 * 60);
+            timer.scheduleAtFixedRate(new VisualGridStatusPageRequestTimer(), 30, 12 * 1000 * 60);
             isRunning = true;
             Logger.info("VGStatusPageRequestTimer started");
         }

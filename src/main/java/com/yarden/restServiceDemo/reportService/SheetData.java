@@ -2,10 +2,8 @@ package com.yarden.restServiceDemo.reportService;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 
 import java.io.IOException;
 import java.util.*;
@@ -60,8 +58,8 @@ public class SheetData {
             SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, tab.value);
             writeSpecificSheetTab(sheetTabIdentifier);
         }
-        for (Enums.VGSheetTabsNames tab: Enums.VGSheetTabsNames.values()) {
-            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.VG.value, tab.value);
+        for (Enums.VisualGridSheetTabsNames tab: Enums.VisualGridSheetTabsNames.values()) {
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, tab.value);
             writeSpecificSheetTab(sheetTabIdentifier);
         }
         clearCachedSheetData();

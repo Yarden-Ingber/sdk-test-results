@@ -18,7 +18,7 @@ public class VisualGridStatusPageService {
 
     public void postResults(String json) throws IOException {
         visualGridStatusPageRequestJson = new Gson().fromJson(json, VisualGridStatusPageRequestJson.class);
-        sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VG.value, Enums.VGSheetTabsNames.Status.value));
+        sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         if (getNumOfStatusLines() >= NumOfResultsToShow) {
             sheetData.deleteLastRowInSheet();
         }
@@ -31,9 +31,9 @@ public class VisualGridStatusPageService {
     }
 
     private JsonElement parseRequestJsonToStatusEntry() {
-        String newEntryJsonString = "\"" + Enums.VGSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\",";
+        String newEntryJsonString = "\"" + Enums.VisualGridSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\",";
         for (String column : sheetData.getColumnNames()) {
-            if (!column.equals(Enums.VGSheetColumnNames.Timestamp.value)) {
+            if (!column.equals(Enums.VisualGridSheetColumnNames.Timestamp.value)) {
                 newEntryJsonString = newEntryJsonString + "\"" + column + "\":\"" + getSystemStatusFromRequestJson(column) + "\",";
             }
         }

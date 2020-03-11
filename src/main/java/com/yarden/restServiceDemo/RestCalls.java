@@ -51,9 +51,9 @@ public class RestCalls {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/vg_status")
-    public ResponseEntity postVGStatus(@RequestBody String json) {
+    public ResponseEntity postVisualGridStatus(@RequestBody String json) {
         synchronized (lock) {
-            VGStatusPageRequestTimer.isRequestReceived = true;
+            VisualGridStatusPageRequestTimer.isRequestReceived = true;
             newRequestPrint(json);
             try {
                 new VisualGridStatusPageService().postResults(json);

@@ -1,6 +1,6 @@
 package com.yarden.restServiceDemo;
 
-import com.yarden.restServiceDemo.reportService.VGStatusPageRequestTimer;
+import com.yarden.restServiceDemo.reportService.VisualGridStatusPageRequestTimer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class RestServiceDemoApplication {
 
 	public static void main(String[] args) {
-		VGStatusPageRequestTimer.start();
+		VisualGridStatusPageRequestTimer.start();
 		SpringApplication.run(RestServiceDemoApplication.class, args);
 	}
 

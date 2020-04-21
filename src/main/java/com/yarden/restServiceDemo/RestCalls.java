@@ -106,12 +106,15 @@ public class RestCalls {
             return new ResponseEntity("Mail sent", HttpStatus.OK);
         }
     }
-
+    
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/eyes")
-    public ResponseEntity sendEyesMailReport(@RequestBody String json){
+    public ResponseEntity sendEyesMailReport(@RequestBody(required = false) String json){
         synchronized (lock) {
             newRequestPrint(json);
             try {
+                if (json == null) {
+                    json = "{}";
+                }
                 new EyesSlackReporterSender().send(json);
             } catch (Throwable throwable) {
                 return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

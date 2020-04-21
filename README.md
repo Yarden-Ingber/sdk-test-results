@@ -87,12 +87,14 @@ Non DotNet sdks can't update the mandatory column.
 Send a `POST` to `/eyes_result` with the JSON payload (below) - returns a `200` and the requested JSON.
 ```
 {  
-  "group":"Visual tests",
+  "group":"Front end",
   "id":"1234",
-  "sandbox":true,
+  "sandbox":false,
   "results":[  
     {  
       "test_name": "test7",
+      "feature": "feature1",
+      "feature_sub_category": "sub1",
       "parameters":{
         "browser":"chrome"
       },
@@ -100,6 +102,8 @@ Send a `POST` to `/eyes_result` with the JSON payload (below) - returns a `200` 
     },
     {  
       "test_name": "test7",
+      "feature": "feature2",
+      "feature_sub_category": "sub1",
       "parameters":{
         "browser":"firefox"
       },

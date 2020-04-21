@@ -15,7 +15,6 @@ public class HtmlReportGenerator {
     SlackReportData slackReportData;
     private final String htmlReportFileName = "test_report.html";
     private final String pdfReportFileName = "test_report.pdf";
-    private final String sdkHtmlReportFileName = "sdk_report";
 
     public HtmlReportGenerator(SlackReportData slackReportData){
         this.slackReportData = slackReportData;
@@ -23,7 +22,7 @@ public class HtmlReportGenerator {
 
     public String getHtmlReportUrlInAwsS3(String bucketName) throws FileNotFoundException, UnsupportedEncodingException {
         generateHtmlReportFile();
-        String fileNameInBucket = sdkHtmlReportFileName + "_" + Logger.getTimaStamp();
+        String fileNameInBucket = "report" + "_" + Logger.getTimaStamp();
         AwsS3Provider.uploadFileToS3(bucketName, fileNameInBucket, htmlReportFileName);
         String fileUrl = AwsS3Provider.getUrlToFileInS3(bucketName, fileNameInBucket);
         try {
@@ -74,8 +73,10 @@ public class HtmlReportGenerator {
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h1>" + slackReportData.getReportTitle() + "</h1>");
-        htmlReportStringBuilder.append("<h2>Version</h2>");
-        htmlReportStringBuilder.append(versionToList(slackReportData.getVersion()) + "<br/><br/>");
+        if (slackReportData.getVersion() != null && !slackReportData.getVersion().isEmpty()) {
+            htmlReportStringBuilder.append("<h2>Version</h2>");
+            htmlReportStringBuilder.append(versionToList(slackReportData.getVersion()) + "<br/><br/>");
+        }
         if (slackReportData.getChangeLog() != null && !slackReportData.getChangeLog().isEmpty()) {
             htmlReportStringBuilder.append("<details open><summary><b>Change log</b></summary>");
             htmlReportStringBuilder.append(slackReportData.getChangeLog() + "<br/>");
@@ -95,7 +96,7 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append("</details><br/>");
         }
         if (slackReportData.getDetailedPassedTestsTable() != null) {
-            htmlReportStringBuilder.append("<details><summary><b>Passed tests</b></summary>");
+            htmlReportStringBuilder.append("<br/><details><summary><b>Passed tests</b></summary>");
             htmlReportStringBuilder.append(slackReportData.getDetailedPassedTestsTable());
             htmlReportStringBuilder.append("</details>");
         }

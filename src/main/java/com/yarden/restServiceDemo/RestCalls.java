@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo;
 import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.reportService.*;
+import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
 import org.springframework.http.HttpStatus;
@@ -101,6 +102,19 @@ public class RestCalls {
             } catch (Throwable t) {
                 t.printStackTrace();
                 return new ResponseEntity("Failed sending email: " + t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Mail sent", HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/send_mail/eyes")
+    public ResponseEntity sendEyesMailReport(@RequestBody String json){
+        synchronized (lock) {
+            newRequestPrint(json);
+            try {
+                new EyesSlackReporterSender().send(json);
+            } catch (Throwable throwable) {
+                return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity("Mail sent", HttpStatus.OK);
         }

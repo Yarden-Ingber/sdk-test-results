@@ -53,7 +53,7 @@ public class Enums {
     }
 
     public enum EyesSheetTabsNames {
-        FrontEnd("Front end"), IntegrationsTests("Integrations tests"), BackendTests("Backend tests"), Sandbox("sandbox");
+        FrontEnd("Front end"), IntegrationsTests("Integration tests"), BackendTests("Backend tests"), Sandbox("sandbox");
 
         public final String value;
 
@@ -94,8 +94,8 @@ public class Enums {
 
     public enum EnvVariables {
         MailjetApiKeyPublic(System.getenv("MJ_APIKEY_PUBLIC")), MailjetApiKeyPrivate(System.getenv("MJ_APIKEY_PRIVATE")),
-        AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")),
-        SlackSdkReleaseChannelEndpoint(System.getenv("SDK_RELEASE_SLACK_CHANNEL_ENDPOINT"));
+        AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), AwsS3EyesReportsBucketName(System.getenv("EYE_REPORTS_S3_BUCKET")),
+        MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")), SlackSdkReleaseChannelEndpoint(System.getenv("SDK_RELEASE_SLACK_CHANNEL_ENDPOINT"));
 
         public final String value;
 

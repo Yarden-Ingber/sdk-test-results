@@ -9,6 +9,12 @@ public class TestResultData {
     @SerializedName("test_name")
     @Expose
     private String testName;
+    @SerializedName("feature")
+    @Expose
+    private String feature;
+    @SerializedName("feature_sub_category")
+    @Expose
+    private String feature_sub_category;
     @SerializedName("parameters")
     @Expose
     private JsonObject parameters;
@@ -53,5 +59,21 @@ public class TestResultData {
 
     public void setResultUrl(String resultUrl) {
         this.resultUrl = resultUrl;
+    }
+
+    public String getFeature() {
+        return feature;
+    }
+
+    public void setFeature(String feature) {
+        this.feature = feature;
+    }
+
+    public String getFeature_sub_category() {
+        return feature_sub_category;
+    }
+
+    public void setFeature_sub_category(String feature_sub_category) {
+        this.feature_sub_category = feature_sub_category;
     }
 }

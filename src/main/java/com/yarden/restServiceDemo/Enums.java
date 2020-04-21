@@ -53,7 +53,7 @@ public class Enums {
     }
 
     public enum EyesSheetTabsNames {
-        VisualTests("Visual tests"), Sandbox("sandbox");
+        FrontEnd("Front end"), IntegrationsTests("Integrations tests"), BackendTests("Backend tests"), Sandbox("sandbox");
 
         public final String value;
 
@@ -63,7 +63,7 @@ public class Enums {
     }
 
     public enum EyesSheetColumnNames {
-        TestName("Test name"), Status("Status"), Url("Url"), IDRow("id"), TimestampRow("timestamp");
+        TestName("Test name"), Feature("Feature"), FeatureSubCategory("Feature sub-category"), Status("Status"), Url("Url"), IDRow("id"), TimestampRow("timestamp");
 
         public final String value;
 

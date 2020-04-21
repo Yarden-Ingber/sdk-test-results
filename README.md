@@ -165,6 +165,18 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
 
 By default the mail will be sent to a mail report group release.reports@applitools.com. To test this endpoint add a specific recipient and it will overwrite the default value.
 
+##### Send a `POST` to `/send_mail/eyes` with the JSON payload (below) - returns a `200`.
+
+```
+{
+  "specificRecipient":"optional_specific_mail@applitools.com"
+}
+```
+
+<u>`specificRecipient` - String - optional<u>
+
+By default the mail will be sent to a mail report group release.reports@applitools.com. To test this endpoint add a specific recipient and it will overwrite the default value.
+
 ##### Send a `POST` to `/send_mail/generic` with the JSON payload (below) - returns a `200`.
 
 ```

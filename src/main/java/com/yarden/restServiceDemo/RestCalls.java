@@ -106,7 +106,7 @@ public class RestCalls {
             return new ResponseEntity("Mail sent", HttpStatus.OK);
         }
     }
-    
+
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/eyes")
     public ResponseEntity sendEyesMailReport(@RequestBody(required = false) String json){
         synchronized (lock) {

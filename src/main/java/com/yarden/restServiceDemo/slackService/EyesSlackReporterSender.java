@@ -21,9 +21,17 @@ import java.io.IOException;
 public class EyesSlackReporterSender {
 
     private SlackReportNotificationJson requestJson;
+    private static final String EndedTestTasksCounterFile = "EndedTestTasksCounterFile.txt";
+    private static final int NumOfTestTasks = 1;
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
+        if (isAllTestsEnded()) {
+            sendReport();
+        }
+    }
+
+    private void sendReport() throws IOException, MailjetSocketTimeoutException, MailjetException{
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new version of Eyes is about to be released.")
                 .setReportTitle("Test report for Eyes")
@@ -36,6 +44,17 @@ public class EyesSlackReporterSender {
             new SlackReporter().report(slackReportData);
         }
         new MailSender().send(slackReportData);
+    }
+
+    private boolean isAllTestsEnded() throws IOException {
+        String endedTestTasksCounterString = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile);
+        int count = Integer.parseInt(endedTestTasksCounterString) + 1;
+        if (count >= NumOfTestTasks) {
+            AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile, "0");
+            return true;
+        }
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile, String.valueOf(count));
+        return false;
     }
 
     private HTMLTableBuilder getHighLevelReportTable() {

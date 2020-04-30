@@ -8,6 +8,9 @@ public class SlackReportNotificationJson {
     @SerializedName("sdk")
     @Expose
     private String sdk;
+    @SerializedName("id")
+    @Expose
+    private String id;
     @SerializedName("version")
     @Expose
     private String version;
@@ -82,5 +85,13 @@ public class SlackReportNotificationJson {
 
     public void setSpecificRecipient(String specificRecipient) {
         this.specificRecipient = specificRecipient;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

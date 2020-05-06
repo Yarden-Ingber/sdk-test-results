@@ -81,7 +81,7 @@ public class EyesSlackReporterSender {
                     if (!row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.TimestampRow.value)
                             && !row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.IDRow.value)
                             && row.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Passed.value)) {
-                        tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(), "PASS");
+                        tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString(), "PASS");
                     }
                 }
             }

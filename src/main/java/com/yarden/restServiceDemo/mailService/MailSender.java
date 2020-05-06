@@ -31,7 +31,7 @@ public class MailSender {
                                         .put("Email", "yarden.ingber@applitools.com")
                                         .put("Name", "Yarden Ingber"))
                                 .put(Emailv31.Message.TO, slackReportData.getRecipientsJsonArray())
-                                .put(Emailv31.Message.SUBJECT, "SDK Release")
+                                .put(Emailv31.Message.SUBJECT, slackReportData.getReportTitle())
                                 .put(Emailv31.Message.TEXTPART,
                                         slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + slackReportData.getHtmlReportUrl())
                                 .put(Emailv31.Message.CUSTOMID, "SdkRelease")));

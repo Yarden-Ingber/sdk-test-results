@@ -22,7 +22,7 @@ public class EyesSlackReporterSender {
 
     private SlackReportNotificationJson requestJson;
     private static final String EndedTestTasksCounterFile = "EndedTestTasksCounterFile.txt";
-    private static final int NumOfTestTasks = 1;
+    private static final int NumOfTestTasks = Integer.parseInt(System.getenv("EYES_TEST_TASKS_COUNT"));
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
@@ -46,7 +46,7 @@ public class EyesSlackReporterSender {
         new MailSender().send(slackReportData);
     }
 
-    private boolean isAllTestsEnded() throws IOException {
+    private static synchronized boolean isAllTestsEnded() throws IOException {
         String endedTestTasksCounterString = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile);
         int count = Integer.parseInt(endedTestTasksCounterString) + 1;
         if (count >= NumOfTestTasks) {

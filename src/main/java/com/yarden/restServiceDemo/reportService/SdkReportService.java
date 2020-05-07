@@ -124,10 +124,13 @@ public class SdkReportService {
     }
 
     private String getCurrentColumnId(String sdk){
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
-            if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)){
-                return sheetEntry.getAsJsonObject().get(sdk).getAsString();
+        try {
+            for (JsonElement sheetEntry: sheetData.getSheetData()){
+                if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)){
+                    return sheetEntry.getAsJsonObject().get(sdk).getAsString();
+                }
             }
+        } catch (Throwable t) {
         }
         return "";
     }

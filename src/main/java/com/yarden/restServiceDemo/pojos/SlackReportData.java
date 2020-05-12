@@ -14,6 +14,7 @@ public class SlackReportData {
     private HTMLTableBuilder highLevelReportTable = null;
     private HTMLTableBuilder detailedPassedTestsTable = null;
     private String reportTitle = "";
+    private String mailSubject = "";
     private String changeLog = "";
     private String version = "";
     private String coverageGap = "";
@@ -27,6 +28,15 @@ public class SlackReportData {
 
     public SlackReportData setReportTitle(String reportTitle) {
         this.reportTitle = fixNewLineForHtml(reportTitle);
+        return this;
+    }
+
+    public String getMailSubject() {
+        return mailSubject;
+    }
+
+    public SlackReportData setMailSubject(String mailSubject) {
+        this.mailSubject = mailSubject;
         return this;
     }
 

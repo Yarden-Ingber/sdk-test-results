@@ -23,7 +23,7 @@ public class Enums {
     }
 
     public enum SdkGroupsSheetTabNames {
-        Selenium("Selenium"), Images("Images"), Appium("Appium"), Core("Core"), MobileNative("Mobile native");
+        Selenium("Selenium"), Images("Images"), Appium("Appium"), Core("Core"), MobileNative("MobileNative");
 
         public final String value;
 

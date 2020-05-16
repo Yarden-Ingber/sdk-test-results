@@ -169,7 +169,10 @@ By default the mail will be sent to a mail report group release.reports@applitoo
 
 ```
 {
-  "specificRecipient":"optional_specific_mail@applitools.com"
+  "specificRecipient":"optional_specific_mail@applitools.com",
+  "version":"10.9.88",
+  "changeLog":"### Fixed
+                - Updated accessibility enums (experimental)."
 }
 ```
 

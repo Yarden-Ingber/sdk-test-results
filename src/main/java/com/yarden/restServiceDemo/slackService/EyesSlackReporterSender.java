@@ -36,6 +36,8 @@ public class EyesSlackReporterSender {
                 .setReportTextPart("A new version of Eyes is about to be released.")
                 .setReportTitle("Test report for Eyes")
                 .setMailSubject("Test report for Eyes")
+                .setChangeLog(requestJson.getChangeLog())
+                .setVersion(requestJson.getVersion())
                 .setHighLevelReportTable(getHighLevelReportTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3EyesReportsBucketName.value);

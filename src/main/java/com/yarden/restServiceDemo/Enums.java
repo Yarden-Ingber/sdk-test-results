@@ -52,6 +52,22 @@ public class Enums {
         }
     }
 
+    public enum SdkVersionsSheetTabsNames {
+        Versions("Versions");
+
+        public final String value;
+
+        SdkVersionsSheetTabsNames(String value) {this.value = value;}
+    }
+
+    public enum SdkVersionsSheetColumnNames {
+        Sdk("sdk"), Version("latest version");
+
+        public final String value;
+
+        SdkVersionsSheetColumnNames(String value) {this.value = value;}
+    }
+
     public enum EyesSheetTabsNames {
         FrontEnd("Front end"), IntegrationsTests("Integration tests"), BackendTests("Backend tests"), Sandbox("sandbox");
 
@@ -106,8 +122,8 @@ public class Enums {
     }
 
     public enum SpreadsheetIDs {
-        SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"),
-        VisualGrid("1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ");
+        SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), SdkVersions("1TOw6XqUAdKRQL6QFkpcF_mMUGfX7CmxbUsXIbolSABM"),
+        Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"), VisualGrid("1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ");
 
         public final String value;
 

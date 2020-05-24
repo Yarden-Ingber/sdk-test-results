@@ -58,6 +58,9 @@ public class SheetData {
         for (Enums.VisualGridSheetTabsNames tab: Enums.VisualGridSheetTabsNames.values()) {
             writeSpecificSheetTab(Enums.SpreadsheetIDs.VisualGrid.value, tab.value);
         }
+        for (Enums.SdkVersionsSheetTabsNames tab: Enums.SdkVersionsSheetTabsNames.values()) {
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.SdkVersions.value, tab.value);
+        }
         clearCachedSheetData();
     }
 

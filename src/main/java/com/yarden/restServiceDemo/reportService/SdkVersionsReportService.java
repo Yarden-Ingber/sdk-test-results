@@ -32,7 +32,7 @@ public class SdkVersionsReportService {
         } else {
             addVersionToSheet(sdk, version);
         }
-        sheetData.writeSheet();
+        SheetData.writeAllTabsToSheet();
     }
 
     private void addVersionToSheet(String sdk, String version){

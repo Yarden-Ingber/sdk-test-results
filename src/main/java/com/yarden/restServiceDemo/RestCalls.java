@@ -55,7 +55,7 @@ public class RestCalls {
     public ResponseEntity postVisualGridStatus(@RequestBody String json) {
         synchronized (lock) {
             VisualGridStatusPageRequestTimer.isRequestReceived = true;
-            newRequestPrint(json);
+            Logger.info("**********New VG status request detected**********");
             try {
                 new VisualGridStatusPageService().postResults(json);
             } catch (Throwable e) {

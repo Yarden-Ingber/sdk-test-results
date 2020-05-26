@@ -18,7 +18,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldClearSheets = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json);
+            newRequestPrint(json, "/result");
             try {
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {
@@ -37,7 +37,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldClearSheets = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json);
+            newRequestPrint(json, "/eyes_result");
             try {
                 new EyesReportService().postResults(json);
             } catch (InternalError e) {
@@ -75,7 +75,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/extra_test_data")
     public ResponseEntity postExtraTestData(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json);
+            newRequestPrint(json, "/health");
             try {
                 new SdkReportService().postExtraTestData(json);
             } catch (JsonSyntaxException e) {
@@ -95,7 +95,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/sdks")
     public ResponseEntity sendSdkMailReportOverload(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json);
+            newRequestPrint(json, "/send_mail/sdks");
             try {
                 SheetData.writeAllTabsToSheet();
                 new SdkSlackReportSender().send(json);
@@ -111,7 +111,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/tests_end/eyes")
     public ResponseEntity sendEyesMailReport(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json);
+            newRequestPrint(json, "/tests_end/eyes");
             try {
                 if (json == null) {
                     json = "{}";
@@ -127,7 +127,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/generic")
     public ResponseEntity sendGenericMailReport(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json);
+            newRequestPrint(json, "/send_mail/generic");
             try {
                 new NonTestTableSlackReportSender().send(json);
             } catch (Throwable throwable) {
@@ -149,10 +149,10 @@ public class RestCalls {
         }
     }
 
-    private void newRequestPrint(String json){
+    private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
-        Logger.info("New result request detected: " + json);
+        Logger.info("New request detected: " + request + " === payload: " + json);
     }
 
 }

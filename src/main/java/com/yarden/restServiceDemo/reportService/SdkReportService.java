@@ -290,7 +290,7 @@ public class SdkReportService {
     }
 
     private boolean isTestedLocally(){
-        return sdkResultRequestJson.getId().equals("0000-0000");
+        return sdkResultRequestJson.getId().equals("0000-0000") || sdkResultRequestJson.getId().equals("aaaa-aaaa");
     }
 
 }

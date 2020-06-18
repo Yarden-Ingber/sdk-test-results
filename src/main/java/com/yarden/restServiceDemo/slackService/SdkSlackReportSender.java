@@ -18,7 +18,9 @@ import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class SdkSlackReportSender {
 
@@ -59,6 +61,28 @@ public class SdkSlackReportSender {
         new MailSender().send(slackReportData);
     }
 
+    public void sendFullRegression(String json) throws FileNotFoundException, UnsupportedEncodingException, MailjetSocketTimeoutException, MailjetException {
+        requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
+        if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
+            Logger.error("Failed sending report, Missing SDK in request json.");
+            throw new JsonParseException("No SDK in request JSON");
+        } else {
+            sdk = requestJson.getSdk();
+        }
+        SlackReportData slackReportData = new SlackReportData()
+                .setReportTextPart("Full regression test report.\n\nSDK: " + sdk)
+                .setReportTitle("Full regression test report for SDK: " + sdk)
+                .setMailSubject("Full regression test report for SDK: " + sdk)
+                .setHighLevelReportTable(getHighLevelFullRegressionReportTable())
+                .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
+                .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
+                .setDetailedFailedTestsTable(getDetailedFailedTestsTable())
+                .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
+        slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
+        setRecipientMail(slackReportData);
+        new MailSender().send(slackReportData);
+    }
+
     private String getVersion(){
         return requestJson.getVersion()
                 .replace("RELEASE_CANDIDATE;", "")
@@ -78,6 +102,31 @@ public class SdkSlackReportSender {
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
         tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentTestCount, previousTestCount);
         return tableBuilder;
+    }
+
+    private HTMLTableBuilder getHighLevelFullRegressionReportTable() {
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 3, 4);
+        tableBuilder.addTableHeader("Version", "Passed tests", "Failed tests", "Missing tests");
+        String currentPassedTestsCount = Integer.toString(getPassedTestCountForSdk());
+        String currentFailedTestsCount = Integer.toString(getFailedTestCountForSdk());
+        String currentMissingTestsCount = Integer.toString(getMissingTestsCountForSdk());
+        tableBuilder.addRowValues(true, "Current report", currentPassedTestsCount, currentFailedTestsCount, currentMissingTestsCount);
+        tableBuilder.addRowValues(true, "Previous report", getPreviousTestCountInS3(TestCountType.PASSED, currentPassedTestsCount), getPreviousTestCountInS3(TestCountType.FAILED, currentFailedTestsCount), getPreviousTestCountInS3(TestCountType.MISSING, currentMissingTestsCount));
+        return tableBuilder;
+    }
+
+    private String getPreviousTestCountInS3(TestCountType testCountType, String currentTestCount){
+        String previousTestCountFileName = requestJson.getSdk() + "Previous"+ testCountType.name() + "FullRegressionTestCount.txt";
+        String previousTestCount = "";
+        try {
+            previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName);
+        } catch (Throwable t) { t.printStackTrace(); }
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
+        return previousTestCount;
+    }
+
+    private enum TestCountType {
+        PASSED, FAILED, MISSING;
     }
 
     private HTMLTableBuilder getDetailedMissingTestsTable() {
@@ -110,7 +159,27 @@ public class SdkSlackReportSender {
                         if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
                         } else {
                             tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(),"PASS",
-                                    getSumOfPermutationsForTest(row));
+                                    getSumOfPassedPermutationsForTest(row));
+                        }
+                    }
+                }
+            }
+        }
+        return tableBuilder;
+    }
+
+    private HTMLTableBuilder getDetailedFailedTestsTable() {
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
+        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result", "Permutations");
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(sdk).getAsString().contains(Enums.TestResults.Failed.value)) {
+                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
+                        } else {
+                            tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(),"Fail",
+                                    getSumOfFailedPermutationsForTest(row));
                         }
                     }
                 }
@@ -127,6 +196,48 @@ public class SdkSlackReportSender {
                 int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
                 int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
                 totalAmount += passedValueInteger + failedValueInteger;
+            }
+        }
+        return totalAmount;
+    }
+
+    private int getPassedTestCountForSdk(){
+        int totalAmount = 0;
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            for (JsonElement sheetEntry: reportSheet){
+                int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
+                totalAmount += passedValueInteger;
+            }
+        }
+        return totalAmount;
+    }
+
+    private int getFailedTestCountForSdk(){
+        int totalAmount = 0;
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            for (JsonElement sheetEntry: reportSheet){
+                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
+                totalAmount += failedValueInteger;
+            }
+        }
+        return totalAmount;
+    }
+
+    private int getMissingTestsCountForSdk() {
+        int totalAmount = 0;
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
+                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
+                        } else {
+                            totalAmount++;
+                        }
+                    }
+                }
             }
         }
         return totalAmount;
@@ -163,9 +274,17 @@ public class SdkSlackReportSender {
         return "";
     }
 
-    private String getSumOfPermutationsForTest(JsonElement row){
+    private String getSumOfPassedPermutationsForTest(JsonElement row){
         try {
             return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SdkSheetColumnNames.Pass.value).getAsInt());
+        } catch (Exception e) {
+            return "0";
+        }
+    }
+
+    private String getSumOfFailedPermutationsForTest(JsonElement row){
+        try {
+            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SdkSheetColumnNames.Fail.value).getAsInt());
         } catch (Exception e) {
             return "0";
         }

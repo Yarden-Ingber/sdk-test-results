@@ -108,6 +108,21 @@ public class RestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/send_full_regression/sdks")
+    public ResponseEntity sendSdkFullRegressionReport(@RequestBody String json){
+        synchronized (lock) {
+            newRequestPrint(json, "/send_full_regression/sdks");
+            try {
+                SheetData.writeAllTabsToSheet();
+                new SdkSlackReportSender().sendFullRegression(json);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return new ResponseEntity("Failed sending email: " + t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Mail sent", HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/tests_end/eyes")
     public ResponseEntity sendEyesMailReport(@RequestBody String json){
         synchronized (lock) {

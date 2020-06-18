@@ -91,8 +91,13 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append(slackReportData.getCoverageGap() + "<br/><br/>");
         }
         if (slackReportData.getDetailedMissingTestsTable() != null){
-            htmlReportStringBuilder.append("<details><summary><b>Unexecuted tests</b></summary>");
+            htmlReportStringBuilder.append("<br/><details><summary><b>Unexecuted tests</b></summary>");
             htmlReportStringBuilder.append(slackReportData.getDetailedMissingTestsTable());
+            htmlReportStringBuilder.append("</details><br/>");
+        }
+        if (slackReportData.getDetailedFailedTestsTable() != null) {
+            htmlReportStringBuilder.append("<br/><details><summary><b>Failed tests</b></summary>");
+            htmlReportStringBuilder.append(slackReportData.getDetailedFailedTestsTable());
             htmlReportStringBuilder.append("</details><br/>");
         }
         if (slackReportData.getDetailedPassedTestsTable() != null) {

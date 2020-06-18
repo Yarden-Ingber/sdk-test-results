@@ -13,6 +13,7 @@ public class SlackReportData {
     private HTMLTableBuilder detailedMissingTestsTable = null;
     private HTMLTableBuilder highLevelReportTable = null;
     private HTMLTableBuilder detailedPassedTestsTable = null;
+    private HTMLTableBuilder detailedFailedTestsTable = null;
     private String reportTitle = "";
     private String mailSubject = "";
     private String changeLog = "";
@@ -146,6 +147,15 @@ public class SlackReportData {
 
     public SlackReportData setHtmlReportUrl(String htmlReportUrl) {
         this.htmlReportUrl = htmlReportUrl;
+        return this;
+    }
+
+    public HTMLTableBuilder getDetailedFailedTestsTable() {
+        return detailedFailedTestsTable;
+    }
+
+    public SlackReportData setDetailedFailedTestsTable(HTMLTableBuilder detailedFailedTestsTable) {
+        this.detailedFailedTestsTable = detailedFailedTestsTable;
         return this;
     }
 }

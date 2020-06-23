@@ -18,6 +18,9 @@ public class SdkVersionsReportService {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         String sdk = requestJson.getSdk();
         String version = requestJson.getVersion();
+        if (version == null || version.isEmpty()) {
+            return;
+        }
         version = version.replaceAll("RELEASE_CANDIDATE-", "")
                 .replaceAll("RELEASE_CANDIDATE;", "")
                 .replaceAll("RELEASE_CANDIDATE", "");

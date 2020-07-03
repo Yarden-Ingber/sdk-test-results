@@ -95,10 +95,13 @@ public class SdkSlackReportSender {
         tableBuilder.addTableHeader("SDK", "Success percentage", "Test count", "Previous release test count");
         String previousTestCountFileName = requestJson.getSdk() + "PreviousTestCount.txt";
         String previousTestCount = "";
-        String currentTestCount = Integer.toString(getTotalTestCountForSdk());
+        String currentTestCount = Integer.toString(getPassedTestCountForSdk());
         try {
             previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName);
-        } catch (Throwable t) { t.printStackTrace(); }
+        } catch (Throwable t) {
+            Logger.warn("No file named: " + previousTestCountFileName + " in S3 bucket: " + Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
+            t.printStackTrace();
+        }
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
         tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentTestCount, previousTestCount);
         return tableBuilder;

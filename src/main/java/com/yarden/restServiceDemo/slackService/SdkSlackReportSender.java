@@ -11,6 +11,7 @@ import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.mailService.MailSender;
+import com.yarden.restServiceDemo.reportService.SdkVersionsReportService;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
@@ -57,6 +58,7 @@ public class SdkSlackReportSender {
         setRecipientMail(slackReportData);
         if (requestJson.getSpecificRecipient() == null || requestJson.getSpecificRecipient().isEmpty()){
             new SlackReporter().report(slackReportData);
+            new SdkVersionsReportService().updateVersion(json);
         }
         new MailSender().send(slackReportData);
     }

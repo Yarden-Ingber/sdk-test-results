@@ -99,7 +99,6 @@ public class RestCalls {
             try {
                 SheetData.writeAllTabsToSheet();
                 new SdkSlackReportSender().send(json);
-                new SdkVersionsReportService().updateVersion(json);
             } catch (Throwable t) {
                 t.printStackTrace();
                 return new ResponseEntity("Failed sending email: " + t.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

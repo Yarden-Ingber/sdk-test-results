@@ -22,7 +22,7 @@ public class EyesSlackReporterSender {
 
     private SlackReportNotificationJson requestJson;
     private static final String EndedTestTasksCounterFile = "EndedTestTasksCounterFile.txt";
-    private static final int NumOfTestTasks = Integer.parseInt(System.getenv("EYES_TEST_TASKS_COUNT"));
+    private static final int NumOfTestTasks = Integer.parseInt("1");
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
@@ -75,8 +75,8 @@ public class EyesSlackReporterSender {
     }
 
     private HTMLTableBuilder getDetailedPassedTestsTable() {
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 2);
-        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Result");
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 4);
+        tableBuilder.addTableHeader("<div align=\"left\">Test name</div>", "Feature", "Feature sub-category", "Result");
         for (Enums.EyesSheetTabsNames eyesReportTab: Enums.EyesSheetTabsNames.values()) {
             if (eyesReportTab != Enums.EyesSheetTabsNames.Sandbox) {
                 JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, eyesReportTab.value)).getSheetData();
@@ -84,7 +84,10 @@ public class EyesSlackReporterSender {
                     if (!row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.TimestampRow.value)
                             && !row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.IDRow.value)
                             && row.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Passed.value)) {
-                        tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString(), "PASS");
+                        tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString(),
+                                row.getAsJsonObject().get(Enums.EyesSheetColumnNames.Feature.value).getAsString(),
+                                row.getAsJsonObject().get(Enums.EyesSheetColumnNames.FeatureSubCategory.value).getAsString(),
+                                "PASS");
                     }
                 }
             }

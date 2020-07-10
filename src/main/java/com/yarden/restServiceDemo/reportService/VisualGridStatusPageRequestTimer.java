@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo.reportService;
 
 import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.RestCalls;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -24,18 +25,20 @@ public class VisualGridStatusPageRequestTimer extends TimerTask {
 
     @Override
     public void run() {
-        Logger.info("VisualGridStatusPageRequestTimer saying: \"tick...\"");
-        if (!isRequestReceived) {
-            Logger.info("VisualGridStatusPageRequestTimer timeout. adding empty row to Visual Grid status page.");
-            String json = "{\"status\": []}";
-            try {
-                new VisualGridStatusPageService().postResults(json);
-            } catch (IOException e) {
-                e.printStackTrace();
+        synchronized (RestCalls.lock) {
+            Logger.info("VisualGridStatusPageRequestTimer saying: \"tick...\"");
+            if (!isRequestReceived) {
+                Logger.info("VisualGridStatusPageRequestTimer timeout. adding empty row to Visual Grid status page.");
+                String json = "{\"status\": []}";
+                try {
+                    new VisualGridStatusPageService().postResults(json);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
             }
-            return;
+            isRequestReceived = false;
         }
-        isRequestReceived = false;
     }
 
 }

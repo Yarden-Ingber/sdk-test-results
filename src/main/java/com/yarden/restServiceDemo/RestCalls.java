@@ -16,7 +16,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
         synchronized (lock) {
-            WriteEntireSheetsPeriodically.shouldClearSheets = false;
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/result");
             try {
@@ -35,7 +35,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/eyes_result")
     public ResponseEntity postEyesResults(@RequestBody String json) {
         synchronized (lock) {
-            WriteEntireSheetsPeriodically.shouldClearSheets = false;
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/eyes_result");
             try {

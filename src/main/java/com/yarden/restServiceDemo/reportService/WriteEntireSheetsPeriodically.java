@@ -7,14 +7,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class WriteEntireSheetsPeriodically extends TimerTask{
-    public static boolean shouldClearSheets = false;
+    public static boolean shouldStopSheetWritingTimer = false;
     private static boolean isRunning = false;
     private static Timer timer;
 
     public static  synchronized void start() {
         if (!isRunning) {
             timer = new Timer("WriteEntireSheetsPeriodically");
-            timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 3 * 1000 * 60);
+            timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 1000 * 30);
             isRunning = true;
         }
     }
@@ -27,17 +27,17 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
     @Override
     public void run() {
         Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
-        if (shouldClearSheets) {
-            try {
-                Logger.info("Timer timeout. writing all sheets to google.");
-                SheetData.writeAllTabsToSheet();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            SheetData.writeAllTabsToSheet();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (shouldStopSheetWritingTimer) {
+            Logger.info("Timer timeout");
             stop();
             return;
         }
-        shouldClearSheets = true;
+        shouldStopSheetWritingTimer = true;
     }
 
 

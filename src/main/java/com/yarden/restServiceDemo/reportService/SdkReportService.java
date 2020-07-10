@@ -80,7 +80,7 @@ public class SdkReportService {
         JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
-            String testName = capitalize(testResult.getTestName());
+            String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
             String paramsString = "";
             if (shouldAddTestParamsToTestName) {
                 paramsString = getTestParamsAsString(testResult);
@@ -91,6 +91,13 @@ public class SdkReportService {
                 markTestAsMandatory(testName);
             }
         }
+    }
+
+    private String addGenericTestFlag(TestResultData testResult, String testName){
+        if (testResult.isGeneric() != null && testResult.isGeneric()) {
+            return testName + "(generic)";
+        }
+        return testName;
     }
 
     private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SdkSheetColumnNames permutationResult){

@@ -24,6 +24,9 @@ public class TestResultData {
     @SerializedName("result_url")
     @Expose
     private String resultUrl;
+    @SerializedName("isGeneric")
+    @Expose
+    private Boolean isGeneric;
 
     public String getTestName() {
         return testName;
@@ -75,5 +78,13 @@ public class TestResultData {
 
     public void setFeature_sub_category(String feature_sub_category) {
         this.feature_sub_category = feature_sub_category;
+    }
+
+    public Boolean isGeneric() {
+        return isGeneric;
+    }
+
+    public void setGeneric(Boolean generic) {
+        isGeneric = generic;
     }
 }

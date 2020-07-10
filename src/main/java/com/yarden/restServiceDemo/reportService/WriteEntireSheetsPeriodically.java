@@ -14,7 +14,7 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
     public static  synchronized void start() {
         if (!isRunning) {
             timer = new Timer("WriteEntireSheetsPeriodically");
-            timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 5 * 1000 * 60);
+            timer.scheduleAtFixedRate(new WriteEntireSheetsPeriodically(), 30, 3 * 1000 * 60);
             isRunning = true;
         }
     }

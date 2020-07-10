@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.*;
+import java.time.LocalDate;
 
 public class HtmlReportGenerator {
 
@@ -73,6 +74,7 @@ public class HtmlReportGenerator {
                 "    <div class=\"content\">\n" +
                 "        <div class=\"header\">applitools</div>");
         htmlReportStringBuilder.append("<h1>" + slackReportData.getReportTitle() + "</h1>");
+        htmlReportStringBuilder.append("<h2>" + LocalDate.now().toString() + "</h2>");
         if (slackReportData.getVersion() != null && !slackReportData.getVersion().isEmpty()) {
             htmlReportStringBuilder.append("<h2>Version</h2>");
             htmlReportStringBuilder.append(versionToList(slackReportData.getVersion()) + "<br/><br/>");

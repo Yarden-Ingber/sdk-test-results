@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo.reportService;
 
 import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.RestCalls;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -26,18 +27,20 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
 
     @Override
     public void run() {
-        Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
-        try {
-            SheetData.writeAllTabsToSheet();
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (RestCalls.lock) {
+            Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
+            try {
+                SheetData.writeAllTabsToSheet();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (shouldStopSheetWritingTimer) {
+                Logger.info("Timer timeout");
+                stop();
+                return;
+            }
+            shouldStopSheetWritingTimer = true;
         }
-        if (shouldStopSheetWritingTimer) {
-            Logger.info("Timer timeout");
-            stop();
-            return;
-        }
-        shouldStopSheetWritingTimer = true;
     }
 
 

@@ -95,7 +95,7 @@ public class SdkReportService {
 
     private String addGenericTestFlag(TestResultData testResult, String testName){
         if (testResult.isGeneric() != null && testResult.isGeneric()) {
-            return testName + "(generic)";
+            return testName + Enums.Strings.Generic.value;
         }
         return testName;
     }

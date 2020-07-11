@@ -2,6 +2,16 @@ package com.yarden.restServiceDemo;
 
 public class Enums {
 
+    public enum Strings{
+        Generic("(generic)");
+
+        public final String value;
+
+        Strings(String value){
+            this.value = value;
+        }
+    }
+
     public enum TestResults{
         Passed("1"), Failed("-1"), Missing("");
 

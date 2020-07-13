@@ -15,27 +15,32 @@ public class SheetData {
     private SheetTabIdentifier sheetTabIdentifier;
     private static Map<SheetTabIdentifier, List<String>> columnsNamesMap = new HashMap<>();
     private static Map<SheetTabIdentifier, JsonArray> sheetDataPerTabMap = new HashMap<>();
+    private static final String lock = "lock";
 
     public SheetData(SheetTabIdentifier sheetTabIdentifier){
         this.sheetTabIdentifier = sheetTabIdentifier;
     }
 
     public JsonArray getSheetData(){
-        if (!sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
-            try {
+        synchronized (lock){
+            if (!sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
                 try {
-                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
-                    columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
-                    sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
-                } catch (Throwable t1) {
-                    List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
-                    sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
+                    try {
+                        List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
+                        columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
+                        sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
+                    } catch (Throwable t1) {
+                        Thread.sleep(500);
+                        List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
+                        sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
+                    }
+                } catch (Throwable t) {
+                    Logger.error("failed getting sheet:" + t.getMessage());
+                    t.printStackTrace();
                 }
-            } catch (Throwable t) {
-                Logger.error("failed getting sheet:" + t.getMessage());
             }
+            return sheetDataPerTabMap.get(sheetTabIdentifier);
         }
-        return sheetDataPerTabMap.get(sheetTabIdentifier);
     }
 
     public void writeSheet() throws IOException {
@@ -65,12 +70,20 @@ public class SheetData {
     }
 
     private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) throws IOException {
-        SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(spreadsheetID, sheetTabName);
-        if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
-            SheetData sheetData = new SheetData(sheetTabIdentifier);
-            sheetData.columnNames = columnsNamesMap.get(sheetTabIdentifier);
-            sheetData.sheetTabIdentifier = sheetTabIdentifier;
-            SheetDBApiService.updateSheet(sheetData);
+        synchronized (lock){
+            SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(spreadsheetID, sheetTabName);
+            if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
+                SheetData sheetData = new SheetData(sheetTabIdentifier);
+                sheetData.columnNames = columnsNamesMap.get(sheetTabIdentifier);
+                sheetData.sheetTabIdentifier = sheetTabIdentifier;
+                try {
+                    SheetDBApiService.updateSheet(sheetData);
+                } catch (Throwable t){
+                    t.printStackTrace();
+                    try { Thread.sleep(500); } catch (Throwable e) { }
+                    SheetDBApiService.updateSheet(sheetData);
+                }
+            }
         }
     }
 

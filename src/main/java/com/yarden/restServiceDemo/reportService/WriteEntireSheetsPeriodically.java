@@ -27,19 +27,23 @@ public class WriteEntireSheetsPeriodically extends TimerTask{
 
     @Override
     public void run() {
-        synchronized (RestCalls.lock) {
-            Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
-            try {
-                SheetData.writeAllTabsToSheet();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            synchronized (RestCalls.lock) {
+                Logger.info("WriteEntireSheetsPeriodically saying: \"tick...\"");
+                try {
+                    SheetData.writeAllTabsToSheet();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+                if (shouldStopSheetWritingTimer) {
+                    Logger.info("Timer timeout");
+                    stop();
+                    return;
+                }
+                shouldStopSheetWritingTimer = true;
             }
-            if (shouldStopSheetWritingTimer) {
-                Logger.info("Timer timeout");
-                stop();
-                return;
-            }
-            shouldStopSheetWritingTimer = true;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

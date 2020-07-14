@@ -81,6 +81,7 @@ public class SheetData {
                 } catch (Throwable t){
                     t.printStackTrace();
                     try { Thread.sleep(500); } catch (Throwable e) { }
+                    Logger.warn("Retrying writeSpecificSheetTab");
                     SheetDBApiService.updateSheet(sheetData);
                 }
             }

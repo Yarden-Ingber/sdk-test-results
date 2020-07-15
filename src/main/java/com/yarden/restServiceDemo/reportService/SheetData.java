@@ -30,7 +30,9 @@ public class SheetData {
                         columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
                         sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
                     } catch (Throwable t1) {
-                        Thread.sleep(500);
+                        Logger.warn("SheetDBApiService.getAllSheet failed");
+                        Thread.sleep(3000);
+                        Logger.warn("Retrying getSheetData");
                         List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
                         sheetDataPerTabMap.put(sheetTabIdentifier, SheetDBApiService.listToJsonArray(sheet));
                     }
@@ -79,8 +81,9 @@ public class SheetData {
                 try {
                     SheetDBApiService.updateSheet(sheetData);
                 } catch (Throwable t){
+                    Logger.warn("SheetDBApiService.updateSheet failed");
                     t.printStackTrace();
-                    try { Thread.sleep(500); } catch (Throwable e) { }
+                    try { Thread.sleep(3000); } catch (Throwable e) { }
                     Logger.warn("Retrying writeSpecificSheetTab");
                     SheetDBApiService.updateSheet(sheetData);
                 }

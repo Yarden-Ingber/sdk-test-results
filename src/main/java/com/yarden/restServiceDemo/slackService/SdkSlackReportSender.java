@@ -97,13 +97,16 @@ public class SdkSlackReportSender {
         if (getFailedTestCountForSdk() > 0) {
             throw new RequestAbortedException("There are failed tests in the excel sheet");
         }
+        String currentSpecificTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> !testName.contains(Enums.Strings.Generic.value)));
+        if (currentSpecificTestCount == "0"){
+            throw new RequestAbortedException("No test results in sheet for sdk: " + requestJson.getSdk());
+        }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 6);
         tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic tesst count");
         String previousSpecificTestCountFileName = requestJson.getSdk() + "PreviousSpecificTestCount.txt";
         String previousGenericTestCountFileName = requestJson.getSdk() + "PreviousGenericTestCount.txt";
         String previousSpecificTestCount = getTestCountFromFileNameInS3(previousSpecificTestCountFileName);
         String previousGenericTestCount = getTestCountFromFileNameInS3(previousGenericTestCountFileName);
-        String currentSpecificTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> !testName.contains(Enums.Strings.Generic.value)));
         String currentGenericTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> testName.contains(Enums.Strings.Generic.value)));
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousSpecificTestCountFileName, currentSpecificTestCount);
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousGenericTestCountFileName, currentGenericTestCount);

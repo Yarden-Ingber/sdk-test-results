@@ -102,7 +102,7 @@ public class SdkSlackReportSender {
             throw new RequestAbortedException("No test results in sheet for sdk: " + requestJson.getSdk());
         }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 6);
-        tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic tesst count");
+        tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic test count");
         String previousSpecificTestCountFileName = requestJson.getSdk() + "PreviousSpecificTestCount.txt";
         String previousGenericTestCountFileName = requestJson.getSdk() + "PreviousGenericTestCount.txt";
         String previousSpecificTestCount = getTestCountFromFileNameInS3(previousSpecificTestCountFileName);

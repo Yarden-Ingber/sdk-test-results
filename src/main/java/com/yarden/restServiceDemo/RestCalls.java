@@ -32,6 +32,25 @@ public class RestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.DELETE, path = "/delete_previous_results")
+    public ResponseEntity deletePreviousResults(@RequestBody String json) {
+        synchronized (lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json, "/delete_previous_results");
+            try {
+                new SdkReportService().deleteAllColumnsForSdkInAllTabs(json);
+            } catch (InternalError e) {
+                return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (JsonSyntaxException e) {
+                String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
+                Logger.error(errorMessage);
+                return new ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/eyes_result")
     public ResponseEntity postEyesResults(@RequestBody String json) {
         synchronized (lock) {

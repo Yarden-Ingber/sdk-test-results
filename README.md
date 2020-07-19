@@ -9,11 +9,8 @@ All results are also posted to Raw data tab.
 #### Please use the release sheets only for RELEASE test runs. For Dev, use sandbox sheet.
 
 ### Results queue mechanism
-The sheet checks for an input every five minutes.
-If between two checks there’s no new update then the queue gets dumped to the sheet.
-Any test sending new results resets the counter.
-After 10 results in the queue it is dumped immediately to the sheet and the queue is emptied.<br>
-In the worst case it can take 10 min for the data to get to the sheet (one result right after a periodical check and no more results after it)
+In order to reduce the amount of requests to google, the results server adds all the requests to a buffer. Every minute the buffer gets dumped to the sheet.
+This means that a new request may take up to a minute to be shown on the google sheet.
 
 ### Report
 
@@ -81,6 +78,15 @@ Set it to `false`, or stop sending it in your request, to start using the shared
   
 If set to true && the reporting sdk is DotNet, the mandatory column will be updated. posted results with the same id will accumulate also on the mandatory column.
 Non DotNet sdks can't update the mandatory column.
+
+#### Delete previous results for a specific sdk
+Send a `DELETE` to `/delete_previous_results` with the JSON payload (below) - returns a `200` and the requested JSON.
+
+```
+{  
+  "sdk":"java"
+}
+```
 
 #### Post new test results for Eyes
 

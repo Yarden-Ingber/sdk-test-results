@@ -130,6 +130,15 @@ public class SdkReportService {
         }
     }
 
+    public void deleteAllColumnsForSdkInAllTabs(String json){
+        sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        Logger.info("Deleting all result columns in all tabs for sdk: " + sdkResultRequestJson.getSdk());
+        for (Enums.SdkGroupsSheetTabNames tabName : Enums.SdkGroupsSheetTabNames.values()) {
+            sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, tabName.value));
+            deleteTestResultsForSdk(sdkResultRequestJson.getSdk());
+        }
+    }
+
     private String getCurrentColumnId(String sdk){
         try {
             for (JsonElement sheetEntry: sheetData.getSheetData()){
@@ -208,14 +217,32 @@ public class SdkReportService {
 
     private void deleteEntireSdkColumn(String sdk){
         Logger.info("Deleting entire column for sdk: " + sdk);
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
-            sheetEntry.getAsJsonObject().addProperty(sdk, "");
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Fail.value, "");
-            sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Pass.value, "");
-            if (isSandbox()) {
+        deleteTestResultsForSdk(sdk);
+        deleteEntireSdkExtraDataColumn(sdk);
+        deleteEntireMandatoryColomn();
+    }
+
+    private void deleteTestResultsForSdk(String sdk) {
+        if (sheetData.getSheetData().get(0).getAsJsonObject().keySet().contains(sdk)) {
+            for (JsonElement sheetEntry : sheetData.getSheetData()) {
+                sheetEntry.getAsJsonObject().addProperty(sdk, "");
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Fail.value, "");
+                sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.Pass.value, "");
+            }
+        }
+    }
+
+    private void deleteEntireSdkExtraDataColumn(String sdk) {
+        if (isSandbox()) {
+            for (JsonElement sheetEntry: sheetData.getSheetData()){
                 sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.ExtraData.value, "");
             }
-            if (sdkResultRequestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+        }
+    }
+
+    private void deleteEntireMandatoryColomn(){
+        if (sdkResultRequestJson.getMandatory() && isAllowedToUpdateMandatory()) {
+            for (JsonElement sheetEntry: sheetData.getSheetData()){
                 try {
                     sheetEntry.getAsJsonObject().addProperty(Enums.SdkSheetColumnNames.Mandatory.value, "");
                 } catch (Exception e) {}

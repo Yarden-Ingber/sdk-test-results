@@ -98,19 +98,24 @@ public class SdkSlackReportSender {
             throw new RequestAbortedException("There are failed tests in the excel sheet");
         }
         String currentSpecificTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> !testName.contains(Enums.Strings.Generic.value)));
-        if (currentSpecificTestCount == "0"){
+        String currentGenericTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> testName.contains(Enums.Strings.Generic.value)));
+        if (currentSpecificTestCount == "0" && currentGenericTestCount == "0"){
             throw new RequestAbortedException("No test results in sheet for sdk: " + requestJson.getSdk());
         }
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 6);
-        tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic test count");
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 8);
+        tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic test count", "Total test count", "Previous release total test count");
         String previousSpecificTestCountFileName = requestJson.getSdk() + "PreviousSpecificTestCount.txt";
         String previousGenericTestCountFileName = requestJson.getSdk() + "PreviousGenericTestCount.txt";
+        String previousTotalTestCountFileName = requestJson.getSdk() + "PreviousTotalTestCount.txt";
         String previousSpecificTestCount = getTestCountFromFileNameInS3(previousSpecificTestCountFileName);
         String previousGenericTestCount = getTestCountFromFileNameInS3(previousGenericTestCountFileName);
-        String currentGenericTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> testName.contains(Enums.Strings.Generic.value)));
+        String previousTotalTestCount = getTestCountFromFileNameInS3(previousTotalTestCountFileName);
+        String currentTotalTestCount = String.valueOf(Integer.parseInt(currentGenericTestCount) + Integer.parseInt(currentSpecificTestCount));
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousSpecificTestCountFileName, currentSpecificTestCount);
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousGenericTestCountFileName, currentGenericTestCount);
-        tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentSpecificTestCount, previousSpecificTestCount, currentGenericTestCount, previousGenericTestCount);
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTotalTestCountFileName, currentTotalTestCount);
+        tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentSpecificTestCount, previousSpecificTestCount, currentGenericTestCount,
+                previousGenericTestCount, currentTotalTestCount, previousTotalTestCount);
         return tableBuilder;
     }
 

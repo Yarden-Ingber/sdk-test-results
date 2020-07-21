@@ -138,7 +138,7 @@ public class SheetData {
         }
     }
 
-    public static final int PostResultsBufferSize = 50;
+    public static final int PostResultsBufferSize = 200;
     public static AtomicReference<Integer> resultsCount = new AtomicReference<>();
 
 }

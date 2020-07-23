@@ -79,7 +79,7 @@ public class Enums {
     }
 
     public enum EyesSheetTabsNames {
-        FrontEnd("Front end"), IntegrationsTests("Integration tests"), BackendTests("Backend tests"), Sandbox("sandbox");
+        FrontEnd("Front end"), IntegrationsTests("Integration tests"), FunctionalTests("Functional tests"), BackendTests("Backend tests"), Sandbox("sandbox");
 
         public final String value;
 

@@ -62,15 +62,16 @@ public class EyesSlackReporterSender {
 
     private HTMLTableBuilder getHighLevelReportTable() {
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 3);
-        tableBuilder.addTableHeader("Success percentage", "Test count", "Previous release test count");
+        tableBuilder.addTableHeader("Success percentage", "Passed test count", "Previous release test count");
         String previousTestCountFileName = "EyesPreviousTestCount.txt";
         String previousTestCount = "";
-        String currentTestCount = Integer.toString(getTotalTestCount());
+        String passedTestCount = Integer.toString(getPassedTestCount());
+        String successPercentage = Integer.toString(Math.round(((float)getPassedTestCount() / getTotalTestCount()) * 100));
         try {
             previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, previousTestCountFileName);
         } catch (Throwable t) { t.printStackTrace(); }
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, previousTestCountFileName, currentTestCount);
-        tableBuilder.addRowValues(true, "100", currentTestCount, previousTestCount);
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, previousTestCountFileName, passedTestCount);
+        tableBuilder.addRowValues(true, successPercentage, passedTestCount, previousTestCount);
         return tableBuilder;
     }
 
@@ -103,13 +104,31 @@ public class EyesSlackReporterSender {
                 for (JsonElement sheetEntry: reportSheet){
                     if (!sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.TimestampRow.value)
                     && !sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.IDRow.value)
-                    && sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Passed.value)){
+                    && (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Passed.value) ||
+                            sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Failed.value))){
                         totalAmount++;
                     }
                 }
             }
         }
         return totalAmount;
+    }
+
+    private int getPassedTestCount(){
+        int passedAmount = 0;
+        for (Enums.EyesSheetTabsNames eyesReportTab: Enums.EyesSheetTabsNames.values()) {
+            if (eyesReportTab != Enums.EyesSheetTabsNames.Sandbox) {
+                JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, eyesReportTab.value)).getSheetData();
+                for (JsonElement sheetEntry: reportSheet){
+                    if (!sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.TimestampRow.value)
+                            && !sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(Enums.EyesSheetColumnNames.IDRow.value)
+                            && sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.Status.value).getAsString().equals(Enums.TestResults.Passed.value)){
+                        passedAmount++;
+                    }
+                }
+            }
+        }
+        return passedAmount;
     }
 
     private void setRecipientMail(SlackReportData slackReportData) {

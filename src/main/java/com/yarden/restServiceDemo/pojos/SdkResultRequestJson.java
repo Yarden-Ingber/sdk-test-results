@@ -36,7 +36,7 @@ public class SdkResultRequestJson {
     }
 
     public String getId() {
-        if (id == null) {
+        if (id == null || id.isEmpty()) {
             id = UUID.randomUUID().toString().substring(0, 6);
         }
         return id;

@@ -16,6 +16,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.yarden.restServiceDemo.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class SheetDBApiService {
                             .setApplicationName(APPLICATION_NAME)
                             .build();
                 } catch (Throwable t) {
+                    t.printStackTrace();
                     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
                     sheetApiService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                             .setApplicationName(APPLICATION_NAME)
@@ -121,9 +123,26 @@ public class SheetDBApiService {
     }
 
     public static void updateSheet(SheetData sheetData) throws IOException {
-        getService().spreadsheets().values()
-                .update(sheetData.getSheetTabIdentifier().spreadsheetID, sheetData.getSheetTabIdentifier().sheetTabName + "!A1:BM2000", new ValueRange().setValues(jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames())))
-                .setValueInputOption("RAW").execute();
+        Sheets sheetService = null;
+        Sheets.Spreadsheets.Values sheetValues;
+        String spreadsheetID = "";
+        String range = "";
+        List<List<Object>> newValues = new LinkedList<>();
+        try {
+            sheetService = getService();
+            sheetValues = sheetService.spreadsheets().values();
+            spreadsheetID = sheetData.getSheetTabIdentifier().spreadsheetID;
+            range = sheetData.getSheetTabIdentifier().sheetTabName + "!A1:BM2000";
+            newValues = jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames());
+            sheetValues.update(spreadsheetID, range, new ValueRange().setValues(newValues))
+                    .setValueInputOption("RAW").execute();
+        } catch (Throwable t) {
+            Logger.warn("Failed in update sheet");
+            Logger.warn(spreadsheetID);
+            Logger.warn(range);
+            Logger.warn(Integer.toString(newValues.size()));
+            throw t;
+        }
     }
 
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {

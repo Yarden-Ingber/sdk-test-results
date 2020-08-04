@@ -105,7 +105,11 @@ public class SheetData {
     }
 
     public List<String> getColumnNames(){
-        return columnsNamesMap.get(sheetTabIdentifier);
+        List<String> result = columnsNamesMap.get(sheetTabIdentifier);
+        if (result == null) {
+            Logger.error("No columns for tab identifier: " + sheetTabIdentifier);
+        }
+        return result;
     }
 
     public SheetTabIdentifier getSheetTabIdentifier(){

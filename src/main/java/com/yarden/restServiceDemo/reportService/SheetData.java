@@ -108,6 +108,8 @@ public class SheetData {
         List<String> result = columnsNamesMap.get(sheetTabIdentifier);
         if (result == null) {
             Logger.error("No columns for tab identifier: " + sheetTabIdentifier);
+            List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
+            columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
         }
         return result;
     }

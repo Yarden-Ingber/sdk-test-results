@@ -103,8 +103,8 @@ public class SdkSlackReportSender {
         if (currentTotalTestCount == "0"){
             throw new RequestAbortedException("No test results in sheet for sdk: " + requestJson.getSdk());
         }
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 2, 8);
-        tableBuilder.addTableHeader("SDK", "Success percentage", "Specific test count", "Previous release specific test count", "Generic test count", "Previous release generic test count", "Total test count", "Previous release total test count");
+        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 3, 4);
+        tableBuilder.addTableHeader("Test run", "Total test count", "Specific test count", "Generic test count");
         String previousSpecificTestCountFileName = requestJson.getSdk() + "PreviousSpecificTestCount.txt";
         String previousGenericTestCountFileName = requestJson.getSdk() + "PreviousGenericTestCount.txt";
         String previousTotalTestCountFileName = requestJson.getSdk() + "PreviousTotalTestCount.txt";
@@ -114,8 +114,8 @@ public class SdkSlackReportSender {
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousSpecificTestCountFileName, currentSpecificTestCount);
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousGenericTestCountFileName, currentGenericTestCount);
         AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTotalTestCountFileName, currentTotalTestCount);
-        tableBuilder.addRowValues(true, requestJson.getSdk(), "100", currentSpecificTestCount, previousSpecificTestCount, currentGenericTestCount,
-                previousGenericTestCount, currentTotalTestCount, previousTotalTestCount);
+        tableBuilder.addRowValues(true, "Current", currentTotalTestCount, currentSpecificTestCount, currentGenericTestCount);
+        tableBuilder.addRowValues(true, "Previous", previousTotalTestCount, previousSpecificTestCount, previousGenericTestCount);
         return tableBuilder;
     }
 

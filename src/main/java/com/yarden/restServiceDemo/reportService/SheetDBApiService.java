@@ -6,6 +6,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -46,7 +47,7 @@ public class SheetDBApiService {
                 } catch (Throwable t) {
                     t.printStackTrace();
                     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-                    sheetApiService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    sheetApiService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, setTimeout(getCredentials(HTTP_TRANSPORT), 3 * 60000))
                             .setApplicationName(APPLICATION_NAME)
                             .build();
                 }
@@ -55,6 +56,13 @@ public class SheetDBApiService {
             }
         }
         return sheetApiService;
+    }
+
+    private static HttpRequestInitializer setTimeout(final HttpRequestInitializer initializer, final int timeout) {
+        return request -> {
+            initializer.initialize(request);
+            request.setReadTimeout(timeout);
+        };
     }
 
     public static JsonArray listToJsonArray(List<List<Object>> sheet) {

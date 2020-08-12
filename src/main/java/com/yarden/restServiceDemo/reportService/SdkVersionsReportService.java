@@ -14,7 +14,7 @@ public class SdkVersionsReportService {
     private SlackReportNotificationJson requestJson;
     private SheetData sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SdkVersions.value, Enums.SdkVersionsSheetTabsNames.Versions.value));
 
-    public void updateVersion(String json) throws IOException {
+    public void updateVersion(String json) {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         String sdk = requestJson.getSdk();
         String version = requestJson.getVersion();

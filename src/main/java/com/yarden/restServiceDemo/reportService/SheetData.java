@@ -45,13 +45,13 @@ public class SheetData {
         }
     }
 
-    public void writeSheet() throws IOException {
+    public void writeSheet() {
         if (resultsCount.get() >= PostResultsBufferSize) {
             writeAllTabsToSheet();
         }
     }
 
-    public static void writeAllTabsToSheet() throws IOException {
+    public static void writeAllTabsToSheet() {
         Logger.info("Writing all sheets to google");
         for (Enums.SdkGeneralSheetTabsNames tab: Enums.SdkGeneralSheetTabsNames.values()) {
             writeSpecificSheetTab(Enums.SpreadsheetIDs.SDK.value, tab.value);
@@ -71,7 +71,7 @@ public class SheetData {
         clearCachedSheetData();
     }
 
-    private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) throws IOException {
+    private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) {
         synchronized (lock){
             SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(spreadsheetID, sheetTabName);
             if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
@@ -110,6 +110,10 @@ public class SheetData {
             Logger.error("No columns for tab identifier: " + sheetTabIdentifier);
             List<List<Object>> sheet = SheetDBApiService.getAllSheet(sheetTabIdentifier);
             columnsNamesMap.put(sheetTabIdentifier, SheetDBApiService.getKeyList(sheet));
+            result = columnsNamesMap.get(sheetTabIdentifier);
+            if (result == null) {
+                Logger.error("Still no columns for tab identifier: " + sheetTabIdentifier);
+            }
         }
         return result;
     }

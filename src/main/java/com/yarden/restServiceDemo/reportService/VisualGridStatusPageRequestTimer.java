@@ -30,11 +30,7 @@ public class VisualGridStatusPageRequestTimer extends TimerTask {
             if (!isRequestReceived) {
                 Logger.info("VisualGridStatusPageRequestTimer timeout. adding empty row to Visual Grid status page.");
                 String json = "{\"status\": []}";
-                try {
-                    new VisualGridStatusPageService().postResults(json);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                new VisualGridStatusPageService().postResults(json);
                 return;
             }
             isRequestReceived = false;

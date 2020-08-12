@@ -16,7 +16,7 @@ public class VisualGridStatusPageService {
     SheetData sheetData;
     private static final int NumOfResultsToShow = 800;
 
-    public void postResults(String json) {
+    public void postResults(String json) throws IOException {
         visualGridStatusPageRequestJson = new Gson().fromJson(json, VisualGridStatusPageRequestJson.class);
         sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         if (getNumOfStatusLines() >= NumOfResultsToShow) {

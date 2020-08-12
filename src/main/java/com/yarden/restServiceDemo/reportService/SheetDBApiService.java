@@ -112,19 +112,19 @@ public class SheetDBApiService {
         return resultMatrix;
     }
 
-    public static List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier) {
+    public static synchronized List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier) {
         ValueRange response = null;
         boolean isPassed = false;
         int waitTime = 0;
         while (!isPassed) {
             try {
-                Thread.sleep(waitTime);
+                Thread.currentThread().sleep(waitTime);
                 response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
                 if (response != null) {
                     isPassed = true;
                 }
             } catch (Throwable t) {
-                Logger.warn("Failed in getAllSheet. Retrying...");
+                Logger.warn("Failed in getAllSheet. Retrying... waitTime=" + waitTime);
                 waitTime = waitTime + 2000;
                 if (waitTime == 2000 * 5) {
                     throw new RuntimeException("Failed in getAllSheet");
@@ -134,7 +134,7 @@ public class SheetDBApiService {
         return response.getValues();
     }
 
-    public static void updateSheet(SheetData sheetData) {
+    public static void updateSheet(SheetData sheetData) throws IOException {
         Sheets sheetService = null;
         Sheets.Spreadsheets.Values sheetValues;
         String spreadsheetID = "";
@@ -153,6 +153,7 @@ public class SheetDBApiService {
             Logger.warn(spreadsheetID);
             Logger.warn(range);
             Logger.warn(Integer.toString(newValues.size()));
+            throw t;
         }
     }
 

@@ -45,13 +45,13 @@ public class SheetData {
         }
     }
 
-    public void writeSheet() {
+    public void writeSheet() throws IOException {
         if (resultsCount.get() >= PostResultsBufferSize) {
             writeAllTabsToSheet();
         }
     }
 
-    public static void writeAllTabsToSheet() {
+    public static void writeAllTabsToSheet() throws IOException {
         Logger.info("Writing all sheets to google");
         for (Enums.SdkGeneralSheetTabsNames tab: Enums.SdkGeneralSheetTabsNames.values()) {
             writeSpecificSheetTab(Enums.SpreadsheetIDs.SDK.value, tab.value);
@@ -71,7 +71,7 @@ public class SheetData {
         clearCachedSheetData();
     }
 
-    private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) {
+    private static void writeSpecificSheetTab(String spreadsheetID, String sheetTabName) throws IOException {
         synchronized (lock){
             SheetTabIdentifier sheetTabIdentifier = new SheetTabIdentifier(spreadsheetID, sheetTabName);
             if (sheetDataPerTabMap.containsKey(sheetTabIdentifier)) {
@@ -83,7 +83,7 @@ public class SheetData {
                 } catch (Throwable t){
                     Logger.warn("SheetDBApiService.updateSheet failed");
                     t.printStackTrace();
-                    try { Thread.sleep(3000); } catch (Throwable e) { }
+                    try { Thread.currentThread().sleep(3000); } catch (Throwable e) { }
                     Logger.warn("Retrying writeSpecificSheetTab");
                     SheetDBApiService.updateSheet(sheetData);
                 }

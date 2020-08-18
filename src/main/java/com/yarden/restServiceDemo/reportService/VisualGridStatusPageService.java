@@ -23,7 +23,6 @@ public class VisualGridStatusPageService {
             sheetData.deleteLastRowInSheet();
         }
         sheetData.addElementToBeginningOfReportSheet(parseRequestJsonToStatusEntry());
-        SheetData.writeAllTabsToSheet();
     }
 
     private int getNumOfStatusLines(){

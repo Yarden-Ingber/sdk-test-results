@@ -74,6 +74,8 @@ public class RestCalls {
     public ResponseEntity postVisualGridStatus(@RequestBody String json) {
         synchronized (lock) {
             VisualGridStatusPageRequestTimer.isRequestReceived = true;
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             Logger.info("**********New VG status request detected**********");
             try {
                 new VisualGridStatusPageService().postResults(json);

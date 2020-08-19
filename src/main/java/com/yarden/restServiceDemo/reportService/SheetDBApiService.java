@@ -41,7 +41,7 @@ public class SheetDBApiService {
             try {
                 try {
                     final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-                    sheetApiService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    sheetApiService = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, setTimeout(getCredentials(HTTP_TRANSPORT), 3 * 60000))
                             .setApplicationName(APPLICATION_NAME)
                             .build();
                 } catch (Throwable t) {

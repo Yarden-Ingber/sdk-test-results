@@ -126,17 +126,17 @@ public class SheetDBApiService {
         int waitTime = 0;
         while (!isPassed) {
             try {
-                Thread.currentThread().sleep(waitTime);
                 response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
                 if (response != null) {
                     isPassed = true;
                 }
             } catch (Throwable t) {
-                Logger.warn("Failed in getAllSheet. Retrying... waitTime=" + waitTime);
+                sheetApiService = null;
+                Logger.warn("Failed in getAllSheet");
                 waitTime = waitTime + 2000;
-                if (waitTime == 2000 * 5) {
-                    throw new RuntimeException("Failed in getAllSheet");
-                }
+                if (waitTime == 2000 * 5) {throw new RuntimeException("Failed in getAllSheet");}
+                try {Thread.currentThread().sleep(waitTime);} catch (InterruptedException e) {e.printStackTrace();}
+                Logger.warn("Retrying... waitTime=" + waitTime);
             }
         }
         return response.getValues();

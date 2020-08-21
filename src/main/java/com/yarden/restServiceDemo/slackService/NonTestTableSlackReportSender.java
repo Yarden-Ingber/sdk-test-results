@@ -13,17 +13,13 @@ public class NonTestTableSlackReportSender {
 
     public void send(String json) throws IOException {
         SlackReportNotificationJson requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
-        String reportTitle = requestJson.getReportTitle();
-        String mailTextPart = requestJson.getMailTextPart();
-        String version = requestJson.getVersion();
-        String changeLog = requestJson.getChangeLog();
-        String testCoverageGap = requestJson.getTestCoverageGap();
         SlackReportData slackReportData = new SlackReportData()
-                .setReportTextPart(mailTextPart)
-                .setReportTitle(reportTitle)
-                .setVersion(version)
-                .setChangeLog(changeLog)
-                .setCoverageGap(testCoverageGap)
+                .setReportTextPart(requestJson.getMailTextPart())
+                .setReportTitle(requestJson.getReportTitle())
+                .setSdk(requestJson.getSdk())
+                .setVersion(requestJson.getVersion())
+                .setChangeLog(requestJson.getChangeLog())
+                .setCoverageGap(requestJson.getTestCoverageGap())
                 .setRecipientsJsonArray(new JSONArray()
                         .put(new JSONObject()
                                 .put("Email", Enums.EnvVariables.MailReportRecipient.value)

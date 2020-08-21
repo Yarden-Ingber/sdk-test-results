@@ -9,6 +9,7 @@ import org.json.JSONArray;
 
 public class SlackReportData {
 
+    private String sdk;
     private String reportTextPart;
     private HTMLTableBuilder detailedMissingTestsTable = null;
     private HTMLTableBuilder highLevelReportTable = null;
@@ -156,6 +157,15 @@ public class SlackReportData {
 
     public SlackReportData setDetailedFailedTestsTable(HTMLTableBuilder detailedFailedTestsTable) {
         this.detailedFailedTestsTable = detailedFailedTestsTable;
+        return this;
+    }
+
+    public String getSdk() {
+        return sdk;
+    }
+
+    public SlackReportData setSdk(String sdk) {
+        this.sdk = sdk;
         return this;
     }
 }

@@ -48,6 +48,7 @@ public class SdkSlackReportSender {
                 .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
+                .setSdk(sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
                 .setCoverageGap(testCoverageGap)

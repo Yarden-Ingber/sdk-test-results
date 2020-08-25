@@ -77,6 +77,7 @@ public class SdkSlackReportSender {
                 .setReportTextPart("Full regression test report.\n\nSDK: " + sdk)
                 .setReportTitle("Full regression test report for SDK: " + sdk)
                 .setMailSubject("Full regression test report for SDK: " + sdk)
+                .setSdk(sdk)
                 .setHighLevelReportTable(getHighLevelFullRegressionReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())

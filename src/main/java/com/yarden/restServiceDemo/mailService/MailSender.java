@@ -32,8 +32,9 @@ public class MailSender {
                                         .put("Name", "Yarden Ingber"))
                                 .put(Emailv31.Message.TO, slackReportData.getRecipientsJsonArray())
                                 .put(Emailv31.Message.SUBJECT, slackReportData.getMailSubject())
-                                .put(Emailv31.Message.TEXTPART,
-                                        slackReportData.getReportTextPart() + "\n\nHTML Report:\n" + slackReportData.getHtmlReportUrl())
+                                .put(Emailv31.Message.HTMLPART, slackReportData.getReportTextPart().replace("\n", "<br/>") +
+                                        "<br><br>HTML Report:<br>" +
+                                        slackReportData.getHtmlReportUrl())
                                 .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
         response = client.post(request);
         Logger.info(Integer.toString(response.getStatus()));

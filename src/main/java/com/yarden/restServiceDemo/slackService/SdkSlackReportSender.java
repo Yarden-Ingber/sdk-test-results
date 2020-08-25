@@ -45,7 +45,9 @@ public class SdkSlackReportSender {
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
         SlackReportData slackReportData = new SlackReportData()
-                .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") + "\n\n" + newVersionInstructions)
+                .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") +
+                        "\n\n" + newVersionInstructions +
+                        "<br><br>" + getHighLevelReportTable())
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
                 .setSdk(sdk)
@@ -65,7 +67,7 @@ public class SdkSlackReportSender {
         new MailSender().send(slackReportData);
     }
 
-    public void sendFullRegression(String json) throws FileNotFoundException, UnsupportedEncodingException, MailjetSocketTimeoutException, MailjetException {
+    public void sendFullRegression(String json) throws FileNotFoundException, UnsupportedEncodingException, MailjetSocketTimeoutException, MailjetException, IOException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending report, Missing SDK in request json.");
@@ -74,7 +76,8 @@ public class SdkSlackReportSender {
             sdk = requestJson.getSdk();
         }
         SlackReportData slackReportData = new SlackReportData()
-                .setReportTextPart("Full regression test report.\n\nSDK: " + sdk)
+                .setReportTextPart("Full regression test report.\n\nSDK: " + sdk +
+                        "<br><br>" + getHighLevelReportTable())
                 .setReportTitle("Full regression test report for SDK: " + sdk)
                 .setMailSubject("Full regression test report for SDK: " + sdk)
                 .setSdk(sdk)

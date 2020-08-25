@@ -23,8 +23,9 @@ public class HtmlReportGenerator {
 
     public String getHtmlReportUrlInAwsS3(String bucketName) throws FileNotFoundException, UnsupportedEncodingException {
         generateHtmlReportFile();
-        AwsS3Provider.uploadFileToS3(bucketName, getFileNameInBucket(), htmlReportFileName);
-        String fileUrl = AwsS3Provider.getUrlToFileInS3(bucketName, getFileNameInBucket());
+        String fileNameInBucket = getFileNameInBucket();
+        AwsS3Provider.uploadFileToS3(bucketName, fileNameInBucket, htmlReportFileName);
+        String fileUrl = AwsS3Provider.getUrlToFileInS3(bucketName, fileNameInBucket);
         try {
             new File(htmlReportFileName).delete();
         } catch (Throwable t) {t.printStackTrace();}
@@ -171,10 +172,11 @@ public class HtmlReportGenerator {
     }
 
     private String getFileNameInBucket(){
-        if (slackReportData.getSdk() != null && !slackReportData.getSdk().isEmpty()) {
+        if (slackReportData.getSdk() != null && !slackReportData.getSdk().isEmpty()
+            && slackReportData.getVersion() != null && !slackReportData.getVersion().isEmpty()) {
             return "report" + "_" + slackReportData.getSdk() + "_" + slackReportData.getVersion();
         } else {
-            return "report" + "_" + Logger.getTimaStamp();
+            return "report" + "_" + Logger.getTimaStamp().replaceAll(" ", "_").replace('.', ':');
         }
     }
 

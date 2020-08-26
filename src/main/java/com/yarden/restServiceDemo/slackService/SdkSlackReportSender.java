@@ -47,7 +47,7 @@ public class SdkSlackReportSender {
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") +
                         "\n\n" + newVersionInstructions +
-                        "<br><br>" + getHighLevelReportTable())
+                        "<br>" + getHighLevelReportTable())
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
                 .setSdk(sdk)

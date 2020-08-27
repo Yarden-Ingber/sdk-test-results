@@ -9,14 +9,12 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.reportService.SdkVersionsReportService;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
-import org.apache.http.impl.execchain.RequestAbortedException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,17 +42,18 @@ public class SdkSlackReportSender {
         changeLog = requestJson.getChangeLog();
         testCoverageGap = requestJson.getTestCoverageGap();
         String newVersionInstructions = getNewVersionInstructions();
+        SdkReleaseEventHighLevelReportTableBuilder sdkReleaseEventHighLevelReportTableBuilder = new SdkReleaseEventHighLevelReportTableBuilder(requestJson);
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") +
                         "\n\n" + newVersionInstructions +
-                        "<br>" + getHighLevelReportTable())
+                        "<br>" + sdkReleaseEventHighLevelReportTableBuilder.getHighLevelReportTable())
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
                 .setSdk(sdk)
                 .setVersion(version)
                 .setChangeLog(changeLog)
                 .setCoverageGap(testCoverageGap)
-                .setHighLevelReportTable(getHighLevelReportTable())
+                .setHighLevelReportTable(sdkReleaseEventHighLevelReportTableBuilder.getHighLevelReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
@@ -75,13 +74,14 @@ public class SdkSlackReportSender {
         } else {
             sdk = requestJson.getSdk();
         }
+        SdkHighLevelFullRegressionReportTableBuilder sdkHighLevelFullRegressionReportTableBuilder = new SdkHighLevelFullRegressionReportTableBuilder(requestJson);
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("Full regression test report.\n\nSDK: " + sdk +
-                        "<br><br>" + getHighLevelFullRegressionReportTable())
+                        "<br><br>" + sdkHighLevelFullRegressionReportTableBuilder.getHighLevelReportTable())
                 .setReportTitle("Full regression test report for SDK: " + sdk)
                 .setMailSubject("Full regression test report for SDK: " + sdk)
                 .setSdk(sdk)
-                .setHighLevelReportTable(getHighLevelFullRegressionReportTable())
+                .setHighLevelReportTable(sdkHighLevelFullRegressionReportTableBuilder.getHighLevelReportTable())
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setDetailedFailedTestsTable(getDetailedFailedTestsTable())
@@ -96,67 +96,6 @@ public class SdkSlackReportSender {
                 .replace("RELEASE_CANDIDATE;", "")
                 .replaceAll("RELEASE_CANDIDATE-", "")
                 .replaceAll("@", " ");
-    }
-
-    private HTMLTableBuilder getHighLevelReportTable() throws RequestAbortedException {
-        if (getFailedTestCountForSdk() > 0) {
-            throw new RequestAbortedException("There are failed tests in the excel sheet");
-        }
-        String currentSpecificTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> !testName.contains(Enums.Strings.Generic.value)));
-        String currentGenericTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> testName.contains(Enums.Strings.Generic.value)));
-        String currentTotalTestCount = String.valueOf(Integer.parseInt(currentGenericTestCount) + Integer.parseInt(currentSpecificTestCount));
-        if (currentTotalTestCount == "0"){
-            throw new RequestAbortedException("No test results in sheet for sdk: " + requestJson.getSdk());
-        }
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 3, 4);
-        tableBuilder.addTableHeader("Test run", "Total test count", "Specific test count", "Generic test count");
-        String previousSpecificTestCountFileName = requestJson.getSdk() + "PreviousSpecificTestCount.txt";
-        String previousGenericTestCountFileName = requestJson.getSdk() + "PreviousGenericTestCount.txt";
-        String previousTotalTestCountFileName = requestJson.getSdk() + "PreviousTotalTestCount.txt";
-        String previousSpecificTestCount = getTestCountFromFileNameInS3(previousSpecificTestCountFileName);
-        String previousGenericTestCount = getTestCountFromFileNameInS3(previousGenericTestCountFileName);
-        String previousTotalTestCount = getTestCountFromFileNameInS3(previousTotalTestCountFileName);
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousSpecificTestCountFileName, currentSpecificTestCount);
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousGenericTestCountFileName, currentGenericTestCount);
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTotalTestCountFileName, currentTotalTestCount);
-        tableBuilder.addRowValues(true, "Current", currentTotalTestCount, currentSpecificTestCount, currentGenericTestCount);
-        tableBuilder.addRowValues(true, "Previous", previousTotalTestCount, previousSpecificTestCount, previousGenericTestCount);
-        return tableBuilder;
-    }
-
-    private String getTestCountFromFileNameInS3(String fileName){
-        try {
-            return AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, fileName);
-        } catch (Throwable t) {
-            Logger.warn("No file named: " + fileName + " in S3 bucket: " + Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
-            t.printStackTrace();
-        }
-        return "";
-    }
-
-    private HTMLTableBuilder getHighLevelFullRegressionReportTable() {
-        HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 3, 4);
-        tableBuilder.addTableHeader("Version", "Passed tests", "Failed tests", "Missing tests");
-        String currentPassedTestsCount = Integer.toString(getPassedTestCountForSdk((String testName) -> true));
-        String currentFailedTestsCount = Integer.toString(getFailedTestCountForSdk());
-        String currentMissingTestsCount = Integer.toString(getMissingTestsCountForSdk());
-        tableBuilder.addRowValues(true, "Current report", currentPassedTestsCount, currentFailedTestsCount, currentMissingTestsCount);
-        tableBuilder.addRowValues(true, "Previous report", getPreviousTestCountInS3(TestCountType.PASSED, currentPassedTestsCount), getPreviousTestCountInS3(TestCountType.FAILED, currentFailedTestsCount), getPreviousTestCountInS3(TestCountType.MISSING, currentMissingTestsCount));
-        return tableBuilder;
-    }
-
-    private String getPreviousTestCountInS3(TestCountType testCountType, String currentTestCount){
-        String previousTestCountFileName = requestJson.getSdk() + "Previous"+ testCountType.name() + "FullRegressionTestCount.txt";
-        String previousTestCount = "";
-        try {
-            previousTestCount = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName);
-        } catch (Throwable t) { t.printStackTrace(); }
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3SdkReportsBucketName.value, previousTestCountFileName, currentTestCount);
-        return previousTestCount;
-    }
-
-    private enum TestCountType {
-        PASSED, FAILED, MISSING;
     }
 
     private HTMLTableBuilder getDetailedMissingTestsTable() {
@@ -218,73 +157,9 @@ public class SdkSlackReportSender {
         return tableBuilder;
     }
 
-    private int getTotalTestCountForSdk(){
-        int totalAmount = 0;
-        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
-                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
-                totalAmount += passedValueInteger + failedValueInteger;
-            }
-        }
-        return totalAmount;
-    }
-
     @FunctionalInterface
     public interface AddingTestCountCondition {
         boolean shouldAddTest(String testName);
-    }
-
-    private int getPassedTestCountForSdk(AddingTestCountCondition addingTestCountCondition){
-        int totalAmount = 0;
-        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
-                    int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
-                    totalAmount += passedValueInteger;
-                }
-            }
-        }
-        return totalAmount;
-    }
-
-    private int getFailedTestCountForSdk(){
-        int totalAmount = 0;
-        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
-                totalAmount += failedValueInteger;
-            }
-        }
-        return totalAmount;
-    }
-
-    private int getMissingTestsCountForSdk() {
-        int totalAmount = 0;
-        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
-                for (JsonElement row: reportSheet) {
-                    if (row.getAsJsonObject().get(sdk).getAsString().isEmpty()) {
-                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
-                        } else {
-                            totalAmount++;
-                        }
-                    }
-                }
-            }
-        }
-        return totalAmount;
-    }
-
-    private int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SdkSheetColumnNames permutationResult){
-        JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
-        return (passedValue == null || passedValue.getAsString().isEmpty()) ?
-                0 :
-                sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
     }
 
     private void setRecipientMail(SlackReportData slackReportData) {
@@ -298,16 +173,16 @@ public class SdkSlackReportSender {
     }
 
     private String getNewVersionInstructions(){
-        String text = "Instructions and dependencies: ";
-        if (sdk.equals("dotnet")) {
-            return text + "https://www.nuget.org/packages/Eyes.Selenium/";
-        } else if (sdk.equals("java")) {
-            return text + "https://mvnrepository.com/artifact/com.applitools/eyes-selenium-java3/" + version;
-        } else if (sdk.equals("js_selenium_4")) {
-            return text + "https://www.npmjs.com/package/@applitools/eyes-selenium";
-        } else if (sdk.equals("js_wdio_5")) {
-            return text + "https://www.npmjs.com/package/@applitools/eyes-webdriverio";
-        }
+//        String text = "Instructions and dependencies: ";
+//        if (sdk.equals("dotnet")) {
+//            return text + "https://www.nuget.org/packages/Eyes.Selenium/";
+//        } else if (sdk.equals("java")) {
+//            return text + "https://mvnrepository.com/artifact/com.applitools/eyes-selenium-java3/" + version;
+//        } else if (sdk.equals("js_selenium_4")) {
+//            return text + "https://www.npmjs.com/package/@applitools/eyes-selenium";
+//        } else if (sdk.equals("js_wdio_5")) {
+//            return text + "https://www.npmjs.com/package/@applitools/eyes-webdriverio";
+//        }
         return "";
     }
 

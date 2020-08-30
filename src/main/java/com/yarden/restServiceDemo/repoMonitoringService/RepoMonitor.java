@@ -81,19 +81,19 @@ public class RepoMonitor extends TimerTask{
     private String findNewPackageName(List<String> knownList, List<String> receivedList) {
         for (String packageName : receivedList) {
             if (!knownList.contains(packageName)) {
-                return packageName;
+                return packageName + ", was public bot not any more";
             }
         }
         for (String packageName : knownList) {
             if (!receivedList.contains(packageName)) {
-                return packageName;
+                return packageName + ", was private and changed to public";
             }
         }
         return "";
     }
 
-    private void sendMailWarning(String codeManagerName, String packageName) throws MailjetSocketTimeoutException, MailjetException {
-        Logger.warn("RepoMonitor: A difference in repo\\package was discovered in " + codeManagerName + ": " + packageName);
+    private void sendMailWarning(String codeManagerName, String packageDifferenceMessage) throws MailjetSocketTimeoutException, MailjetException {
+        Logger.warn("RepoMonitor: A difference in repo\\package was discovered in " + codeManagerName + ": " + packageDifferenceMessage);
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
@@ -113,7 +113,7 @@ public class RepoMonitor extends TimerTask{
 //                                                .put("Name", "Adam Carmi"))
                                 )
                                 .put(Emailv31.Message.SUBJECT, "WARNING!! Public package difference found in " + codeManagerName)
-                                .put(Emailv31.Message.TEXTPART, "A difference in the expected public packages list found in " + codeManagerName + ". package name: " + packageName)
+                                .put(Emailv31.Message.TEXTPART, "A difference in the expected public packages list found in " + codeManagerName + ". package name: " + packageDifferenceMessage)
                                 .put(Emailv31.Message.CUSTOMID, "RepoMonitor")));
         response = client.post(request);
         Logger.info("RepoMonitor: " + response.getStatus());

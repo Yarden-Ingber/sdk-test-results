@@ -81,12 +81,12 @@ public class RepoMonitor extends TimerTask{
     private String findNewPackageName(List<String> knownList, List<String> receivedList) {
         for (String packageName : receivedList) {
             if (!knownList.contains(packageName)) {
-                return packageName + ", was public but not any more";
+                return packageName + ", is public but doesn't exist in the known list of public packages";
             }
         }
         for (String packageName : knownList) {
             if (!receivedList.contains(packageName)) {
-                return packageName + ", was private and changed to public";
+                return packageName + ", was public but not any more";
             }
         }
         return "";

@@ -41,7 +41,7 @@ public class RepoMonitor extends TimerTask{
     public static synchronized void start() {
         if (!isRunning) {
             timer = new Timer("RepoMonitor");
-            timer.scheduleAtFixedRate(new RepoMonitor(), 30, 1000 * 60 * 60 * 2);
+            timer.scheduleAtFixedRate(new RepoMonitor(), 30, 1000 * 60 * 60 * 5);
             isRunning = true;
         }
     }
@@ -81,7 +81,7 @@ public class RepoMonitor extends TimerTask{
     private String findNewPackageName(List<String> knownList, List<String> receivedList) {
         for (String packageName : receivedList) {
             if (!knownList.contains(packageName)) {
-                return packageName + ", was public bot not any more";
+                return packageName + ", was public but not any more";
             }
         }
         for (String packageName : knownList) {
@@ -108,9 +108,9 @@ public class RepoMonitor extends TimerTask{
                                         .put(new JSONObject()
                                                 .put("Email", "yarden.ingber@applitools.com")
                                                 .put("Name", "Yarden Ingber"))
-//                                        .put(new JSONObject()
-//                                                .put("Email", "adam.carmi@applitools.com")
-//                                                .put("Name", "Adam Carmi"))
+                                        .put(new JSONObject()
+                                                .put("Email", "adam.carmi@applitools.com")
+                                                .put("Name", "Adam Carmi"))
                                 )
                                 .put(Emailv31.Message.SUBJECT, "WARNING!! Public package difference found in " + codeManagerName)
                                 .put(Emailv31.Message.TEXTPART, "A difference in the expected public packages list found in " + codeManagerName + ". package name: " + packageDifferenceMessage)

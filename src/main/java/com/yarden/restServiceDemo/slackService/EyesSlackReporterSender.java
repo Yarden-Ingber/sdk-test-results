@@ -32,13 +32,14 @@ public class EyesSlackReporterSender {
     }
 
     private void sendReport() throws IOException, MailjetSocketTimeoutException, MailjetException{
+        HTMLTableBuilder highLevelReportTable = getHighLevelReportTable();
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new version of Eyes is about to be released.")
                 .setReportTitle("Test report for Eyes")
                 .setMailSubject("Test report for Eyes")
                 .setChangeLog(requestJson.getChangeLog())
                 .setVersion(requestJson.getVersion())
-                .setHighLevelReportTable(getHighLevelReportTable())
+                .setHighLevelReportTable(highLevelReportTable)
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3EyesReportsBucketName.value);
         slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
@@ -46,6 +47,8 @@ public class EyesSlackReporterSender {
 //        if (requestJson.getSpecificRecipient() == null || requestJson.getSpecificRecipient().isEmpty()){
 //            new SlackReporter().report(slackReportData);
 //        }
+        slackReportData.setReportTextPart(slackReportData.getReportTextPart() +
+                "<br>" + highLevelReportTable);
         new MailSender().send(slackReportData);
     }
 

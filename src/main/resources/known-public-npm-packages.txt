@@ -36,4 +36,3 @@
 @applitools/eyes-webdriverio4-service
 @applitools/eyes.webdriverio
 @applitools/eyes-playwright
-@applitools/test-public-package

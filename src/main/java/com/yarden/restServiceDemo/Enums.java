@@ -43,7 +43,7 @@ public class Enums {
     }
 
     public enum SdkGeneralSheetTabsNames {
-        Sandbox("sandbox"), RawData("Raw data");
+        Sandbox("sandbox");
 
         public final String value;
 
@@ -53,7 +53,7 @@ public class Enums {
     }
 
     public enum SdkSheetColumnNames {
-        TestName("Test name"), Mandatory("mandatory"), IDRow("id"), Fail("_fail"), Pass("_pass"), ExtraData("_extra");
+        TestName("Test name"), IDRow("id"), ExtraData("_extra");
 
         public final String value;
 

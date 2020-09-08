@@ -17,6 +17,9 @@ public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTabl
 
     public SdkReleaseEventHighLevelReportTableBuilder(SlackReportNotificationJson requestJson) throws RequestAbortedException {
         super(requestJson);
+        if (getFailedTestCountForSdk() > 0) {
+            throw new RequestAbortedException("There are failed tests in the excel sheet");
+        }
         currentSpecificTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> !testName.contains(Enums.Strings.Generic.value)));
         currentGenericTestCount = Integer.toString(getPassedTestCountForSdk((String testName) -> testName.contains(Enums.Strings.Generic.value)));
         currentTotalTestCount = String.valueOf(Integer.parseInt(currentGenericTestCount) + Integer.parseInt(currentSpecificTestCount));
@@ -35,9 +38,6 @@ public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTabl
     }
 
     public HTMLTableBuilder getHighLevelReportTable() throws RequestAbortedException {
-        if (getFailedTestCountForSdk() > 0) {
-            throw new RequestAbortedException("There are failed tests in the excel sheet");
-        }
         HTMLTableBuilder tableBuilder = new HTMLTableBuilder(false, 3, 4);
         tableBuilder.addTableHeader("Test run", "Total test count", "Specific test count", "Generic test count");
         tableBuilder.addRowValues(true, "Current", currentTotalTestCount, currentSpecificTestCount, currentGenericTestCount);

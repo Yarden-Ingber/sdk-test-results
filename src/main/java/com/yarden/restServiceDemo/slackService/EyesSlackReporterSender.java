@@ -74,8 +74,9 @@ public class EyesSlackReporterSender {
             int count = counterObject.counter + 1;
             if (count >= NumOfTestTasks) {
                 wrtieNewEndTasksCounter(new EndTasksCounterObject("0", 0));
+            } else {
+                wrtieNewEndTasksCounter(new EndTasksCounterObject(requestJson.getId(), counterObject.counter + 1));
             }
-            wrtieNewEndTasksCounter(new EndTasksCounterObject(requestJson.getId(), counterObject.counter + 1));
         }
     }
 

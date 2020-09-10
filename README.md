@@ -188,6 +188,7 @@ By default the mail will be sent to a mail report group release.reports@applitoo
 
 ```
 {
+  "id":"1234",
   "specificRecipient":"optional_specific_mail@applitools.com",
   "version":"10.9.88",
   "changeLog":"### Fixed

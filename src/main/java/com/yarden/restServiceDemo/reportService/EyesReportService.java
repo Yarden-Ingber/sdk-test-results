@@ -37,6 +37,16 @@ public class EyesReportService {
         SheetData.resetResultsCounterIfBiggerThankResultsBufferSize();
     }
 
+    public void deleteAllData(){
+        for (Enums.EyesSheetTabsNames tab : Enums.EyesSheetTabsNames.values()) {
+            if (!tab.equals(Enums.EyesSheetTabsNames.Sandbox)) {
+                Logger.info("Deleting data from tab " + tab.value);
+                sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.Eyes.value, tab.value));
+                deleteEntireColumn();
+            }
+        }
+    }
+
     private void setGoogleSheetTabName(){
         googleSheetTabName = eyesResultRequestJson.getGroup();
         if (isSandbox()) {

@@ -159,6 +159,20 @@ public class RestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.DELETE, path = "/reset_eyes_report_data")
+    public ResponseEntity deleteEntireEyesData(){
+        synchronized (lock) {
+            newRequestPrint("", "/reset_eyes_report_data");
+            try {
+                new EyesReportService().deleteAllData();
+                new EyesSlackReporterSender().resetEndTasksCounter();
+            } catch (Throwable throwable) {
+                return new ResponseEntity("Failed deleting eyes report data: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity("Data deleted", HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/generic")
     public ResponseEntity sendGenericMailReport(@RequestBody String json){
         synchronized (lock) {

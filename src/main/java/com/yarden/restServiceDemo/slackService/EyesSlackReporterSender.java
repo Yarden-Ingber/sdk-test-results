@@ -37,6 +37,10 @@ public class EyesSlackReporterSender {
         updateEndTasksCounterFile();
     }
 
+    public synchronized void resetEndTasksCounter(){
+        wrtieNewEndTasksCounter(new EndTasksCounterObject("0", 0));
+    }
+
     private void sendReport() throws IOException, MailjetSocketTimeoutException, MailjetException{
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new version of Eyes is about to be released.")

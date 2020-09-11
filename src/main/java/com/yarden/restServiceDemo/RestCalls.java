@@ -151,6 +151,7 @@ public class RestCalls {
                 if (json == null) {
                     json = "{}";
                 }
+                SheetData.writeAllTabsToSheet();
                 new EyesSlackReporterSender().send(json);
             } catch (Throwable throwable) {
                 return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -162,6 +163,8 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.DELETE, path = "/reset_eyes_report_data")
     public ResponseEntity deleteEntireEyesData(){
         synchronized (lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint("", "/reset_eyes_report_data");
             try {
                 new EyesReportService().deleteAllData();

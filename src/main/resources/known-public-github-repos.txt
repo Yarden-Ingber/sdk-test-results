@@ -153,3 +153,4 @@ eyes.common.java3
 testcafe
 playwright
 testcafe-classic-demo
+Eyes.Sdk.DotNet

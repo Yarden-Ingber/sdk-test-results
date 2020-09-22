@@ -154,3 +154,4 @@ testcafe
 playwright
 testcafe-classic-demo
 Eyes.Sdk.DotNet
+cs-applitools-java-hackathon

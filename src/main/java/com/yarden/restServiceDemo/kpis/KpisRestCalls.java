@@ -29,6 +29,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/started_investigation")
     public ResponseEntity started_investigation(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/started_investigation");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.StartedInvestigation).updateStateChange();
@@ -39,6 +41,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/missing_information")
     public ResponseEntity missing_information(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/missing_information");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.MissingInformation).updateStateChange();
@@ -49,6 +53,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/waiting_for_field_input")
     public ResponseEntity waiting_for_field_input(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/waiting_for_field_input");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.WaitingForFieldInput).updateStateChange();
@@ -59,6 +65,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/reproduced")
     public ResponseEntity reproduced(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/reproduced");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.Reproduced).updateStateChange();
@@ -69,6 +77,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/work_in_progress")
     public ResponseEntity work_in_progress(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/work_in_progress");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.WorkInProgress).updateStateChange();
@@ -79,6 +89,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/waiting_for_field_approval")
     public ResponseEntity waiting_for_field_approval(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/waiting_for_field_approval");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.WaitingForFieldApproval).updateStateChange();
@@ -89,9 +101,23 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/done")
     public ResponseEntity done(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/done");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.Done).updateStateChange();
+            return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/update_ticket_type")
+    public ResponseEntity update_ticket_type(@RequestBody String json) {
+        synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json, "/update_ticket_type");
+            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
+            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateTicketType();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }

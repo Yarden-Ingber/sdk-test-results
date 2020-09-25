@@ -17,6 +17,10 @@ public class TicketsStateChanger {
             Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
             return;
         }
+        if (currentState.equals(newState)) {
+            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
+            return;
+        }
         if (newState.equals(TicketStates.New)) {
             Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
         } else if (newState.equals(TicketStates.StartedInvestigation)) {

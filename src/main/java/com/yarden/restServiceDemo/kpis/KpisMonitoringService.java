@@ -19,7 +19,7 @@ public class KpisMonitoringService {
         this.newState = newState;
     }
 
-    public void updateStateChange() throws IllegalStateException {
+    public void updateStateChange() {
         try {
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateState(ticket, newState);
@@ -35,8 +35,18 @@ public class KpisMonitoringService {
                     "\"" + Enums.KPIsSheetColumnNames.CreationDate.value + "\":\"" + Logger.getTimaStamp() + "\"," +
                     "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
                     "\"" + Enums.KPIsSheetColumnNames.CurrentFlowState.value + "\":\"" + newState.name() + "\"}");
-            Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
+            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
             sheetData.getSheetData().add(newEntry);
+        }
+    }
+
+    public void updateTicketType() {
+        try {
+            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
+            JsonElement ticket = findSheetEntry();
+            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketType.value, ticketUpdateRequest.getTicketType());
+        } catch (NotFoundException e) {
+            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
         }
     }
 

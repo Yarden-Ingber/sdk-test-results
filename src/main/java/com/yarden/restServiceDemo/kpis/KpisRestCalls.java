@@ -3,6 +3,7 @@ package com.yarden.restServiceDemo.kpis;
 import com.google.gson.Gson;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
+import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/ticket_created")
     public ResponseEntity ticket_created(@RequestBody String json) {
         synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/ticket_created");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.New).updateStateChange();

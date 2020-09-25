@@ -68,6 +68,9 @@ public class SheetData {
         for (Enums.SdkVersionsSheetTabsNames tab: Enums.SdkVersionsSheetTabsNames.values()) {
             writeSpecificSheetTab(Enums.SpreadsheetIDs.SdkVersions.value, tab.value);
         }
+        for (Enums.KPIsSheetTabsNames tab: Enums.KPIsSheetTabsNames.values()) {
+            writeSpecificSheetTab(Enums.SpreadsheetIDs.KPIS.value, tab.value);
+        }
         clearCachedSheetData();
     }
 

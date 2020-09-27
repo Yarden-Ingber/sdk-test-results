@@ -122,9 +122,21 @@ public class KpisRestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/missing_quality")
+    public ResponseEntity missing_quality(@RequestBody String json) {
+        synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json, "/missing_quality");
+            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
+            new KpisMonitoringService(ticketUpdateRequest, TicketStates.MissingQuality).updateTicketType();
+            return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
+        }
+    }
+
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
-        Logger.info("New KPI request detected: " + request + " === payload: " + json);
+        Logger.info("KPIs: New KPI request detected: " + request + " === payload: " + json);
     }
 }

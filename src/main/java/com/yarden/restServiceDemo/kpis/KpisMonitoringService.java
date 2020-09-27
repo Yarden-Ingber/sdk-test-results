@@ -22,31 +22,22 @@ public class KpisMonitoringService {
     public void updateStateChange() {
         try {
             JsonElement ticket = findSheetEntry();
-            new TicketsStateChanger().updateState(ticket, newState);
+            new TicketsStateChanger().updateExistingTicketState(ticket, newState);
         } catch (NotFoundException e) {
             if (!newState.equals(TicketStates.New)) {
-                Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
+                Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
             }
-            JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.SubProject.value + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.TicketID.value + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.CreationDate.value + "\":\"" + Logger.getTimaStamp() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
-                    "\"" + Enums.KPIsSheetColumnNames.CurrentFlowState.value + "\":\"" + newState.name() + "\"}");
-            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
-            sheetData.getSheetData().add(newEntry);
+            addNewTicketEntry();
         }
     }
 
     public void updateTicketType() {
         try {
-            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
+            Logger.info("KPIs: Updating ticket type for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getTicketType());
             JsonElement ticket = findSheetEntry();
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketType.value, ticketUpdateRequest.getTicketType());
         } catch (NotFoundException e) {
-            Logger.info("*#^#$%^#$^&@%^@$%&@#$^*$^&*#%^");
+            Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
         }
     }
 
@@ -57,6 +48,19 @@ public class KpisMonitoringService {
             }
         }
         throw new NotFoundException("");
+    }
+
+    private void addNewTicketEntry(){
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.SubProject.value + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketID.value + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CreationDate.value + "\":\"" + Logger.getTimaStamp() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CurrentFlowState.value + "\":\"" + newState.name() + "\"}");
+        Logger.info("KPIs: Adding a new ticket to the sheet: " + newEntry.toString());
+        sheetData.getSheetData().add(newEntry);
     }
 
 }

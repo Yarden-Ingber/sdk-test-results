@@ -119,7 +119,7 @@ public class Enums {
     }
 
     public enum KPIsSheetTabsNames {
-        RawData("Raw data");
+        RawData("Raw data"), KPIs("KPIs");
 
         public final String value;
 
@@ -134,7 +134,8 @@ public class Enums {
         StartedInvestigationDate("Started investigation date"), ReproducedDate("Reproduced date"),
         MovedToMissingInformation("Moved to missing information"), MovedToWaitingForFieldInput("Moved to waiting for field input"),
         MovedToWaitingForApprovalDate("Moved to waiting for approval date"), MovedToDoneDate("Moved to done date"),
-        ReopenedAfterMovedToApproval("Reopened after moved to approval"), CurrentFlowState("Current flow state");
+        ReopenedAfterMovedToApproval("Reopened after moved to approval"), CurrentFlowState("Current flow state"),
+        MissingQuality("Moved to missing quality");
 
         public final String value;
 

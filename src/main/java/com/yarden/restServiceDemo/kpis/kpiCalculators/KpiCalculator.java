@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +17,13 @@ public class KpiCalculator {
     private SheetData rawSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
     private SheetData kpiSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.KPIs.value));
     private KpiSheetEntries kpiSheetEntries = new KpiSheetEntries();
+
+    @Test
+    public void buildKpisSheet() throws IOException {
+        calculate();
+        dumpKpisToSheet();
+        SheetData.writeAllTabsToSheet();
+    }
 
     public void calculate(){
         for (JsonElement sheetEntry: rawSheetData.getSheetData()){
@@ -32,9 +38,10 @@ public class KpiCalculator {
                     addNumberOfTicketsMovedToMissingInformationLastWeek(kpisSheetEntryObject, sheetEntry);
                     addNumberOfTicketsMovedToWaitingForFieldInputLastWeek(kpisSheetEntryObject, sheetEntry);
                     addNumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek(kpisSheetEntryObject, sheetEntry);
-                    addTicketsTimeFromNewToDone(kpisSheetEntryObject, sheetEntry);
-                    addBugsTimeFromNewToDone(kpisSheetEntryObject, sheetEntry);
-                    addBugsTimeFromStartedInvestigationToReproduced(kpisSheetEntryObject, sheetEntry);
+                    addTicketsTimeInHoursFromNewToDone(kpisSheetEntryObject, sheetEntry);
+                    addBugsTimeInHoursFromNewToDone(kpisSheetEntryObject, sheetEntry);
+                    addBugsTimeInHoursFromStartedInvestigationToReproduced(kpisSheetEntryObject, sheetEntry);
+                    addAverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek(kpisSheetEntryObject, sheetEntry);
                 }
             }
         }
@@ -57,12 +64,12 @@ public class KpiCalculator {
     public enum KpisColumns {
         Team("Team"), SubProject("Sub project"), OpenTickets("Open tickets"), NumberOfTicketsCreatedLastWeek("Number of tickets created last week"),
         NumberOfBugsCreatedLastWeek("Number of bugs created last week"), NumberOfTicketsMovedToDoneLastWeek("Number of tickets moved to done last week"),
-        NumberOfBugsMovedToDoneLastWeek("Number of bugs moved to done last week"), TicketsTimeFromNewToDone("Tickets time from new to done"),
-        BugsTimeFromNewToDone("Bugs time from new to done"), BugsTimeFromStartedInvestigationToReproduced("Bugs time from started investigation to reproduced"),
+        NumberOfBugsMovedToDoneLastWeek("Number of bugs moved to done last week"), TicketsTimeInHoursFromNewToDone("Tickets time in hours from new to done"),
+        BugsTimeInHoursFromNewToDone("Bugs time in hours from new to done"), BugsTimeInHoursFromStartedInvestigationToReproduced("Bugs time in hours from started investigation to reproduced"),
         NumberOfTicketsMovedToMissingInformationLastWeek("Number of tickets moved to Missing information last week"),
         NumberOfTicketsMovedToWaitingForFieldInputLastWeek("Number of tickets moved to Waiting for field input last week"),
         NumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek("Number of bugs moved back from Waiting for field approval to WIP last week"),
-        AverageTimeBugsWaitInWaitingForFieldApprovalLastWeek("Average time bugs wait in Waiting for field approval last week");
+        AverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek("Average time in hours bugs wait in Waiting for field approval last week");
 
         public final String value;
 
@@ -195,7 +202,7 @@ public class KpiCalculator {
         }
     }
 
-    private void addTicketsTimeFromNewToDone(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+    private void addTicketsTimeInHoursFromNewToDone(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
         String movedToDoneTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.MovedToDoneDate.value).getAsString();
         if (movedToDoneTimestamp.isEmpty()) {
             return;
@@ -203,19 +210,13 @@ public class KpiCalculator {
         try {
             Date creationDate = timestampToDate(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
             Date movedToDoneDate = timestampToDate(movedToDoneTimestamp);
-            Long daysBetweenNewAndDone = TimeUnit.MILLISECONDS.toHours(movedToDoneDate.getTime() - creationDate.getTime());
-            AvarageCalculator avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.TicketsTimeFromNewToDone);
-            if (avarageCalculator == null) {
-                kpisSheetEntryObject.kpisList.put(KpisColumns.TicketsTimeFromNewToDone, new AvarageCalculator());
-                avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.TicketsTimeFromNewToDone);
-            }
-            avarageCalculator.members.add(daysBetweenNewAndDone);
+            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.TicketsTimeInHoursFromNewToDone, creationDate, movedToDoneDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
-    private void addBugsTimeFromNewToDone(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+    private void addBugsTimeInHoursFromNewToDone(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
         if (!isBug(sheetEntry)) {
             return;
         }
@@ -226,36 +227,50 @@ public class KpiCalculator {
         try {
             Date creationDate = timestampToDate(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
             Date movedToDoneDate = timestampToDate(movedToDoneTimestamp);
-            Long hoursBetweenNewAndDone = TimeUnit.MILLISECONDS.toHours(movedToDoneDate.getTime() - creationDate.getTime());
-            AvarageCalculator avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.BugsTimeFromNewToDone);
-            if (avarageCalculator == null) {
-                kpisSheetEntryObject.kpisList.put(KpisColumns.BugsTimeFromNewToDone, new AvarageCalculator());
-                avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.BugsTimeFromNewToDone);
-            }
-            avarageCalculator.members.add(hoursBetweenNewAndDone);
+            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.BugsTimeInHoursFromNewToDone, creationDate, movedToDoneDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
-    private void addBugsTimeFromStartedInvestigationToReproduced(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+    private void addBugsTimeInHoursFromStartedInvestigationToReproduced(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
         String reproducedTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.ReproducedDate.value).getAsString();
-        if (reproducedTimestamp.isEmpty()) {
+        String startedInvestigationTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.StartedInvestigationDate.value).getAsString();
+        if (reproducedTimestamp.isEmpty() || startedInvestigationTimestamp.isEmpty()) {
             return;
         }
         try {
-            Date startedInvestigationDate = timestampToDate(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.StartedInvestigationDate.value).getAsString());
+            Date startedInvestigationDate = timestampToDate(startedInvestigationTimestamp);
             Date reproducedDate = timestampToDate(reproducedTimestamp);
-            Long hoursBetweenStartedInvestigationAndReproduced = TimeUnit.MILLISECONDS.toHours(reproducedDate.getTime() - startedInvestigationDate.getTime());
-            AvarageCalculator avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.BugsTimeFromStartedInvestigationToReproduced);
-            if (avarageCalculator == null) {
-                kpisSheetEntryObject.kpisList.put(KpisColumns.BugsTimeFromStartedInvestigationToReproduced, new AvarageCalculator());
-                avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(KpisColumns.BugsTimeFromStartedInvestigationToReproduced);
-            }
-            avarageCalculator.members.add(hoursBetweenStartedInvestigationAndReproduced);
+            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.BugsTimeInHoursFromStartedInvestigationToReproduced, startedInvestigationDate, reproducedDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addAverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+        String movedToDoneTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.MovedToDoneDate.value).getAsString();
+        String movedToWaitingForApprovalTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.MovedToWaitingForApprovalDate.value).getAsString();
+        if (movedToDoneTimestamp.isEmpty() || movedToWaitingForApprovalTimestamp.isEmpty()) {
+            return;
+        }
+        try {
+            Date movedToDoneDate = timestampToDate(movedToDoneTimestamp);
+            Date movedToWaitingForApprovalDate = timestampToDate(movedToWaitingForApprovalTimestamp);
+            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.AverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek, movedToWaitingForApprovalDate, movedToDoneDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addTimeCalculationToAvarageCalculator(KpisSheetEntryObject kpisSheetEntryObject, KpisColumns kpisColumns, Date start, Date end){
+        Long calculatedTime = TimeUnit.MILLISECONDS.toHours(end.getTime() - start.getTime());
+        AvarageCalculator avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(kpisColumns);
+        if (avarageCalculator == null) {
+            kpisSheetEntryObject.kpisList.put(kpisColumns, new AvarageCalculator());
+            avarageCalculator = (AvarageCalculator)kpisSheetEntryObject.kpisList.get(kpisColumns);
+        }
+        avarageCalculator.members.add(calculatedTime);
     }
 
     private void addOneToTicketsCount(KpisSheetEntryObject kpisSheetEntryObject, KpisColumns kpisColumns){

@@ -36,3 +36,4 @@
 @applitools/eyes.webdriverio
 @applitools/eyes-playwright
 @applitools/sdk-shared
+@applitools/sdk-fake-eyes-server

@@ -1,5 +1,6 @@
 package com.yarden.restServiceDemo.kpis;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.yarden.restServiceDemo.Enums;
@@ -17,6 +18,10 @@ public class KpisMonitoringService {
     public KpisMonitoringService(TicketUpdateRequest ticketUpdateRequest, TicketStates newState) {
         this.ticketUpdateRequest = ticketUpdateRequest;
         this.newState = newState;
+    }
+
+    public static JsonArray getAllTickets(){
+        return new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value)).getSheetData();
     }
 
     public void updateStateChange() {

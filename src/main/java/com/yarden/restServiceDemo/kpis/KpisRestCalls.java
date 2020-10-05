@@ -122,6 +122,14 @@ public class KpisRestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/get_all_tickets")
+    public String get_all_tickets() {
+        synchronized (RestCalls.lock) {
+            newRequestPrint("", "/get_all_tickets");
+            return KpisMonitoringService.getAllTickets().toString();
+        }
+    }
+
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

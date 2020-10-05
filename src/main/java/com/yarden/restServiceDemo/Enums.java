@@ -131,7 +131,7 @@ public class Enums {
     public enum KPIsSheetColumnNames {
         Team("Team"), SubProject("Sub project"), TicketID("Ticket ID"), TicketTitle("Ticket title"), TicketUrl("Ticket url"),
         TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"),
-        StartedInvestigationDate("Started investigation date"), ReproducedDate("Reproduced date"),
+        AcceptedDate("Accepted date"), ReproducedDate("Reproduced date"),
         MovedToMissingInformation("Moved to missing information"), MovedToWaitingForFieldInput("Moved to waiting for field input"),
         MovedToWaitingForApprovalDate("Moved to waiting for approval date"), MovedToDoneDate("Moved to done date"),
         ReopenedAfterMovedToApproval("Reopened after moved to approval"), CurrentFlowState("Current flow state"),

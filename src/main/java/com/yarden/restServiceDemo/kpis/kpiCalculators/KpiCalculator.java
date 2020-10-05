@@ -37,10 +37,10 @@ public class KpiCalculator {
                     addToNumberOfBugsMovedToDoneLastWeek(kpisSheetEntryObject, sheetEntry);
                     addNumberOfTicketsMovedToMissingInformationLastWeek(kpisSheetEntryObject, sheetEntry);
                     addNumberOfTicketsMovedToWaitingForFieldInputLastWeek(kpisSheetEntryObject, sheetEntry);
-                    addNumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek(kpisSheetEntryObject, sheetEntry);
+                    addNumberOfBugsMovedBackFromWaitingForFieldApprovalToReproducedLastWeek(kpisSheetEntryObject, sheetEntry);
                     addTicketsTimeInHoursFromNewToDone(kpisSheetEntryObject, sheetEntry);
                     addBugsTimeInHoursFromNewToDone(kpisSheetEntryObject, sheetEntry);
-                    addBugsTimeInHoursFromStartedInvestigationToReproduced(kpisSheetEntryObject, sheetEntry);
+                    addBugsTimeInHoursFromAcceptedToReproduced(kpisSheetEntryObject, sheetEntry);
                     addAverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek(kpisSheetEntryObject, sheetEntry);
                 }
             }
@@ -65,10 +65,10 @@ public class KpiCalculator {
         Team("Team"), SubProject("Sub project"), OpenTickets("Open tickets"), NumberOfTicketsCreatedLastWeek("Number of tickets created last week"),
         NumberOfBugsCreatedLastWeek("Number of bugs created last week"), NumberOfTicketsMovedToDoneLastWeek("Number of tickets moved to done last week"),
         NumberOfBugsMovedToDoneLastWeek("Number of bugs moved to done last week"), TicketsTimeInHoursFromNewToDone("Tickets time in hours from new to done"),
-        BugsTimeInHoursFromNewToDone("Bugs time in hours from new to done"), BugsTimeInHoursFromStartedInvestigationToReproduced("Bugs time in hours from started investigation to reproduced"),
+        BugsTimeInHoursFromNewToDone("Bugs time in hours from new to done"), BugsTimeInHoursFromAcceptedToReproduced("Bugs time in hours from accepted to reproduced"),
         NumberOfTicketsMovedToMissingInformationLastWeek("Number of tickets moved to Missing information last week"),
         NumberOfTicketsMovedToWaitingForFieldInputLastWeek("Number of tickets moved to Waiting for field input last week"),
-        NumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek("Number of bugs moved back from Waiting for field approval to WIP last week"),
+        NumberOfBugsMovedBackFromWaitingForFieldApprovalToReproducedLastWeek("Number of bugs moved back from Waiting for field approval to reproduced last week"),
         AverageTimeInHoursBugsWaitInWaitingForFieldApprovalLastWeek("Average time in hours bugs wait in Waiting for field approval last week");
 
         public final String value;
@@ -188,14 +188,14 @@ public class KpiCalculator {
         }
     }
 
-    private void addNumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
-        String movedBackFromWaitingForFieldApprovalToWIPDate = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.ReopenedAfterMovedToApproval.value).getAsString();
-        if (movedBackFromWaitingForFieldApprovalToWIPDate.isEmpty()) {
+    private void addNumberOfBugsMovedBackFromWaitingForFieldApprovalToReproducedLastWeek(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+        String movedBackFromWaitingForFieldApprovalToReproducedDate = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.ReopenedAfterMovedToApproval.value).getAsString();
+        if (movedBackFromWaitingForFieldApprovalToReproducedDate.isEmpty()) {
             return;
         }
         try {
-            if (isTimestampInLastWeek(movedBackFromWaitingForFieldApprovalToWIPDate)) {
-                addOneToTicketsCount(kpisSheetEntryObject, KpisColumns.NumberOfBugsMovedBackFromWaitingForFieldApprovalToWIPLastWeek);
+            if (isTimestampInLastWeek(movedBackFromWaitingForFieldApprovalToReproducedDate)) {
+                addOneToTicketsCount(kpisSheetEntryObject, KpisColumns.NumberOfBugsMovedBackFromWaitingForFieldApprovalToReproducedLastWeek);
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -233,16 +233,16 @@ public class KpiCalculator {
         }
     }
 
-    private void addBugsTimeInHoursFromStartedInvestigationToReproduced(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
+    private void addBugsTimeInHoursFromAcceptedToReproduced(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry){
         String reproducedTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.ReproducedDate.value).getAsString();
-        String startedInvestigationTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.StartedInvestigationDate.value).getAsString();
-        if (reproducedTimestamp.isEmpty() || startedInvestigationTimestamp.isEmpty()) {
+        String acceptedTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.AcceptedDate.value).getAsString();
+        if (reproducedTimestamp.isEmpty() || acceptedTimestamp.isEmpty()) {
             return;
         }
         try {
-            Date startedInvestigationDate = timestampToDate(startedInvestigationTimestamp);
+            Date acceptedDate = timestampToDate(acceptedTimestamp);
             Date reproducedDate = timestampToDate(reproducedTimestamp);
-            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.BugsTimeInHoursFromStartedInvestigationToReproduced, startedInvestigationDate, reproducedDate);
+            addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.BugsTimeInHoursFromAcceptedToReproduced, acceptedDate, reproducedDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }

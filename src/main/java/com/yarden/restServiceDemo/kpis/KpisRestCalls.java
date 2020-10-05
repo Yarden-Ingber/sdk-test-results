@@ -26,14 +26,14 @@ public class KpisRestCalls {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/started_investigation")
-    public ResponseEntity started_investigation(@RequestBody String json) {
+    @RequestMapping(method = RequestMethod.POST, path = "/accepted")
+    public ResponseEntity accepted(@RequestBody String json) {
         synchronized (RestCalls.lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/started_investigation");
+            newRequestPrint(json, "/accepted");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.StartedInvestigation).updateStateChange();
+            new KpisMonitoringService(ticketUpdateRequest, TicketStates.Accepted).updateStateChange();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }
@@ -70,18 +70,6 @@ public class KpisRestCalls {
             newRequestPrint(json, "/reproduced");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.Reproduced).updateStateChange();
-            return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
-        }
-    }
-
-    @RequestMapping(method = RequestMethod.POST, path = "/work_in_progress")
-    public ResponseEntity work_in_progress(@RequestBody String json) {
-        synchronized (RestCalls.lock) {
-            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
-            WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/work_in_progress");
-            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.WorkInProgress).updateStateChange();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }

@@ -37,28 +37,25 @@ public class TicketsStateChanger {
     private void executeUpdateState(JsonElement ticket, TicketStates currentState, TicketStates newState){
         if (newState.equals(TicketStates.New)) {
             Logger.warn("KPIs: Ticket moved from a non new state to new !!!!!!!!!!!!");
-        } else if (newState.equals(TicketStates.StartedInvestigation)) {
-            Logger.info("KPIs: Moving ticket to " + TicketStates.StartedInvestigation.name() + " state");
-            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.StartedInvestigationDate.value, Logger.getTimaStamp());
-        } else if (newState.equals(TicketStates.Reproduced)) {
+        } else if (currentState.equals(TicketStates.New) && newState.equals(TicketStates.Accepted)) {
+            Logger.info("KPIs: Moving ticket to " + TicketStates.Accepted.name() + " state");
+            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.AcceptedDate.value, Logger.getTimaStamp());
+        } else if ((currentState.equals(TicketStates.Accepted) || currentState.equals(TicketStates.WaitingForFieldInput))
+                && newState.equals(TicketStates.Reproduced)) {
             Logger.info("KPIs: Moving ticket to " + TicketStates.Reproduced.name() + " state");
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.ReproducedDate.value, Logger.getTimaStamp());
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketType.value, Enums.KPIsTicketTypes.Bug.value);
-        } else if (newState.equals(TicketStates.MissingInformation)) {
-            Logger.info("KPIs: Moving ticket to " + TicketStates.MissingInformation.name() + " state");
-            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.MovedToMissingInformation.value, Logger.getTimaStamp());
-        } else if (newState.equals(TicketStates.WaitingForFieldInput)) {
+        } else if (currentState.equals(TicketStates.Accepted) && newState.equals(TicketStates.WaitingForFieldInput)) {
             Logger.info("KPIs: Moving ticket to " + TicketStates.WaitingForFieldInput.name() + " state");
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.MovedToWaitingForFieldInput.value, Logger.getTimaStamp());
-        } else if (newState.equals(TicketStates.WorkInProgress) && currentState.equals(TicketStates.Reproduced)) {
-            Logger.info("KPIs: Moving ticket to " + TicketStates.WorkInProgress.name() + " state");
-        } else if (newState.equals(TicketStates.WorkInProgress) && currentState.equals(TicketStates.WaitingForFieldApproval)) {
-            Logger.info("KPIs: Moving ticket to " + TicketStates.WorkInProgress.name() + " state");
+        } else if (currentState.equals(TicketStates.WaitingForFieldApproval) && newState.equals(TicketStates.Reproduced)) {
+            Logger.info("KPIs: Moving ticket to " + TicketStates.Reproduced.name() + " state");
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.ReopenedAfterMovedToApproval.value, Logger.getTimaStamp());
-        } else if (newState.equals(TicketStates.WaitingForFieldApproval)) {
+        } else if (currentState.equals(TicketStates.Reproduced) && newState.equals(TicketStates.WaitingForFieldApproval)) {
             Logger.info("KPIs: Moving ticket to " + TicketStates.WaitingForFieldApproval.name() + " state");
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.MovedToWaitingForApprovalDate.value, Logger.getTimaStamp());
-        } else if (newState.equals(TicketStates.Done)) {
+        } else if ((currentState.equals(TicketStates.New) || currentState.equals(TicketStates.WaitingForFieldInput) || currentState.equals(TicketStates.WaitingForFieldApproval))
+                && newState.equals(TicketStates.Done)) {
             Logger.info("KPIs: Moving ticket to " + TicketStates.Done.name() + " state");
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.MovedToDoneDate.value, Logger.getTimaStamp());
         } else if (newState.equals(TicketStates.MissingQuality)) {
@@ -80,25 +77,22 @@ public class TicketsStateChanger {
     public TicketsStateChanger(){
         if (legalStateChanges == null) {
             legalStateChanges = new ArrayList<>();
-            legalStateChanges.add(new StateChange(TicketStates.New, TicketStates.StartedInvestigation));
-            legalStateChanges.add(new StateChange(TicketStates.StartedInvestigation, TicketStates.MissingInformation));
-            legalStateChanges.add(new StateChange(TicketStates.StartedInvestigation, TicketStates.WaitingForFieldInput));
-            legalStateChanges.add(new StateChange(TicketStates.StartedInvestigation, TicketStates.Reproduced));
+            legalStateChanges.add(new StateChange(TicketStates.New, TicketStates.Accepted));
+            legalStateChanges.add(new StateChange(TicketStates.New, TicketStates.Done));
+            legalStateChanges.add(new StateChange(TicketStates.Accepted, TicketStates.Reproduced));
+            legalStateChanges.add(new StateChange(TicketStates.Accepted, TicketStates.WaitingForFieldInput));
             legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldInput, TicketStates.Reproduced));
-            legalStateChanges.add(new StateChange(TicketStates.MissingInformation, TicketStates.Reproduced));
-            legalStateChanges.add(new StateChange(TicketStates.Reproduced, TicketStates.WorkInProgress));
-            legalStateChanges.add(new StateChange(TicketStates.WorkInProgress, TicketStates.WaitingForFieldApproval));
-            legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldApproval, TicketStates.WorkInProgress));
+            legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldInput, TicketStates.Done));
+            legalStateChanges.add(new StateChange(TicketStates.Reproduced, TicketStates.WaitingForFieldApproval));
             legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldApproval, TicketStates.Done));
-            legalStateChanges.add(new StateChange(TicketStates.StartedInvestigation, TicketStates.Done));
+            legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldApproval, TicketStates.Reproduced));
             legalStateChanges.add(new StateChange(TicketStates.Done, TicketStates.MissingQuality));
             legalStateChanges.add(new StateChange(TicketStates.MissingQuality, TicketStates.Done));
             legalStateChanges.add(new StateChange(TicketStates.New, TicketStates.New));
-            legalStateChanges.add(new StateChange(TicketStates.StartedInvestigation, TicketStates.StartedInvestigation));
+            legalStateChanges.add(new StateChange(TicketStates.Accepted, TicketStates.Accepted));
             legalStateChanges.add(new StateChange(TicketStates.MissingInformation, TicketStates.MissingInformation));
             legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldInput, TicketStates.WaitingForFieldInput));
             legalStateChanges.add(new StateChange(TicketStates.Reproduced, TicketStates.Reproduced));
-            legalStateChanges.add(new StateChange(TicketStates.WorkInProgress, TicketStates.WorkInProgress));
             legalStateChanges.add(new StateChange(TicketStates.WaitingForFieldApproval, TicketStates.WaitingForFieldApproval));
             legalStateChanges.add(new StateChange(TicketStates.Done, TicketStates.Done));
         }

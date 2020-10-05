@@ -2,6 +2,6 @@ package com.yarden.restServiceDemo.kpis;
 
 public enum TicketStates {
 
-    New, StartedInvestigation, Reproduced, MissingInformation, WaitingForFieldInput, WorkInProgress, WaitingForFieldApproval, Done, MissingQuality, NoState
+    New, Accepted, Reproduced, MissingInformation, WaitingForFieldInput, WaitingForFieldApproval, Done, MissingQuality, NoState
 
 }

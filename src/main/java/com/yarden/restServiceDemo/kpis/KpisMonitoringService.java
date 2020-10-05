@@ -24,10 +24,10 @@ public class KpisMonitoringService {
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
         } catch (NotFoundException e) {
-            if (!newState.equals(TicketStates.New)) {
-                Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
-            } else {
+            if (newState.equals(TicketStates.New)) {
                 addNewTicketEntry();
+            } else {
+                Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
             }
         }
     }

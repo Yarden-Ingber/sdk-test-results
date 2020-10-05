@@ -26,8 +26,9 @@ public class KpisMonitoringService {
         } catch (NotFoundException e) {
             if (!newState.equals(TicketStates.New)) {
                 Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
+            } else {
+                addNewTicketEntry();
             }
-            addNewTicketEntry();
         }
     }
 

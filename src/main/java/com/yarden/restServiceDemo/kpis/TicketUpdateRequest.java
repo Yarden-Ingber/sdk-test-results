@@ -26,6 +26,9 @@ public class TicketUpdateRequest {
     @SerializedName("ticket_url")
     @Expose
     private String ticketUrl;
+    @SerializedName("state")
+    @Expose
+    private String state;
 
     public String getTeam() {
         return team;
@@ -83,4 +86,11 @@ public class TicketUpdateRequest {
         this.ticketUrl = ticketUrl;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 }

@@ -11,7 +11,8 @@ import javassist.NotFoundException;
 
 public class KpisMonitoringService {
 
-    SheetData sheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
+    SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
+    SheetData eventLogSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.EventLog.value));
     TicketUpdateRequest ticketUpdateRequest;
     TicketStates newState;
 
@@ -26,6 +27,7 @@ public class KpisMonitoringService {
 
     public void updateStateChange() {
         try {
+            addStateUpdateToLog();
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
         } catch (NotFoundException e) {
@@ -48,7 +50,7 @@ public class KpisMonitoringService {
     }
 
     private JsonElement findSheetEntry() throws NotFoundException {
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
+        for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TicketID.value).getAsString().equals(ticketUpdateRequest.getTicketId())){
                 return sheetEntry;
             }
@@ -64,9 +66,22 @@ public class KpisMonitoringService {
                 "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.CreationDate.value + "\":\"" + Logger.getTimaStamp() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.CurrentFlowState.value + "\":\"" + newState.name() + "\"}");
+                "\"" + Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + TicketStates.New.name() + "\":\"" + Logger.getTimaStamp() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CurrentState.value + "\":\"" + newState.name() + "\"}");
         Logger.info("KPIs: Adding a new ticket to the sheet: " + newEntry.toString());
-        sheetData.getSheetData().add(newEntry);
+        rawDataSheetData.getSheetData().add(newEntry);
+    }
+
+    private void addStateUpdateToLog(){
+        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.SubProject.value + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketID.value + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CurrentState.value + "\":\"" + newState.name() + "\"}");
+        Logger.info("KPIs: Adding a new ticket to the sheet: " + newEntry.toString());
+        eventLogSheetData.getSheetData().add(newEntry);
     }
 
 }

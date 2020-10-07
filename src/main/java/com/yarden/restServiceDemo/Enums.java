@@ -119,7 +119,7 @@ public class Enums {
     }
 
     public enum KPIsSheetTabsNames {
-        RawData("Raw data"), KPIs("KPIs");
+        RawData("Raw data"), KPIs("KPIs"), EventLog("Event log");
 
         public final String value;
 
@@ -130,12 +130,10 @@ public class Enums {
 
     public enum KPIsSheetColumnNames {
         Team("Team"), SubProject("Sub project"), TicketID("Ticket ID"), TicketTitle("Ticket title"), TicketUrl("Ticket url"),
-        TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"),
-        AcceptedDate("Accepted date"), ReproducedDate("Reproduced date"),
-        MovedToMissingInformation("Moved to missing information"), MovedToWaitingForFieldInput("Moved to waiting for field input"),
-        MovedToWaitingForApprovalDate("Moved to waiting for approval date"), MovedToDoneDate("Moved to done date"),
-        ReopenedAfterMovedToApproval("Reopened after moved to approval"), CurrentFlowState("Current flow state"),
-        MissingQuality("Moved to missing quality");
+        TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"), CurrentState("Current state"),
+        TimeUntilLeftNewForTheFirstTime("Time until left New for the first time"), EnterForTimeCalculationState("Enter for time calculation state "),
+        LeftForTimeCalculationState("Left for time calculation state "), CalculatedTimeInState("Calculated time in state "),
+        MovedToStateDone("Moved to state Done"), Timestamp("Timestamp");
 
         public final String value;
 

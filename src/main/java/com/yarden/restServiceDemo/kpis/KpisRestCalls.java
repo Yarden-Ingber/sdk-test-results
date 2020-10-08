@@ -56,6 +56,14 @@ public class KpisRestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/get_event_log")
+    public String get_event_log() {
+        synchronized (RestCalls.lock) {
+            newRequestPrint("", "/get_event_log");
+            return KpisMonitoringService.getEntireEventLog().toString();
+        }
+    }
+
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

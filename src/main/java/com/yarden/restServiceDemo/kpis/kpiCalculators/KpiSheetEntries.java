@@ -24,9 +24,11 @@ public class KpiSheetEntries {
         for (JsonElement sheetEntry: rawSheetData.getSheetData()){
             String team = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
             String subProject = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.SubProject.value).getAsString();
-            KpisSheetEntryObject kpisSheetEntryObjectFromSheet = new KpisSheetEntryObject(team, subProject);
+            KpisSheetEntryObject kpisSheetEntryObjectFromSheet = new KpisSheetEntryObject(team, subProject, false);
             if (!isKpiEntryExistInEntriesList(kpisSheetEntryObjectFromSheet)) {
                 kpiSheetEntries.put(kpisSheetEntryObjectFromSheet.team + kpisSheetEntryObjectFromSheet.subProject, kpisSheetEntryObjectFromSheet);
+                kpisSheetEntryObjectFromSheet = new KpisSheetEntryObject(team, subProject, true);
+                kpiSheetEntries.put(kpisSheetEntryObjectFromSheet.team + kpisSheetEntryObjectFromSheet.subProject + OnlyBugs, kpisSheetEntryObjectFromSheet);
             }
         }
     }
@@ -39,5 +41,7 @@ public class KpiSheetEntries {
         }
         return false;
     }
+
+    public static String OnlyBugs = "OnlyBugs";
 
 }

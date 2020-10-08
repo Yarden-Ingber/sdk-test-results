@@ -25,6 +25,10 @@ public class KpisMonitoringService {
         return new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value)).getSheetData();
     }
 
+    public static JsonArray getEntireEventLog(){
+        return new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.EventLog.value)).getSheetData();
+    }
+
     public void updateStateChange() {
         try {
             addStateUpdateToLog();

@@ -6,11 +6,13 @@ public class KpisSheetEntryObject {
 
     public String team;
     public String subProject;
+    public boolean isOnlyBugs;
     public LinkedHashMap<KpiCalculator.KpisColumns, Object> kpisList;
 
-    public KpisSheetEntryObject(String team, String subProject) {
+    public KpisSheetEntryObject(String team, String subProject, boolean isOnlyBugs) {
         this.team = team;
         this.subProject = subProject;
+        this.isOnlyBugs = isOnlyBugs;
         kpisList = new LinkedHashMap<>();
     }
 

@@ -9,7 +9,6 @@
 @applitools/dom-utils
 @applitools/eyes-testcafe
 @applitools/eyes-storybook
-@applitools/docker-compose-testkit
 @applitools/sdk-test-kit
 @applitools/jsdom
 @applitools/screenshot-stitching-client
@@ -36,3 +35,5 @@
 @applitools/eyes-webdriverio4-service
 @applitools/eyes.webdriverio
 @applitools/eyes-playwright
+@applitools/sdk-shared
+@applitools/sdk-fake-eyes-server

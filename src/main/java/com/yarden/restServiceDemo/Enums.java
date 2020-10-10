@@ -118,6 +118,40 @@ public class Enums {
         }
     }
 
+    public enum KPIsSheetTabsNames {
+        RawData("Raw data"), KPIs("KPIs"), EventLog("Event log");
+
+        public final String value;
+
+        KPIsSheetTabsNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum KPIsSheetColumnNames {
+        Team("Team"), SubProject("Sub project"), TicketID("Ticket ID"), TicketTitle("Ticket title"), TicketUrl("Ticket url"),
+        TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"), CurrentState("Current state"),
+        TimeUntilLeftNewForTheFirstTime("Time until left New for the first time"), EnterForTimeCalculationState("Enter for time calculation state "),
+        LeftForTimeCalculationState("Left for time calculation state "), CalculatedTimeInState("Calculated time in state "),
+        MovedToStateDone("Moved to state Done"), Timestamp("Timestamp");
+
+        public final String value;
+
+        KPIsSheetColumnNames(String value){
+            this.value = value;
+        }
+    }
+
+    public enum KPIsTicketTypes {
+        Bug("Bug"), NotABug("Not a bug");
+
+        public final String value;
+
+        KPIsTicketTypes(String value){
+            this.value = value;
+        }
+    }
+
     public enum EnvVariables {
         MailjetApiKeyPublic(System.getenv("MJ_APIKEY_PUBLIC")), MailjetApiKeyPrivate(System.getenv("MJ_APIKEY_PRIVATE")),
         AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), AwsS3EyesReportsBucketName(System.getenv("EYE_REPORTS_S3_BUCKET")),
@@ -128,12 +162,12 @@ public class Enums {
         EnvVariables(String value){
             this.value = value;
         }
-
     }
 
     public enum SpreadsheetIDs {
         SDK("1JZnUB5-nEHWouHJimwyJrTyr-TFsoC9RrKI6U66HJoY"), SdkVersions("1TOw6XqUAdKRQL6QFkpcF_mMUGfX7CmxbUsXIbolSABM"),
-        Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"), VisualGrid("1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ");
+        Eyes("1kCOwx8AP6Fg0ltivnw1o55IA3ZkV3hROB1dZ61FRQh8"), VisualGrid("1umqCfSK3UICmw_ycbyhLjxdcyksBHYxwFNSqAXAN4SQ"),
+        KPIS("1UgeW2OxvsGyNr9oyAgyDmw_9TR3r8dC6qbigKahNLPM");
 
         public final String value;
 

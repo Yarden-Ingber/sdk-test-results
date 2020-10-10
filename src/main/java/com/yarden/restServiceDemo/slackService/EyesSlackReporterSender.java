@@ -17,18 +17,28 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class EyesSlackReporterSender {
 
     private SlackReportNotificationJson requestJson;
     private static final String EndedTestTasksCounterFile = "EndedTestTasksCounterFile.txt";
+    private static final String SplitString = "Split;Sign";
     private static final int NumOfTestTasks = Integer.parseInt(System.getenv("EYES_TEST_TASKS_COUNT"));
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
+        if (requestJson.getId() == null || requestJson.getId().isEmpty()) {
+            requestJson.setId(UUID.randomUUID().toString().substring(0, 6));
+        }
         if (isAllTestsEnded()) {
             sendReport();
         }
+        updateEndTasksCounterFile();
+    }
+
+    public synchronized void resetEndTasksCounter(){
+        wrtieNewEndTasksCounter(new EndTasksCounterObject("0", 0));
     }
 
     private void sendReport() throws IOException, MailjetSocketTimeoutException, MailjetException{
@@ -52,15 +62,48 @@ public class EyesSlackReporterSender {
         new MailSender().send(slackReportData);
     }
 
-    private static synchronized boolean isAllTestsEnded() throws IOException {
-        String endedTestTasksCounterString = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile);
-        int count = Integer.parseInt(endedTestTasksCounterString) + 1;
-        if (count >= NumOfTestTasks) {
-            AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile, "0");
-            return true;
+    private synchronized boolean isAllTestsEnded() throws IOException {
+        EndTasksCounterObject counterObject = getEndTasksCounter();
+        if (counterObject.id.equals(requestJson.getId()) || NumOfTestTasks == 1) {
+            int count = counterObject.counter + 1;
+            if (count >= NumOfTestTasks) {
+                return true;
+            }
         }
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile, String.valueOf(count));
         return false;
+    }
+
+    private synchronized void updateEndTasksCounterFile() throws IOException {
+        EndTasksCounterObject counterObject = getEndTasksCounter();
+        if (!counterObject.id.equals(requestJson.getId())) {
+            wrtieNewEndTasksCounter(new EndTasksCounterObject(requestJson.getId(), 1));
+        } else {
+            int count = counterObject.counter + 1;
+            if (count >= NumOfTestTasks) {
+                wrtieNewEndTasksCounter(new EndTasksCounterObject("0", 0));
+            } else {
+                wrtieNewEndTasksCounter(new EndTasksCounterObject(requestJson.getId(), counterObject.counter + 1));
+            }
+        }
+    }
+
+    private synchronized EndTasksCounterObject getEndTasksCounter() throws IOException {
+        String[] endedTestTasksCounterStringArray = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile).split(SplitString);
+        return new EndTasksCounterObject(endedTestTasksCounterStringArray[0], Integer.parseInt(endedTestTasksCounterStringArray[1]));
+    }
+
+    private synchronized void wrtieNewEndTasksCounter(EndTasksCounterObject counterObject) {
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3EyesReportsBucketName.value, EndedTestTasksCounterFile, counterObject.id + SplitString + counterObject.counter);
+    }
+
+    private class EndTasksCounterObject {
+        public String id;
+        public int counter;
+
+        public EndTasksCounterObject(String id, int counter) {
+            this.id = id;
+            this.counter = counter;
+        }
     }
 
     private HTMLTableBuilder getHighLevelReportTable() {

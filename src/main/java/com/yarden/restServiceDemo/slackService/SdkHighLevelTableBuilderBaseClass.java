@@ -19,10 +19,12 @@ public class SdkHighLevelTableBuilderBaseClass {
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
-                    if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Passed.value)) {
-                        totalAmount++;
+            if (reportSheet.get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
+                for (JsonElement sheetEntry : reportSheet) {
+                    if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
+                        if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Passed.value)) {
+                            totalAmount++;
+                        }
                     }
                 }
             }
@@ -34,9 +36,11 @@ public class SdkHighLevelTableBuilderBaseClass {
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Failed.value)) {
-                    totalAmount++;
+            if (reportSheet.get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
+                for (JsonElement sheetEntry: reportSheet){
+                    if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Failed.value)) {
+                        totalAmount++;
+                    }
                 }
             }
         }

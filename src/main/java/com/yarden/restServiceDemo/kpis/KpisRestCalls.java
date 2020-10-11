@@ -20,7 +20,7 @@ public class KpisRestCalls {
 
     @Test
     public void test() throws IOException {
-        state_change("{\"team\":\"sdk\",\"state\":\"Doing\",\"sub_project\":\"javascript\",\"ticket_id\":\"nMNKaa4L1\",\"ticket_title\":\"NAB: Business mega menu page rendering incorrectly on mobile devices\",\"created_by\":\"Nikhil Nigam\",\"ticket_url\":\"https://trello.com/c/nMNKaa4L\"}");
+        update_only_trello_list("{\"team\":\"sdk\",\"state\":\"Doing\",\"sub_project\":\"javascript\",\"ticket_id\":\"nMNKaa4L1\",\"ticket_title\":\"NAB: Business mega menu page rendering incorrectly on mobile devices\",\"created_by\":\"Nikhil Nigam\",\"ticket_url\":\"https://trello.com/c/nMNKaa4L\",\"current_trello_list\":\"test\"}");
         SheetData.writeAllTabsToSheet();
     }
 
@@ -44,6 +44,18 @@ public class KpisRestCalls {
             newRequestPrint(json, "/update_ticket_type");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateTicketType();
+            return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/update_only_trello_list")
+    public ResponseEntity update_only_trello_list(@RequestBody String json) {
+        synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json, "/update_only_trello_list");
+            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
+            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateOnlyTrelloList();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }

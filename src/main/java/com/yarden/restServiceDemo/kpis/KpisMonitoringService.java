@@ -53,6 +53,11 @@ public class KpisMonitoringService {
         }
     }
 
+    public void updateOnlyTrelloList() {
+        Logger.info("KPIs: Updating ticket trello list only for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getCurrent_trello_list());
+        addStateUpdateToLog();
+    }
+
     private JsonElement findSheetEntry() throws NotFoundException {
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TicketID.value).getAsString().equals(ticketUpdateRequest.getTicketId())){
@@ -83,6 +88,7 @@ public class KpisMonitoringService {
                 "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CurrentTrelloList.value + "\":\"" + ticketUpdateRequest.getCurrent_trello_list() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.CurrentState.value + "\":\"" + newState.name() + "\"}");
         Logger.info("KPIs: Adding a new ticket to the sheet: " + newEntry.toString());
         eventLogSheetData.getSheetData().add(newEntry);

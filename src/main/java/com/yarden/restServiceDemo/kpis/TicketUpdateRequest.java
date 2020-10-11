@@ -29,6 +29,9 @@ public class TicketUpdateRequest {
     @SerializedName("state")
     @Expose
     private String state;
+    @SerializedName("current_trello_list")
+    @Expose
+    private String current_trello_list;
 
     public String getTeam() {
         return team;
@@ -92,5 +95,13 @@ public class TicketUpdateRequest {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getCurrent_trello_list() {
+        return current_trello_list;
+    }
+
+    public void setCurrent_trello_list(String current_trello_list) {
+        this.current_trello_list = current_trello_list;
     }
 }

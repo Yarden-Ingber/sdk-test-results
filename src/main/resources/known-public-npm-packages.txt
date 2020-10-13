@@ -37,3 +37,4 @@
 @applitools/eyes-playwright
 @applitools/sdk-shared
 @applitools/sdk-fake-eyes-server
+@applitools/dom-shared

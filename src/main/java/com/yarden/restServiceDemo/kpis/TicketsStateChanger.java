@@ -38,12 +38,12 @@ public class TicketsStateChanger {
         if (ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value).getAsString().isEmpty()) {
             Date currentDate = KpiCalculator.timestampToDate(timeStamp);
             Date creationDate = KpiCalculator.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
-            Long timeUntilLeftNew = TimeUnit.MILLISECONDS.toMinutes(currentDate.getTime() - creationDate.getTime());
+            Long timeUntilLeftNew = TimeUnit.MILLISECONDS.toHours(currentDate.getTime() - creationDate.getTime());
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value, timeUntilLeftNew);
         }
         Date endTime = KpiCalculator.timestampToDate(timeStamp);
         Date startTime = KpiCalculator.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + currentState.name()).getAsString());
-        Long newCalculatedTime = TimeUnit.MILLISECONDS.toMinutes(endTime.getTime() - startTime.getTime());
+        Long newCalculatedTime = TimeUnit.MILLISECONDS.toHours(endTime.getTime() - startTime.getTime());
         String currentCalculatedTimeString = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CalculatedTimeInState.value + currentState.name()).getAsString();
         Long currentCalculatedTime = 0l;
         if (!currentCalculatedTimeString.isEmpty()) {

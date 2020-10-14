@@ -36,14 +36,14 @@ public class KpisRestCalls {
         }
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/update_ticket_type")
-    public ResponseEntity update_ticket_type(@RequestBody String json) {
+    @RequestMapping(method = RequestMethod.POST, path = "/update_ticket_fields")
+    public ResponseEntity update_ticket_fields(@RequestBody String json) {
         synchronized (RestCalls.lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/update_ticket_type");
+            newRequestPrint(json, "/update_ticket_fields");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateTicketType();
+            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateTicketFields();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }

@@ -133,7 +133,7 @@ public class Enums {
         TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"), CurrentState("Current state"),
         TimeUntilLeftNewForTheFirstTime("Time until left New for the first time"), EnterForTimeCalculationState("Enter for time calculation state "),
         LeftForTimeCalculationState("Left for time calculation state "), CalculatedTimeInState("Calculated time in state "),
-        MovedToStateDone("Moved to state Done"), Timestamp("Timestamp"), CurrentTrelloList("Current trello list");
+        MovedToStateDone("Moved to state Done"), Timestamp("Timestamp"), CurrentTrelloList("Current trello list"), Workaround("Workaround");
 
         public final String value;
 

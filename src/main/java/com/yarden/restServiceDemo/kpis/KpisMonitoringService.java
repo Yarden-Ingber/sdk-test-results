@@ -34,6 +34,7 @@ public class KpisMonitoringService {
             addStateUpdateToLog();
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
+            updateTicketFields(ticket);
         } catch (NotFoundException e) {
             if (newState.equals(TicketStates.New)) {
                 addNewTicketEntry();
@@ -43,11 +44,9 @@ public class KpisMonitoringService {
         }
     }
 
-    public void updateTicketType() {
+    public void updateTicketFields() {
         try {
-            Logger.info("KPIs: Updating ticket type for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getTicketType());
-            JsonElement ticket = findSheetEntry();
-            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketType.value, ticketUpdateRequest.getTicketType());
+            updateTicketFields(findSheetEntry());
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
         }
@@ -56,6 +55,25 @@ public class KpisMonitoringService {
     public void updateOnlyTrelloList() {
         Logger.info("KPIs: Updating ticket trello list only for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getCurrent_trello_list());
         addStateUpdateToLog();
+    }
+
+    private void updateTicketFields(JsonElement ticket) {
+        addStateUpdateToLog();
+        addTypeToTicket(ticket);
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Workaround.value, ticketUpdateRequest.getWorkaround());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, ticketUpdateRequest.getTeam());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.SubProject.value, ticketUpdateRequest.getSubProject());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketID.value, ticketUpdateRequest.getTicketId());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketTitle.value, ticketUpdateRequest.getTicketTitle());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketUrl.value, ticketUpdateRequest.getTicketUrl());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CreatedBy.value, ticketUpdateRequest.getCreatedBy());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CurrentTrelloList.value, ticketUpdateRequest.getCurrent_trello_list());
+    }
+
+    private void addTypeToTicket(JsonElement ticket) {
+        Logger.info("KPIs: Updating ticket type for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getTicketType());
+        String type = ticketUpdateRequest.getTicketType() == null ? "" : ticketUpdateRequest.getTicketType();
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketType.value, type);
     }
 
     private JsonElement findSheetEntry() throws NotFoundException {
@@ -85,6 +103,9 @@ public class KpisMonitoringService {
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.SubProject.value + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.TicketID.value + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.TicketType.value + "\":\"" + ticketUpdateRequest.getTicketType() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
+                "\"" + Enums.KPIsSheetColumnNames.Workaround.value + "\":\"" + ticketUpdateRequest.getWorkaround() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.Timestamp.value + "\":\"" + Logger.getTimaStamp() + "\"," +

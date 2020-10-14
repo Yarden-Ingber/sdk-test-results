@@ -32,6 +32,9 @@ public class TicketUpdateRequest {
     @SerializedName("current_trello_list")
     @Expose
     private String current_trello_list;
+    @SerializedName("workaround")
+    @Expose
+    private String workaround;
 
     public String getTeam() {
         return team;
@@ -103,5 +106,13 @@ public class TicketUpdateRequest {
 
     public void setCurrent_trello_list(String current_trello_list) {
         this.current_trello_list = current_trello_list;
+    }
+
+    public String getWorkaround() {
+        return workaround;
+    }
+
+    public void setWorkaround(String workaround) {
+        this.workaround = workaround;
     }
 }

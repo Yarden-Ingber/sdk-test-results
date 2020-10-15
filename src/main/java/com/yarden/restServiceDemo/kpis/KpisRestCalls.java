@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo.kpis;
 
 import com.google.gson.Gson;
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.SheetData;
@@ -61,9 +62,15 @@ public class KpisRestCalls {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/get_all_tickets")
-    public String get_all_tickets() {
+    public String get_all_tickets(@RequestBody String json) {
         synchronized (RestCalls.lock) {
             newRequestPrint("", "/get_all_tickets");
+            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
+            if (ticketUpdateRequest.getApiKey() == null || ticketUpdateRequest.getApiKey().isEmpty()) {
+                return "Missing API key";
+            } else if (!ticketUpdateRequest.getApiKey().equals(Enums.EnvVariables.ApiToken.value)) {
+                return "Wrong API key: " + ticketUpdateRequest.getApiKey();
+            }
             return KpisMonitoringService.getAllTickets().toString();
         }
     }

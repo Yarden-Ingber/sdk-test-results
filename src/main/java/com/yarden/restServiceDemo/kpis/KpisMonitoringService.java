@@ -46,6 +46,7 @@ public class KpisMonitoringService {
 
     public void updateTicketFields() {
         try {
+            addStateUpdateToLog();
             updateTicketFields(findSheetEntry());
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
@@ -58,7 +59,6 @@ public class KpisMonitoringService {
     }
 
     private void updateTicketFields(JsonElement ticket) {
-        addStateUpdateToLog();
         addTypeToTicket(ticket);
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Workaround.value, ticketUpdateRequest.getWorkaround());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, ticketUpdateRequest.getTeam());

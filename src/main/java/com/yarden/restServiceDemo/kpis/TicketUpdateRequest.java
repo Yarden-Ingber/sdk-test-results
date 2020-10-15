@@ -35,6 +35,12 @@ public class TicketUpdateRequest {
     @SerializedName("workaround")
     @Expose
     private String workaround;
+    @SerializedName("labels")
+    @Expose
+    private String labels;
+    @SerializedName("apiKey")
+    @Expose
+    private String apiKey;
 
     public String getTeam() {
         return team;
@@ -114,5 +120,21 @@ public class TicketUpdateRequest {
 
     public void setWorkaround(String workaround) {
         this.workaround = workaround;
+    }
+
+    public String getLabels() {
+        return labels;
+    }
+
+    public void setLabels(String labels) {
+        this.labels = labels;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

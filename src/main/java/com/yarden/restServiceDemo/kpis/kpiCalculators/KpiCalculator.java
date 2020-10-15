@@ -101,7 +101,10 @@ public class KpiCalculator {
         if (kpisSheetEntryObject.isOnlyBugs && !isBug(sheetEntry)) {
             return;
         }
-        if(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.MovedToStateDone.value).getAsString().isEmpty()) {
+        if (sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString().equals(TicketStates.Done.name())
+            || sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString().equals(TicketStates.RFE.name())) {
+            return;
+        } else {
             addOneToTicketsCount(kpisSheetEntryObject, KpisColumns.OpenTickets);
         }
     }
@@ -162,7 +165,8 @@ public class KpiCalculator {
             return;
         }
         String movedToDoneTimestamp = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.MovedToStateDone.value).getAsString();
-        if (movedToDoneTimestamp.isEmpty()) {
+        if (movedToDoneTimestamp.isEmpty()
+            || !sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString().equals(TicketStates.Done.name())) {
             return;
         }
         try {

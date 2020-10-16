@@ -135,7 +135,8 @@ public class KpiCalculator {
             return;
         }
         try {
-            if (isTimestampInLastWeek(movedToDoneDate)) {
+            if (isTimestampInLastWeek(movedToDoneDate) &&
+                    sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString().equals(TicketStates.Done.name())) {
                 addOneToTicketsCount(kpisSheetEntryObject, KpisColumns.NumberOfTicketsMovedToDoneLastWeek);
             }
         } catch (ParseException e) {

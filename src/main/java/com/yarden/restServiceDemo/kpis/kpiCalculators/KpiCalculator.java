@@ -63,6 +63,19 @@ public class KpiCalculator {
             }
             kpiSheetData.getSheetData().add(sheetEntryBuilder.buildJsonElement());
         }
+        replaceEmptyCellsWithZero();
+    }
+
+    private void replaceEmptyCellsWithZero(){
+        for (JsonElement sheetEntry : kpiSheetData.getSheetData()) {
+            for (KpisColumns column : KpisColumns.values()) {
+                if (!(column.value.equals(KpisColumns.Team.value) || column.value.equals(KpisColumns.SubProject.value) || column.value.equals(KpisColumns.IsOnlyBugs.value))) {
+                    if (sheetEntry.getAsJsonObject().get(column.value) == null || sheetEntry.getAsJsonObject().get(column.value).getAsString().isEmpty()) {
+                        sheetEntry.getAsJsonObject().addProperty(column.value, "0");
+                    }
+                }
+            }
+        }
     }
 
     public enum KpisColumns {
@@ -72,7 +85,7 @@ public class KpiCalculator {
         AverageHoursInWaitingForFieldInput("Average hours in waiting for field input"), AverageHoursInWaitingForRD("Average hours in waiting for R&D"),
         AverageHoursInWaitingForFieldApproval("Average hours in waiting for field approval"), AverageHoursInWaitingForProduct("Average hours in waiting for product"),
         AverageHoursInMissingQuality("Average hours in missing quality"), AverageHoursFromNewToDone("Average hours from new to done"),
-        NumberOfTicketsMovedToWaitingForFieldInputLastWeek("Number of tickets moved to Waiting for field input last week"),
+        NumberOfTicketsMovedToWaitingForFieldInputLastWeek("Number of tickets moved to waiting for field input last week"),
         AverageHoursUntilLeftNewForTheFirstTime("Average hours until left new for the first time");
 
         public final String value;

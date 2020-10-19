@@ -266,7 +266,8 @@ public class KpiCalculator {
     }
 
     private boolean isBug(JsonElement sheetEntry){
-        return sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TicketType.value).getAsString().equals("bug");
+        String ticketType = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TicketType.value).getAsString();
+        return ticketType.toLowerCase().equals("bug") || ticketType.toLowerCase().equals("regression");
     }
 
 }

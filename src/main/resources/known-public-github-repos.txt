@@ -156,3 +156,5 @@ testcafe-classic-demo
 Eyes.Sdk.DotNet
 cs-applitools-java-hackathon
 flan_test
+cs-seleniumPython-hackathon
+Selenium-Javascript-Hackathon

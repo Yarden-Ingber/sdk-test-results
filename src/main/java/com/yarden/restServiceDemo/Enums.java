@@ -12,6 +12,16 @@ public class Enums {
         }
     }
 
+    public enum SplunkSourceTypes{
+        RawKPILog("rawkpilog");
+
+        public final String value;
+
+        SplunkSourceTypes(String value){
+            this.value = value;
+        }
+    }
+
     public enum TestResults{
         Passed("1"), Failed("-1"), Missing("");
 

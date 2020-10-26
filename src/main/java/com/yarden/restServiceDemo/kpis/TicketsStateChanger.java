@@ -54,8 +54,8 @@ public class TicketsStateChanger {
     }
 
     private void addCalculatedTimeInPreviousState(String timeStamp, JsonElement ticket, TicketStates currentState) throws ParseException {
-        Date endTime = KpiCalculator.timestampToDate(timeStamp);
-        Date startTime = KpiCalculator.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + currentState.name()).getAsString());
+        Date endTime = Logger.timestampToDate(timeStamp);
+        Date startTime = Logger.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + currentState.name()).getAsString());
         Long newCalculatedTime = TimeUnit.MILLISECONDS.toHours(endTime.getTime() - startTime.getTime());
         String currentCalculatedTimeString = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CalculatedTimeInState.value + currentState.name()).getAsString();
         Long currentCalculatedTime = 0l;
@@ -66,8 +66,8 @@ public class TicketsStateChanger {
     }
 
     private void setTimeUntilLeftNewForFirstTime(String timeStamp, JsonElement ticket) throws ParseException {
-        Date currentDate = KpiCalculator.timestampToDate(timeStamp);
-        Date creationDate = KpiCalculator.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
+        Date currentDate = Logger.timestampToDate(timeStamp);
+        Date creationDate = Logger.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
         Long timeUntilLeftNew = TimeUnit.MILLISECONDS.toHours(currentDate.getTime() - creationDate.getTime());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value, timeUntilLeftNew);
     }

@@ -2,6 +2,7 @@ package com.yarden.restServiceDemo.kpis.kpiCalculators;
 
 import com.google.gson.JsonElement;
 import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.kpis.TicketStates;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
@@ -96,18 +97,12 @@ public class KpiCalculator {
     }
 
     private boolean isTimestampInLastWeek(String timestamp) throws ParseException {
-        Date date = timestampToDate(timestamp);
+        Date date = Logger.timestampToDate(timestamp);
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
         calendar.add(Calendar.DAY_OF_MONTH, -7);
         return calendar.getTime().before(date);
-    }
-
-    public static Date timestampToDate(String timestamp) throws ParseException {
-        timestamp = timestamp.substring(0,timestamp.indexOf('.'));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        return dateFormat.parse(timestamp);
     }
 
     private void addCountOfOpenTicket(KpisSheetEntryObject kpisSheetEntryObject, JsonElement sheetEntry) {
@@ -184,8 +179,8 @@ public class KpiCalculator {
             return;
         }
         try {
-            Date creationDate = timestampToDate(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
-            Date movedToDoneDate = timestampToDate(movedToDoneTimestamp);
+            Date creationDate = Logger.timestampToDate(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CreationDate.value).getAsString());
+            Date movedToDoneDate = Logger.timestampToDate(movedToDoneTimestamp);
             Long calculatedTime = TimeUnit.MILLISECONDS.toHours(movedToDoneDate.getTime() - creationDate.getTime());
             addTimeCalculationToAvarageCalculator(kpisSheetEntryObject, KpisColumns.AverageHoursFromNewToDone, calculatedTime);
         } catch (ParseException e) {

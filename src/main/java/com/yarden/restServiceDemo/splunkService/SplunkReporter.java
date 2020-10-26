@@ -10,31 +10,60 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SplunkReporter {
 
     private static Receiver receiver = null;
     private static Service service = null;
 
-    public static void report(Enums.SplunkSourceTypes sourcetype, String json){
+    public void report(Enums.SplunkSourceTypes sourcetype, String json){
         Args args = new Args();
         args.add("sourcetype", sourcetype.value);
-        getReceiver().log("qualityevents", args, json);
+        try {
+            getReceiver().log("qualityevents", args, json);
+        } catch (Throwable t) {
+            resetSplunkConnection();
+            getReceiver().log("qualityevents", args, json);
+        }
     }
 
-    @Test
-    public void search() throws IOException {
-        Job job = getService().getJobs().create("search starttime=\"10/12/2020:15:58:00\" endtime=\"10/22/2020:15:59:50\" data.Info.RequestType=GetUserInfo OR data.Info.RequestType=StartSession OR data.Info.RequestType=MatchExpectedOutputAsSession | rex field=data.Context.RequestUrl \"(?<domain>https://.*\\.applitools.com)\" | stats count by domain data.Site | where NOT LIKE(domain, \"https://test%\") | rename data.Site as site | table domain site | head 1000");
+    public String search(String query, String outputMode, int resultsCount) {
+        Job job = null;
+        try {
+            job = getService().getJobs().create(query);
+        } catch (Exception e) {
+            resetSplunkConnection();
+            job = getService().getJobs().create(query);
+        }
         while (!job.isDone()) {
             try {
                 Thread.sleep(500);
             } catch (Throwable t) {}
         }
         CollectionArgs outputArgs = new CollectionArgs();
-        outputArgs.setCount(1000);
-        outputArgs.put("output_mode", "csv");
+        outputArgs.setCount(resultsCount);
+        outputArgs.put("output_mode", outputMode);
         InputStream stream = job.getResults(outputArgs);
-        String theString = IOUtils.toString(stream, Charset.defaultCharset());
+        try {
+            return IOUtils.toString(stream, Charset.defaultCharset());
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
+    @Test
+    public void searchTest() throws IOException {
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DAY_OF_MONTH, -7);
+        String endTime = new SimpleDateFormat("MM/dd/yyyy:HH:mm:ss").format(today);
+        String startTime = new SimpleDateFormat("MM/dd/yyyy:HH:mm:ss").format(calendar.getTime());
+        String query = "search starttime=\"" + startTime + "\" endtime=\"" + endTime + "\" data.Info.RequestType=GetUserInfo OR data.Info.RequestType=StartSession OR data.Info.RequestType=MatchExpectedOutputAsSession | rex field=data.Context.RequestUrl \"(?<domain>https://.*\\.applitools.com)\" | stats count by domain data.Site | where NOT LIKE(domain, \"https://test%\") | rename data.Site as site | table domain site";
+        String theString = search(query, "csv", 1000);
         theString = theString.replace("\"", "").replace("domain,site\n", "");
         String[] domainsSitesList = theString.split("\n");
         for (String domainSite : domainsSitesList) {
@@ -57,7 +86,12 @@ public class SplunkReporter {
         }
     }
 
-    private static Service getService(){
+    private void resetSplunkConnection(){
+        receiver = null;
+        service = null;
+    }
+
+    private Service getService(){
         if (service == null) {
             ServiceArgs serviceArgs = new ServiceArgs();
             serviceArgs.setHost("applitools.splunkcloud.com");
@@ -70,7 +104,7 @@ public class SplunkReporter {
         return service;
     }
 
-    private static Receiver getReceiver(){
+    private Receiver getReceiver(){
         if (receiver == null) {
             return getService().getReceiver();
         }

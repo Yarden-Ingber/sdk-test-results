@@ -140,7 +140,7 @@ public class KpisMonitoringService {
                 "\"" + Enums.KPIsSheetColumnNames.Labels.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getLabels() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.CurrentState.value.replace(" ", "_") + "\":\"" + newState.name() + "\"}");
         Logger.info("KPIs: reporting a new ticket event to Splunk: " + newEntry.toString());
-        SplunkReporter.report(Enums.SplunkSourceTypes.RawKPILog, newEntry.toString());
+        new SplunkReporter().report(Enums.SplunkSourceTypes.RawKPILog, newEntry.toString());
     }
 
 }

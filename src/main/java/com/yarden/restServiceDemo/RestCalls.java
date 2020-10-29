@@ -130,6 +130,9 @@ public class RestCalls {
 
     @RequestMapping(method = RequestMethod.POST, path = "/send_full_regression/sdks")
     public ResponseEntity sendSdkFullRegressionReport(@RequestBody String json){
+        if (Boolean.valueOf(Enums.EnvVariables.TurnOffFullRegressionEmail.value)) {
+            return new ResponseEntity("Mail is turned off by server", HttpStatus.OK);
+        }
         synchronized (lock) {
             newRequestPrint(json, "/send_full_regression/sdks");
             try {

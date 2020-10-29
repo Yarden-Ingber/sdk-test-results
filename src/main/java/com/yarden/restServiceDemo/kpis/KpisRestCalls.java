@@ -61,34 +61,6 @@ public class KpisRestCalls {
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/get_all_tickets")
-    public String get_all_tickets(@RequestBody String json) {
-        synchronized (RestCalls.lock) {
-            newRequestPrint("", "/get_all_tickets");
-            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            if (ticketUpdateRequest.getApiKey() == null || ticketUpdateRequest.getApiKey().isEmpty()) {
-                return "Missing API key";
-            } else if (!ticketUpdateRequest.getApiKey().equals(Enums.EnvVariables.ApiToken.value)) {
-                return "Wrong API key: " + ticketUpdateRequest.getApiKey();
-            }
-            return KpisMonitoringService.getAllTickets().toString();
-        }
-    }
-
-    @RequestMapping(method = RequestMethod.GET, path = "/get_event_log")
-    public String get_event_log(@RequestBody String json) {
-        synchronized (RestCalls.lock) {
-            newRequestPrint("", "/get_event_log");
-            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            if (ticketUpdateRequest.getApiKey() == null || ticketUpdateRequest.getApiKey().isEmpty()) {
-                return "Missing API key";
-            } else if (!ticketUpdateRequest.getApiKey().equals(Enums.EnvVariables.ApiToken.value)) {
-                return "Wrong API key: " + ticketUpdateRequest.getApiKey();
-            }
-            return KpisMonitoringService.getEntireEventLog().toString();
-        }
-    }
-
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

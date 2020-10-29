@@ -129,7 +129,7 @@ public class Enums {
     }
 
     public enum KPIsSheetTabsNames {
-        RawData("Raw data"), KPIs("KPIs"), EventLog("Event log");
+        RawData("Raw data"), KPIs("KPIs");
 
         public final String value;
 
@@ -166,7 +166,7 @@ public class Enums {
         MailjetApiKeyPublic(System.getenv("MJ_APIKEY_PUBLIC")), MailjetApiKeyPrivate(System.getenv("MJ_APIKEY_PRIVATE")),
         AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), AwsS3EyesReportsBucketName(System.getenv("EYE_REPORTS_S3_BUCKET")),
         MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")), SlackSdkReleaseChannelEndpoint(System.getenv("SDK_RELEASE_SLACK_CHANNEL_ENDPOINT")),
-        ApiToken(System.getenv("API_TOKEN"));
+        ApiToken(System.getenv("API_TOKEN")), TurnOffFullRegressionEmail("TURN_OFF_FULL_REGRESSION_EMAIL");
 
         public final String value;
 

@@ -38,3 +38,4 @@
 @applitools/sdk-shared
 @applitools/sdk-fake-eyes-server
 @applitools/dom-shared
+@applitools_usage/sdk-release-kit

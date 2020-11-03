@@ -16,13 +16,14 @@ public class KpisMonitoringService {
     TicketUpdateRequest ticketUpdateRequest;
     TicketStates newState;
 
-    public KpisMonitoringService(TicketUpdateRequest ticketUpdateRequest, TicketStates newState) {
+    public KpisMonitoringService(TicketUpdateRequest ticketUpdateRequest) {
         this.ticketUpdateRequest = ticketUpdateRequest;
-        this.newState = newState;
+        this.newState = new TicketsNewStateResolver(ticketUpdateRequest).resolve();
     }
 
     public void updateStateChange() {
         try {
+            reportEventToSplunk();
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
             updateTicketFields(ticket);
@@ -37,6 +38,7 @@ public class KpisMonitoringService {
 
     public void updateTicketFields() {
         try {
+            reportEventToSplunk();
             updateTicketFields(findSheetEntry());
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");

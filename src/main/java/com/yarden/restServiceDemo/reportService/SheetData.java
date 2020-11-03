@@ -130,6 +130,7 @@ public class SheetData {
         sheetDataPerTabMap.clear();
         columnsNamesMap.clear();
         resultsCount.set(0);
+        System.gc();
     }
 
     public static void incrementResultsCounter(){

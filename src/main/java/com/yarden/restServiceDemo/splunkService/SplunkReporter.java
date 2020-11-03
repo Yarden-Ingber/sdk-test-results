@@ -96,8 +96,8 @@ public class SplunkReporter {
         if (service == null) {
             ServiceArgs serviceArgs = new ServiceArgs();
             serviceArgs.setHost("applitools.splunkcloud.com");
-            serviceArgs.setUsername("yardeningber");
-            serviceArgs.setPassword("sderotjer136");
+            serviceArgs.setUsername(Enums.EnvVariables.SplunkUsername.value);
+            serviceArgs.setPassword(Enums.EnvVariables.SplunkPassword.value);
             serviceArgs.setPort(8089);
             serviceArgs.setSSLSecurityProtocol(SSLSecurityProtocol.TLSv1_2);
             service = Service.connect(serviceArgs);

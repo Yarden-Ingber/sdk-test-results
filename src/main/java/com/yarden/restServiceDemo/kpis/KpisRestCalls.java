@@ -32,7 +32,7 @@ public class KpisRestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/state_change");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.valueOf(ticketUpdateRequest.getState())).updateStateChange();
+            new KpisMonitoringService(ticketUpdateRequest).updateStateChange();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }
@@ -44,7 +44,7 @@ public class KpisRestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/update_ticket_fields");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateTicketFields();
+            new KpisMonitoringService(ticketUpdateRequest).updateTicketFields();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }
@@ -56,7 +56,7 @@ public class KpisRestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/update_only_trello_list");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
-            new KpisMonitoringService(ticketUpdateRequest, TicketStates.NoState).updateOnlyTrelloList();
+            new KpisMonitoringService(ticketUpdateRequest).updateOnlyTrelloList();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
     }

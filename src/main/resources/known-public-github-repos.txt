@@ -159,3 +159,4 @@ flan_test
 cs-seleniumPython-hackathon
 Selenium-Javascript-Hackathon
 cs-applitools-cypress-hackathon
+tutorial-nightwatch

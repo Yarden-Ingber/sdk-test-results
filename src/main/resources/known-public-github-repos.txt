@@ -160,3 +160,4 @@ cs-seleniumPython-hackathon
 Selenium-Javascript-Hackathon
 cs-applitools-cypress-hackathon
 tutorial-nightwatch
+CS-Applitools-Hackathon-CSharp

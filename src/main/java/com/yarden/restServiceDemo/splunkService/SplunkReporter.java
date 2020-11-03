@@ -89,6 +89,7 @@ public class SplunkReporter {
     private void resetSplunkConnection(){
         receiver = null;
         service = null;
+        System.gc();
     }
 
     private Service getService(){

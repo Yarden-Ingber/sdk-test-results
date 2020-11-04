@@ -21,7 +21,7 @@ public class KpisRestCalls {
 
     @Test
     public void test() throws IOException {
-        update_only_trello_list("{\"team\":\"sdk\",\"state\":\"Doing\",\"sub_project\":\"javascript\",\"ticket_id\":\"nMNKaa4L1\",\"ticket_title\":\"NAB: Business mega menu page rendering incorrectly on mobile devices\",\"created_by\":\"Nikhil Nigam\",\"ticket_url\":\"https://trello.com/c/nMNKaa4L\",\"current_trello_list\":\"test\"}");
+        state_change("{\"team\":\"sdk\",\"state\":\"Doing\",\"sub_project\":\"javascript\",\"ticket_id\":\"12\",\"ticket_title\":\"NAB: Business mega menu page rendering incorrectly on mobile devices\",\"created_by\":\"Nikhil Nigam\",\"ticket_url\":\"https://trello.com/c/nMNKaa4L\",\"current_trello_list\":\"test\"}");
         SheetData.writeAllTabsToSheet();
     }
 

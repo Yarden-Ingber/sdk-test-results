@@ -146,6 +146,8 @@ public class TicketsNewStateResolver {
             return TicketStates.Doing;
         } else if (request.getCurrent_trello_list().equals("Waiting For Field's Input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equals("Missing information")) {
+            return TicketStates.WaitingForFieldInput;
         } else if (request.getCurrent_trello_list().equals("Waiting for Field Approval")) {
             return TicketStates.WaitingForFieldApproval;
         } else if (request.getCurrent_trello_list().equals("Done")) {

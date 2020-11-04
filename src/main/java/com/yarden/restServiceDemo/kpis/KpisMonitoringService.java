@@ -55,6 +55,16 @@ public class KpisMonitoringService {
         reportEventToSplunk();
     }
 
+    public void archiveCard() {
+        try {
+            ticketUpdateRequest.setTeam("archived");
+            JsonElement ticket = findSheetEntry();
+            updateTicketFields(ticket);
+        } catch (NotFoundException e) {
+            Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
+        }
+    }
+
     private String getTeamWithTrelloBoardsChange(JsonElement ticket){
         String teams = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
         if (teams.equals(ticketUpdateRequest.getTeam())) {

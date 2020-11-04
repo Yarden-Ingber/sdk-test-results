@@ -49,6 +49,18 @@ public class KpisRestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/archive_card")
+    public ResponseEntity archive_card(@RequestBody String json) {
+        synchronized (RestCalls.lock) {
+            WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
+            WriteEntireSheetsPeriodically.start();
+            newRequestPrint(json, "/archive_card");
+            TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
+            new KpisMonitoringService(ticketUpdateRequest).archiveCard();
+            return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/update_only_trello_list")
     public ResponseEntity update_only_trello_list(@RequestBody String json) {
         synchronized (RestCalls.lock) {

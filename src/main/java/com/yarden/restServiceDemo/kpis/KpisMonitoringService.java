@@ -8,7 +8,9 @@ import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
 import javassist.NotFoundException;
-import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class KpisMonitoringService {
 
@@ -25,6 +27,7 @@ public class KpisMonitoringService {
         try {
             reportEventToSplunk();
             JsonElement ticket = findSheetEntry();
+            ticketUpdateRequest.setTeam(getTeamWithTrelloBoardsChange(ticket));
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
             updateTicketFields(ticket);
         } catch (NotFoundException e) {
@@ -39,7 +42,9 @@ public class KpisMonitoringService {
     public void updateTicketFields() {
         try {
             reportEventToSplunk();
-            updateTicketFields(findSheetEntry());
+            JsonElement ticket = findSheetEntry();
+            ticketUpdateRequest.setTeam(getTeamWithTrelloBoardsChange(ticket));
+            updateTicketFields(ticket);
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
         }
@@ -48,6 +53,45 @@ public class KpisMonitoringService {
     public void updateOnlyTrelloList() {
         Logger.info("KPIs: Updating ticket trello list only for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getCurrent_trello_list());
         reportEventToSplunk();
+    }
+
+    private String getTeamWithTrelloBoardsChange(JsonElement ticket){
+        String teams = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
+        if (teams.equals(ticketUpdateRequest.getTeam())) {
+            return ticketUpdateRequest.getTeam();
+        } else {
+            String delimiter = ",";
+            if (teams.contains(delimiter)) {
+                if (teams.contains(ticketUpdateRequest.getTeam())) {
+                    return teams;
+                } else {
+                    return addTeamLexicographically(teams, delimiter);
+                }
+            } else {
+                return addTeamLexicographically(teams, delimiter);
+            }
+        }
+    }
+
+    private String addTeamLexicographically(String teams, String delimiter){
+        String[] teamsArray = teams.split(delimiter);
+        List<String> teamsListResult = new ArrayList<>();
+        boolean isTeamAdded = false;
+        for (String team : teamsArray) {
+            if (team.compareTo(ticketUpdateRequest.getTeam()) > 0) {
+                teamsListResult.add(ticketUpdateRequest.getTeam());
+                isTeamAdded = true;
+            }
+            teamsListResult.add(team);
+        }
+        if (!isTeamAdded) {
+            teamsListResult.add(ticketUpdateRequest.getTeam());
+        }
+        String concatenatedList = "";
+        for (String team : teamsListResult) {
+            concatenatedList = concatenatedList + team + delimiter;
+        }
+        return concatenatedList.substring(0, concatenatedList.length() - 1);
     }
 
     private void updateTicketFields(JsonElement ticket) {

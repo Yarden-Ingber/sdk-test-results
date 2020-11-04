@@ -12,7 +12,7 @@ public class TicketsNewStateResolver {
     }
 
     private enum Boards {
-        UltrafastGrid("Ultrafast Grid"), JSSDKs("JS SDKs"), AlgoBugs("Algo Bugs"), SDKs("SDKs");
+        UltrafastGrid("Ultrafast Grid"), JSSDKs("JS SDKs"), AlgoBugs("Algo Bugs"), SDKs("SDKs"), EyesAppIssues("Eyes App - Issues");
 
         public String value;
 
@@ -30,6 +30,8 @@ public class TicketsNewStateResolver {
             return resolveStateForAlgoBugs();
         } else if(request.getTeam().equals(Boards.SDKs.value)) {
             return resolveStateForGeneralSdks();
+        } else if(request.getTeam().equals(Boards.EyesAppIssues.value)) {
+            return resolveStateForEyesIssues();
         } else {
             return noStateFound();
         }
@@ -174,6 +176,34 @@ public class TicketsNewStateResolver {
             return TicketStates.WaitingForRD;
         } else if (request.getCurrent_trello_list().equals("Missing Quality Info")) {
             return TicketStates.MissingQuality;
+        } else {
+            return noStateFound();
+        }
+    }
+
+    private TicketStates resolveStateForEyesIssues() {
+        if (request.getCurrent_trello_list().equals("New")) {
+            return TicketStates.New;
+        } else if (request.getCurrent_trello_list().equals("Waiting for R&D")) {
+            return TicketStates.WaitingForRD;
+        } else if (request.getCurrent_trello_list().equals("Trying to reproduce")) {
+            return TicketStates.TryingToReproduce;
+        } else if (request.getCurrent_trello_list().equals("Doing")) {
+            return TicketStates.Doing;
+        } else if (request.getCurrent_trello_list().equals("On Hold / low priority")) {
+            return TicketStates.WaitingForRD;
+        } else if (request.getCurrent_trello_list().equals("Waiting for field input")) {
+            return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equals("Waiting for product")) {
+            return TicketStates.WaitingForProduct;
+        } else if (request.getCurrent_trello_list().equals("For Amit to Review")) {
+            return TicketStates.WaitingForRD;
+        } else if (request.getCurrent_trello_list().equals("To be Deployed next Hotfix")) {
+            return TicketStates.WaitingForRD;
+        } else if (request.getCurrent_trello_list().contains("Done")) {
+            return TicketStates.Done;
+        } else if (request.getCurrent_trello_list().equals("Waiting for field approval")) {
+            return TicketStates.WaitingForFieldApproval;
         } else {
             return noStateFound();
         }

@@ -60,24 +60,19 @@ public class KpisMonitoringService {
         if (teams.equals(ticketUpdateRequest.getTeam())) {
             return ticketUpdateRequest.getTeam();
         } else {
-            String delimiter = ",";
-            if (teams.contains(delimiter)) {
-                if (teams.contains(ticketUpdateRequest.getTeam())) {
-                    return teams;
-                } else {
-                    return addTeamLexicographically(teams, delimiter);
-                }
-            } else {
-                return addTeamLexicographically(teams, delimiter);
-            }
+            return addTeamLexicographically(teams);
         }
     }
 
-    private String addTeamLexicographically(String teams, String delimiter){
+    private String addTeamLexicographically(String teams){
+        String delimiter = ",";
         String[] teamsArray = teams.split(delimiter);
         List<String> teamsListResult = new ArrayList<>();
         boolean isTeamAdded = false;
         for (String team : teamsArray) {
+            if (team.equals(ticketUpdateRequest.getTeam())) {
+                return teams;
+            }
             if (team.compareTo(ticketUpdateRequest.getTeam()) > 0) {
                 teamsListResult.add(ticketUpdateRequest.getTeam());
                 isTeamAdded = true;

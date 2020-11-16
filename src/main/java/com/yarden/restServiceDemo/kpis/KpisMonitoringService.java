@@ -6,7 +6,6 @@ import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
-import com.yarden.restServiceDemo.splunkService.SplunkReporter;
 import javassist.NotFoundException;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ public class KpisMonitoringService {
     SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
     TicketUpdateRequest ticketUpdateRequest;
     TicketStates newState;
+    public static final String TeamDelimiter = ",";
 
     public KpisMonitoringService(TicketUpdateRequest ticketUpdateRequest) {
         this.ticketUpdateRequest = ticketUpdateRequest;
@@ -25,34 +25,35 @@ public class KpisMonitoringService {
 
     public void updateStateChange() {
         try {
-            reportEventToSplunk();
             JsonElement ticket = findSheetEntry();
-            ticketUpdateRequest.setTeam(getTeamWithTrelloBoardsChange(ticket));
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
             updateTicketFields(ticket);
+            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             if (newState.equals(TicketStates.New)) {
-                addNewTicketEntry();
+                JsonElement ticket = addNewTicketEntry();
+                new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
             } else {
                 Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
+                new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
             }
         }
     }
 
     public void updateTicketFields() {
         try {
-            reportEventToSplunk();
             JsonElement ticket = findSheetEntry();
-            ticketUpdateRequest.setTeam(getTeamWithTrelloBoardsChange(ticket));
             updateTicketFields(ticket);
+            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
+            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
         }
     }
 
     public void updateOnlyTrelloList() {
         Logger.info("KPIs: Updating ticket trello list only for ticket " + ticketUpdateRequest.getTicketId() + ": " + ticketUpdateRequest.getCurrent_trello_list());
-        reportEventToSplunk();
+        new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
     }
 
     public void archiveCard() {
@@ -60,6 +61,7 @@ public class KpisMonitoringService {
             ticketUpdateRequest.setTeam("archived");
             JsonElement ticket = findSheetEntry();
             updateTicketFields(ticket);
+            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
         }
@@ -75,8 +77,7 @@ public class KpisMonitoringService {
     }
 
     private String addTeamLexicographically(String teams){
-        String delimiter = ",";
-        String[] teamsArray = teams.split(delimiter);
+        String[] teamsArray = teams.split(TeamDelimiter);
         List<String> teamsListResult = new ArrayList<>();
         boolean isTeamAdded = false;
         for (String team : teamsArray) {
@@ -94,7 +95,7 @@ public class KpisMonitoringService {
         }
         String concatenatedList = "";
         for (String team : teamsListResult) {
-            concatenatedList = concatenatedList + team + delimiter;
+            concatenatedList = concatenatedList + team + TeamDelimiter;
         }
         return concatenatedList.substring(0, concatenatedList.length() - 1);
     }
@@ -102,7 +103,7 @@ public class KpisMonitoringService {
     private void updateTicketFields(JsonElement ticket) {
         addTypeToTicket(ticket);
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Workaround.value, ticketUpdateRequest.getWorkaround());
-        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, ticketUpdateRequest.getTeam());
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, getTeamWithTrelloBoardsChange(ticket));
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.SubProject.value, ticketUpdateRequest.getSubProject());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketID.value, ticketUpdateRequest.getTicketId());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketTitle.value, ticketUpdateRequest.getTicketTitle());
@@ -127,7 +128,7 @@ public class KpisMonitoringService {
         throw new NotFoundException("");
     }
 
-    private void addNewTicketEntry(){
+    private JsonElement addNewTicketEntry(){
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.SubProject.value + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
                 "\"" + Enums.KPIsSheetColumnNames.TicketID.value + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
@@ -143,23 +144,7 @@ public class KpisMonitoringService {
                 "\"" + Enums.KPIsSheetColumnNames.CurrentState.value + "\":\"" + newState.name() + "\"}");
         Logger.info("KPIs: Adding a new ticket to the sheet: " + newEntry.toString());
         rawDataSheetData.getSheetData().add(newEntry);
-    }
-
-    private void reportEventToSplunk() {
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.KPIsSheetColumnNames.Team.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getTeam() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.SubProject.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getSubProject() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.TicketID.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getTicketId() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.TicketType.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getTicketType() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.CreatedBy.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getCreatedBy() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.Workaround.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getWorkaround() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.TicketTitle.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getTicketTitle() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.TicketUrl.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getTicketUrl() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.Timestamp.value.replace(" ", "_") + "\":\"" + Logger.getTimaStamp() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.CurrentTrelloList.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getCurrent_trello_list() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.Labels.value.replace(" ", "_") + "\":\"" + ticketUpdateRequest.getLabels() + "\"," +
-                "\"" + Enums.KPIsSheetColumnNames.CurrentState.value.replace(" ", "_") + "\":\"" + newState.name() + "\"}");
-        Logger.info("KPIs: reporting a new ticket event to Splunk: " + newEntry.toString());
-        new SplunkReporter().report(Enums.SplunkSourceTypes.RawKPILog, newEntry.toString());
+        return newEntry;
     }
 
 }

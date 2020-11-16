@@ -27,11 +27,11 @@ public class KpiCalculator {
         SheetData.writeAllTabsToSheet();
     }
 
-    public void calculate(){
+    public void calculate() {
         for (JsonElement sheetEntry: rawSheetData.getSheetData()){
             for (KpisSheetEntryObject kpisSheetEntryObject : kpiSheetEntries.getEntries().values()) {
                 if (sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString().equals(kpisSheetEntryObject.team)
-                    && sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.SubProject.value).getAsString().equals(kpisSheetEntryObject.subProject)) {
+                        && sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.SubProject.value).getAsString().equals(kpisSheetEntryObject.subProject)) {
                     addCountOfOpenTicket(kpisSheetEntryObject, sheetEntry);
                     addToNumberOfTicketCreatedLastWeek(kpisSheetEntryObject, sheetEntry);
                     addToNumberOfTicketsMovedToDoneLastWeek(kpisSheetEntryObject, sheetEntry);
@@ -55,8 +55,11 @@ public class KpiCalculator {
         for (KpisSheetEntryObject kpisSheetEntryObject : kpiSheetEntries.getEntries().values()) {
             Iterator iterator = kpisSheetEntryObject.kpisList.entrySet().iterator();
             JsonElementBuilder sheetEntryBuilder = new JsonElementBuilder();
-            sheetEntryBuilder.addKeyValue(KpisColumns.Team.value, kpisSheetEntryObject.team);
-            sheetEntryBuilder.addKeyValue(KpisColumns.SubProject.value, kpisSheetEntryObject.subProject);
+            if (kpisSheetEntryObject.subProject.isEmpty()) {
+                sheetEntryBuilder.addKeyValue(KpisColumns.Team.value, kpisSheetEntryObject.team);
+            } else {
+                sheetEntryBuilder.addKeyValue(KpisColumns.Team.value, kpisSheetEntryObject.team + ", " + kpisSheetEntryObject.subProject);
+            }
             sheetEntryBuilder.addKeyValue(KpisColumns.IsOnlyBugs.value, String.valueOf(kpisSheetEntryObject.isOnlyBugs));
             while (iterator.hasNext()) {
                 Map.Entry mapEntry = (Map.Entry)iterator.next();
@@ -70,7 +73,7 @@ public class KpiCalculator {
     private void replaceEmptyCellsWithZero(){
         for (JsonElement sheetEntry : kpiSheetData.getSheetData()) {
             for (KpisColumns column : KpisColumns.values()) {
-                if (!(column.value.equals(KpisColumns.Team.value) || column.value.equals(KpisColumns.SubProject.value) || column.value.equals(KpisColumns.IsOnlyBugs.value))) {
+                if (!(column.value.equals(KpisColumns.Team.value) || column.value.equals(KpisColumns.IsOnlyBugs.value))) {
                     if (sheetEntry.getAsJsonObject().get(column.value) == null || sheetEntry.getAsJsonObject().get(column.value).getAsString().isEmpty()) {
                         sheetEntry.getAsJsonObject().addProperty(column.value, "0");
                     }
@@ -80,7 +83,7 @@ public class KpiCalculator {
     }
 
     public enum KpisColumns {
-        Team("Team"), SubProject("Sub project"), IsOnlyBugs("Is only bugs"), OpenTickets("Open tickets"),
+        Team("Team"), IsOnlyBugs("Is only bugs"), OpenTickets("Open tickets"),
         NumberOfTicketsCreatedLastWeek("Number of tickets created last week"), NumberOfTicketsMovedToDoneLastWeek("Number of tickets moved to done last week"),
         AverageHoursInNew("Average hours in new"), AverageHoursInTryingToReproduce("Average hours in trying to reproduce"), AverageHoursInDoing("Average hours in doing"),
         AverageHoursInWaitingForFieldInput("Average hours in waiting for field input"), AverageHoursInWaitingForRD("Average hours in waiting for R&D"),

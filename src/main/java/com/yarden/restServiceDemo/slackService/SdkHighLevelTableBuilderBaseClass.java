@@ -15,21 +15,17 @@ public class SdkHighLevelTableBuilderBaseClass {
         this.requestJson = requestJson;
     }
 
-    protected int getPermutationResultCountForSingleTestEntry(JsonElement sheetEntry, Enums.SdkSheetColumnNames permutationResult){
-        JsonElement passedValue = sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value);
-        return (passedValue == null || passedValue.getAsString().isEmpty()) ?
-                0 :
-                sheetEntry.getAsJsonObject().get(requestJson.getSdk() + permutationResult.value).getAsInt();
-    }
-
     protected int getPassedTestCountForSdk(SdkSlackReportSender.AddingTestCountCondition addingTestCountCondition){
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
-                    int passedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Pass);
-                    totalAmount += passedValueInteger;
+            if (reportSheet.get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
+                for (JsonElement sheetEntry : reportSheet) {
+                    if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
+                        if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Passed.value)) {
+                            totalAmount++;
+                        }
+                    }
                 }
             }
         }
@@ -40,9 +36,12 @@ public class SdkHighLevelTableBuilderBaseClass {
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            for (JsonElement sheetEntry: reportSheet){
-                int failedValueInteger = getPermutationResultCountForSingleTestEntry(sheetEntry, Enums.SdkSheetColumnNames.Fail);
-                totalAmount += failedValueInteger;
+            if (reportSheet.get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
+                for (JsonElement sheetEntry: reportSheet){
+                    if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Failed.value)) {
+                        totalAmount++;
+                    }
+                }
             }
         }
         return totalAmount;

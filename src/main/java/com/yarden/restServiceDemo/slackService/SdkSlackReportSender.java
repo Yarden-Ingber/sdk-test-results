@@ -128,7 +128,7 @@ public class SdkSlackReportSender {
                         if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
                         } else {
                             tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(),"PASS",
-                                    getSumOfPassedPermutationsForTest(row));
+                                    "1");
                         }
                     }
                 }
@@ -148,7 +148,7 @@ public class SdkSlackReportSender {
                         if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
                         } else {
                             tableBuilder.addRowValues(false, row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString(),"Fail",
-                                    getSumOfFailedPermutationsForTest(row));
+                                    "1");
                         }
                     }
                 }
@@ -184,22 +184,6 @@ public class SdkSlackReportSender {
 //            return text + "https://www.npmjs.com/package/@applitools/eyes-webdriverio";
 //        }
         return "";
-    }
-
-    private String getSumOfPassedPermutationsForTest(JsonElement row){
-        try {
-            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SdkSheetColumnNames.Pass.value).getAsInt());
-        } catch (Exception e) {
-            return "0";
-        }
-    }
-
-    private String getSumOfFailedPermutationsForTest(JsonElement row){
-        try {
-            return Integer.toString(row.getAsJsonObject().get(requestJson.getSdk() + Enums.SdkSheetColumnNames.Fail.value).getAsInt());
-        } catch (Exception e) {
-            return "0";
-        }
     }
 
 }

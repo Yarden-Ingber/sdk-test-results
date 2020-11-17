@@ -80,6 +80,7 @@ public class SdkReportService {
         JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
             TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
+            Logger.info("Updating test result " + testResult.toString());
             String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
             String paramsString = "";
             if (shouldAddTestParamsToTestName) {

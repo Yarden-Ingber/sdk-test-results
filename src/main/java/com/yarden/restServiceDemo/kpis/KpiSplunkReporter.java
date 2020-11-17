@@ -1,6 +1,7 @@
 package com.yarden.restServiceDemo.kpis;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
@@ -57,7 +58,11 @@ public class KpiSplunkReporter {
                 }
                 jsonObject.put(Enums.KPIsSheetColumnNames.Team.value.replace(" ", "_"), ticketUpdateRequest.getTeam());
             } else if (!column.contains(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value)){
-                if (ticket.getAsJsonObject().get(column).isJsonNull()) {
+                JsonObject jo = ticket.getAsJsonObject();
+                Logger.info(jo.toString());
+                JsonElement je = jo.get(column);
+                Logger.info(je.toString());
+                if (je.isJsonNull()) {
                     jsonObject.put(column.replace(" ", "_"), "");
                 } else {
                     jsonObject.put(column.replace(" ", "_"), ticket.getAsJsonObject().get(column).getAsString());

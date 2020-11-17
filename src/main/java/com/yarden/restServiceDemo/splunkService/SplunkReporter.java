@@ -2,6 +2,7 @@ package com.yarden.restServiceDemo.splunkService;
 
 import com.splunk.*;
 import com.yarden.restServiceDemo.Enums;
+import com.yarden.restServiceDemo.Logger;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -25,8 +26,13 @@ public class SplunkReporter {
         try {
             getReceiver().log("qualityevents", args, json);
         } catch (Throwable t) {
-            resetSplunkConnection();
-            getReceiver().log("qualityevents", args, json);
+            Logger.warn("Retrying splunk lof");
+            try {
+                resetSplunkConnection();
+                getReceiver().log("qualityevents", args, json);
+            } catch (Throwable t2) {
+                Logger.error("Failed logging to splunk: " + json);
+            }
         }
     }
 

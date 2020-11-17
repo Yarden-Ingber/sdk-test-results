@@ -59,9 +59,8 @@ public class KpiSplunkReporter {
                 jsonObject.put(Enums.KPIsSheetColumnNames.Team.value.replace(" ", "_"), ticketUpdateRequest.getTeam());
             } else if (!column.contains(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value)){
                 JsonObject jo = ticket.getAsJsonObject();
-                Logger.info(jo.toString());
                 JsonElement je = jo.get(column);
-                Logger.info(je.toString());
+                Logger.info("Column" + column + ": " + je.toString());
                 if (je.isJsonNull()) {
                     jsonObject.put(column.replace(" ", "_"), "");
                 } else {

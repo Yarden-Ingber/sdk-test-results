@@ -152,7 +152,7 @@ public class SheetDBApiService {
             sheetService = getService();
             sheetValues = sheetService.spreadsheets().values();
             spreadsheetID = sheetData.getSheetTabIdentifier().spreadsheetID;
-            range = sheetData.getSheetTabIdentifier().sheetTabName + "!A1:BU3000";
+            range = sheetData.getSheetTabIdentifier().sheetTabName + "!A1:BY3000";
             newValues = jsonArrayToList(sheetData.getSheetData(), sheetData.getColumnNames());
             sheetValues.update(spreadsheetID, range, new ValueRange().setValues(newValues))
                     .setValueInputOption("RAW").execute();

@@ -47,6 +47,7 @@ public class KpiSplunkReporter {
     }
 
     private void addColumnsToEvent(JSONObject jsonObject, JsonElement ticket) {
+        Logger.info("Adding columns to splunk event for ticket: " + ticket.toString());
         for (String column : rawDataSheetData.getColumnNames()) {
             if (column.equals(Enums.KPIsSheetColumnNames.Team.value)) {
                 if (ticket.getAsJsonObject().get(column).getAsString().contains(KpisMonitoringService.TeamDelimiter)) {

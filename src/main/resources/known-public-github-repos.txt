@@ -159,7 +159,6 @@ flan_test
 cs-seleniumPython-hackathon
 Selenium-Javascript-Hackathon
 cs-applitools-cypress-hackathon
-tutorial-nightwatch
 CS-Applitools-Hackathon-CSharp
 eyes-xcui-swift-package
 tutorial-nightwatch-ultrafastgrid

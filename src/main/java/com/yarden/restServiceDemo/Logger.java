@@ -22,7 +22,7 @@ public class Logger {
     }
 
     public static String getTimaStamp(){
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("GMT+3"));
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("GMT+2"));
         return Timestamp.valueOf(zonedDateTime.toLocalDateTime()).toString();
     }
 

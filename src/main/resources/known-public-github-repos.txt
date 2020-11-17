@@ -163,3 +163,4 @@ tutorial-nightwatch
 CS-Applitools-Hackathon-CSharp
 eyes-xcui-swift-package
 tutorial-nightwatch-ultrafastgrid
+tutorial-nightwatch-basic

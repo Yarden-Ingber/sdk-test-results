@@ -87,4 +87,17 @@ public class TestResultData {
     public void setGeneric(Boolean generic) {
         isGeneric = generic;
     }
+
+    @Override
+    public String toString() {
+        return "TestResultData{" +
+                "testName='" + testName + '\'' +
+                ", feature='" + feature + '\'' +
+                ", feature_sub_category='" + feature_sub_category + '\'' +
+                ", parameters=" + parameters +
+                ", passed=" + passed +
+                ", resultUrl='" + resultUrl + '\'' +
+                ", isGeneric=" + isGeneric +
+                '}';
+    }
 }

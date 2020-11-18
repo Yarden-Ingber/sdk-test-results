@@ -25,11 +25,13 @@ public class SplunkReporter {
         args.add("sourcetype", sourcetype.value);
         try {
             getReceiver().log("qualityevents", args, json);
+            Logger.info("Splunk log sent");
         } catch (Throwable t) {
-            Logger.warn("Retrying splunk lof");
+            Logger.warn("Retrying splunk log");
             try {
                 resetSplunkConnection();
                 getReceiver().log("qualityevents", args, json);
+                Logger.info("Splunk log sent");
             } catch (Throwable t2) {
                 Logger.error("Failed logging to splunk: " + json);
             }

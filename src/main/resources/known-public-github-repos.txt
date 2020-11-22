@@ -164,3 +164,4 @@ eyes-xcui-swift-package
 tutorial-nightwatch-ultrafastgrid
 tutorial-nightwatch-basic
 tutorial-puppeteer-basic
+tutorial-puppeteer-ultrafastgrid

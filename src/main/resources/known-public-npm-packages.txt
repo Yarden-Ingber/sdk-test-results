@@ -40,3 +40,5 @@
 @applitools/dom-shared
 @applitools/sdk-release-kit
 @applitools/eyes-nightwatch
+@applitools/eyes-puppeteer
+@applitools/eyes-fake-sdk

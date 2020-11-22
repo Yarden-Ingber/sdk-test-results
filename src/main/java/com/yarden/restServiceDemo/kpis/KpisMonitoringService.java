@@ -28,27 +28,24 @@ public class KpisMonitoringService {
             JsonElement ticket = findSheetEntry();
             new TicketsStateChanger().updateExistingTicketState(ticket, newState);
             updateTicketFields(ticket);
-            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             if (newState.equals(TicketStates.New)) {
                 JsonElement ticket = addNewTicketEntry();
-                new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
             } else {
                 Logger.info("KPIs: Ticket" + ticketUpdateRequest.getTicketId() + " sent an update but wasn't opened under field new column");
-                new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
             }
         }
+        new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
     }
 
     public void updateTicketFields() {
         try {
             JsonElement ticket = findSheetEntry();
             updateTicketFields(ticket);
-            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
-            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
         }
+        new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
     }
 
     public void updateOnlyTrelloList() {
@@ -61,10 +58,10 @@ public class KpisMonitoringService {
             ticketUpdateRequest.setTeam("archived");
             JsonElement ticket = findSheetEntry();
             updateTicketFields(ticket);
-            new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(ticket);
         } catch (NotFoundException e) {
             Logger.info("KPIs: Ticket " + ticketUpdateRequest.getTicketId() + " wasn't found in the sheet");
         }
+        new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
     }
 
     private String getTeamWithTrelloBoardsChange(JsonElement ticket){

@@ -1,10 +1,8 @@
 package com.yarden.restServiceDemo.kpis;
 
 import com.google.gson.Gson;
-import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
-import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -21,16 +19,15 @@ public class KpisRestCalls {
 
     @Test
     public void test() throws IOException {
-        state_change("{\"team\":\"sdk\",\"state\":\"Doing\",\"sub_project\":\"javascript\",\"ticket_id\":\"12\",\"ticket_title\":\"NAB: Business mega menu page rendering incorrectly on mobile devices\",\"created_by\":\"Nikhil Nigam\",\"ticket_url\":\"https://trello.com/c/nMNKaa4L\",\"current_trello_list\":\"test\"}");
-        SheetData.writeAllTabsToSheet();
+        state_update("{\"team\":\"JS SDKs\",\"sub_project\":\"\",\"ticket_id\":\"ike58Acv\",\"ticket_title\":\"Storybook RFE | Add option to not fail the test suite when diffs are found\",\"created_by\":\"Rivka Beck\",\"ticket_url\":\"https://trello.com/c/ike58Acv\",\"state\":\"New\",\"current_trello_list\":\"New\",\"ticket_type\":\"\",\"workaround\":\"\",\"labels\":\"\"}");
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/state_update")
-    public ResponseEntity state_change(@RequestBody String json) {
+    public ResponseEntity state_update(@RequestBody String json) {
         synchronized (RestCalls.lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/state_change");
+            newRequestPrint(json, "/state_update");
             TicketUpdateRequest ticketUpdateRequest = new Gson().fromJson(json, TicketUpdateRequest.class);
             new KpisMonitoringService(ticketUpdateRequest).updateStateChange();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);

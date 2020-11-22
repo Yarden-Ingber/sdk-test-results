@@ -28,7 +28,6 @@ public class KpiSplunkReporter {
 
     public void reportStandAloneEvent(TicketStates newState) {
         JSONObject splunkEventJson = new JSONObject();
-        splunkEventJson.put("Started_at_state_new", 0);
         splunkEventJson.put(Enums.KPIsSheetColumnNames.Team.value.replace(" ", "_"), ticketUpdateRequest.getTeam());
         splunkEventJson.put(Enums.KPIsSheetColumnNames.SubProject.value.replace(" ", "_"), ticketUpdateRequest.getSubProject());
         splunkEventJson.put(Enums.KPIsSheetColumnNames.TicketID.value.replace(" ", "_"), ticketUpdateRequest.getTicketId());

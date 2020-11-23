@@ -80,7 +80,7 @@ public class TicketsNewStateResolver {
             return TicketStates.WaitingForRD;
         } else if (request.getCurrent_trello_list().equals("Strict - Broken")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Hot ticket in work")) {
+        } else if (request.getCurrent_trello_list().equals("Doing")) {
             return TicketStates.Doing;
         } else if (request.getCurrent_trello_list().equals("Solved/Waiting for publish")) {
             return TicketStates.Doing;

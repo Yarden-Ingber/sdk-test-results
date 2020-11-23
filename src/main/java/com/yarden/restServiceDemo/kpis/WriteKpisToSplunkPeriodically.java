@@ -41,7 +41,6 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
     public void run() {
         try {
             synchronized (RestCalls.lock) {
-                Logger.info("WriteKpisToSplunkPeriodically saying: \"tick...\"");
                 try {
                     if (shouldDumpTickets()) {
                         periodicDumpTickets();

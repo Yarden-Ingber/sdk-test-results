@@ -98,7 +98,14 @@ public class SdkReportService {
         paramsList.sort(new ParamsComperator());
         StringBuilder paramsString = new StringBuilder();
         for (Map.Entry<String, JsonElement> param: paramsList) {
-            paramsString.append("(").append(capitalize(param.getKey())).append(":").append(capitalize(param.getValue().getAsString())).append(") ");
+            String key = param.getKey();
+            String value = "";
+            if (param.getValue() != null) {
+                value = param.getValue().getAsString();
+            } else {
+                value = "null";
+            }
+            paramsString.append("(").append(capitalize(key)).append(":").append(capitalize(value)).append(") ");
         }
         return paramsString.toString().trim();
     }

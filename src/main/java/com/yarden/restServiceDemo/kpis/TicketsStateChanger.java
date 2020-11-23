@@ -38,7 +38,9 @@ public class TicketsStateChanger {
         if (ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value).getAsString().isEmpty()) {
             setTimeUntilLeftNewForFirstTime(timeStamp, ticket);
         }
-        addCalculatedTimeInPreviousState(timeStamp, ticket, currentState);
+        if (!currentState.equals(TicketStates.Done)) {
+            addCalculatedTimeInPreviousState(timeStamp, ticket, currentState);
+        }
         writeNewStateTimestamp(timeStamp, ticket, newState);
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CurrentState.value, newState.name());
     }

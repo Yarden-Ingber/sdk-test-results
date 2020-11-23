@@ -100,10 +100,10 @@ public class SdkReportService {
         for (Map.Entry<String, JsonElement> param: paramsList) {
             String key = param.getKey();
             String value = "";
-            if (param.getValue() != null) {
-                value = param.getValue().getAsString();
-            } else {
+            if (param.getValue() == null || param.getValue().isJsonNull()) {
                 value = "null";
+            } else {
+                value = param.getValue().getAsString();
             }
             paramsString.append("(").append(capitalize(key)).append(":").append(capitalize(value)).append(") ");
         }

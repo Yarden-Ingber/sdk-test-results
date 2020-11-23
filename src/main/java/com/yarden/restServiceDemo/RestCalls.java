@@ -208,7 +208,7 @@ public class RestCalls {
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
-        Logger.info("New request detected: " + request + " === payload: " + json);
+        Logger.info("New request detected: " + request + " === payload: " + json.replace(" ", ""));
     }
 
 }

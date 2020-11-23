@@ -75,15 +75,14 @@ public class SdkReportService {
         Logger.info("Updating results in local cached sheet");
         JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
-            TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
-            if (testResult == null) {
-                Logger.warn("testResult is null. result is: " + result.toString());
+            if (result != null) {
+                TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
+                Logger.info("Updating test result " + testResult.toString());
+                String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
+                String paramsString = getTestParamsAsString(testResult);
+                testName = testName + paramsString;
+                updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
             }
-            Logger.info("Updating test result " + testResult.toString());
-            String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
-            String paramsString = getTestParamsAsString(testResult);
-            testName = testName + paramsString;
-            updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
         }
     }
 

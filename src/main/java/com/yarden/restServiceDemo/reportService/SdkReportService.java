@@ -77,7 +77,6 @@ public class SdkReportService {
         for (JsonElement result: resultsArray) {
             if (result != null) {
                 TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
-                Logger.info("Updating test result " + testResult.toString());
                 String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
                 String paramsString = getTestParamsAsString(testResult);
                 testName = testName + paramsString;

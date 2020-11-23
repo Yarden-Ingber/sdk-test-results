@@ -10,7 +10,6 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.kpis.kpiCalculators.KpiCalculator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,7 +44,7 @@ public class TicketsStateChanger {
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CurrentState.value, newState.name());
     }
 
-    private void writeNewStateTimestamp(String timeStamp, JsonElement ticket, TicketStates newState) {
+    public void writeNewStateTimestamp(String timeStamp, JsonElement ticket, TicketStates newState) {
         String newStateColumnName;
         if (newState.equals(TicketStates.Done)) {
             newStateColumnName = Enums.KPIsSheetColumnNames.MovedToStateDone.value;
@@ -55,7 +54,7 @@ public class TicketsStateChanger {
         ticket.getAsJsonObject().addProperty(newStateColumnName, timeStamp);
     }
 
-    private void addCalculatedTimeInPreviousState(String timeStamp, JsonElement ticket, TicketStates currentState) throws ParseException {
+    public void addCalculatedTimeInPreviousState(String timeStamp, JsonElement ticket, TicketStates currentState) throws ParseException {
         Date endTime = Logger.timestampToDate(timeStamp);
         Date startTime = Logger.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + currentState.name()).getAsString());
         Long newCalculatedTime = TimeUnit.MILLISECONDS.toHours(endTime.getTime() - startTime.getTime());

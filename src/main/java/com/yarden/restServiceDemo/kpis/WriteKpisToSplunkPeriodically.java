@@ -73,9 +73,14 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
         return false;
     }
 
-    private void periodicDumpTickets() {
+    private void periodicDumpTickets() throws ParseException {
+        TicketsStateChanger ticketsStateChanger = new TicketsStateChanger();
         SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
+            String timeStamp = Logger.getTimaStamp();
+            String currentState = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString();
+            ticketsStateChanger.addCalculatedTimeInPreviousState(timeStamp, sheetEntry, TicketStates.valueOf(currentState));
+            ticketsStateChanger.writeNewStateTimestamp(timeStamp, sheetEntry, TicketStates.valueOf(currentState));
             TicketUpdateRequest ticketUpdateRequest = new TicketUpdateRequest();
             ticketUpdateRequest.setTeam(sheetEntry.getAsJsonObject().get("Team").getAsString());
             new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(sheetEntry);

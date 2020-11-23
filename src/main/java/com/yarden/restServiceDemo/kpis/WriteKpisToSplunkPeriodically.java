@@ -11,6 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -73,14 +74,20 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
         return false;
     }
 
-    private void periodicDumpTickets() throws ParseException {
+    private void periodicDumpTickets() {
         TicketsStateChanger ticketsStateChanger = new TicketsStateChanger();
+        String timeStamp = Logger.getTimaStamp();
         SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
-            String timeStamp = Logger.getTimaStamp();
-            String currentState = sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString();
-            ticketsStateChanger.addCalculatedTimeInPreviousState(timeStamp, sheetEntry, TicketStates.valueOf(currentState));
-            ticketsStateChanger.writeNewStateTimestamp(timeStamp, sheetEntry, TicketStates.valueOf(currentState));
+            TicketStates currentState = TicketStates.valueOf(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString());
+            if (!(currentState.equals(TicketStates.Done) || currentState.equals(TicketStates.NoState))) {
+                try {
+                    ticketsStateChanger.addCalculatedTimeInPreviousState(timeStamp, sheetEntry, currentState);
+                    ticketsStateChanger.writeNewStateTimestamp(timeStamp, sheetEntry, currentState);
+                } catch (Throwable t) {}
+            }
+        }
+        for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
             TicketUpdateRequest ticketUpdateRequest = new TicketUpdateRequest();
             ticketUpdateRequest.setTeam(sheetEntry.getAsJsonObject().get("Team").getAsString());
             new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportLatestState(sheetEntry);

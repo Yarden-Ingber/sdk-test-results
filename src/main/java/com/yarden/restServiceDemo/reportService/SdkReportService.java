@@ -75,7 +75,7 @@ public class SdkReportService {
         Logger.info("Updating results in local cached sheet");
         JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
-            if (result != null) {
+            if (result != null && !result.isJsonNull()) {
                 TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
                 String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
                 String paramsString = getTestParamsAsString(testResult);

@@ -50,7 +50,7 @@ public class KpiSplunkReporter {
             JsonObject ticketAsJsonObject = ticket.getAsJsonObject();
             JsonElement singleTicketFieldData = ticketAsJsonObject.get(column);
             if (column.equals(Enums.KPIsSheetColumnNames.IsCrossBoards.value)) {
-                addIsCrossBoardsValue(splunkEventJson, ticket, column);
+                addIsCrossBoardsValue(splunkEventJson, singleTicketFieldData, column);
             } else if (column.equals(Enums.KPIsSheetColumnNames.Workaround.value)) {
                 addWorkaroundValue(splunkEventJson, singleTicketFieldData, column);
             } else if (!column.contains(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value)){
@@ -63,7 +63,8 @@ public class KpiSplunkReporter {
         if (singleTicketFieldData == null || singleTicketFieldData.isJsonNull()) {
             splunkEventJson.put(column.replace(" ", "_"), 0);
         } else {
-            int value = singleTicketFieldData.getAsString().equals(Enums.Strings.True.value) ? 1 : 0;
+            int value = 0;
+            value = singleTicketFieldData.getAsString().equals(Enums.Strings.True.value) ? 1 : 0;
             splunkEventJson.put(column.replace(" ", "_"), value);
         }
     }

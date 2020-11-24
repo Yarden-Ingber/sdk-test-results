@@ -49,8 +49,8 @@ public class KpiSplunkReporter {
         for (String column : rawDataSheetData.getColumnNames()) {
             JsonObject ticketAsJsonObject = ticket.getAsJsonObject();
             JsonElement singleTicketFieldData = ticketAsJsonObject.get(column);
-            if (column.equals(Enums.KPIsSheetColumnNames.Team.value)) {
-                addTeamValue(splunkEventJson, ticket, column);
+            if (column.equals(Enums.KPIsSheetColumnNames.IsCrossBoards.value)) {
+                addIsCrossBoardsValue(splunkEventJson, ticket, column);
             } else if (column.equals(Enums.KPIsSheetColumnNames.Workaround.value)) {
                 addWorkaroundValue(splunkEventJson, singleTicketFieldData, column);
             } else if (!column.contains(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value)){
@@ -59,20 +59,20 @@ public class KpiSplunkReporter {
         }
     }
 
-    private void addTeamValue(JSONObject splunkEventJson, JsonElement ticket, String column){
-        if (ticket.getAsJsonObject().get(column).getAsString().contains(KpisMonitoringService.TeamDelimiter)) {
-            splunkEventJson.put("Is_cross_boards", 1);
+    private void addIsCrossBoardsValue(JSONObject splunkEventJson, JsonElement singleTicketFieldData, String column){
+        if (singleTicketFieldData == null || singleTicketFieldData.isJsonNull()) {
+            splunkEventJson.put(column.replace(" ", "_"), 0);
         } else {
-            splunkEventJson.put("Is_cross_boards", 0);
+            int value = singleTicketFieldData.getAsString().equals(Enums.Strings.True.value) ? 1 : 0;
+            splunkEventJson.put(column.replace(" ", "_"), value);
         }
-        splunkEventJson.put("Board", ticketUpdateRequest.getTeam());
     }
 
     private void addWorkaroundValue(JSONObject splunkEventJson, JsonElement singleTicketFieldData, String column){
         if (singleTicketFieldData == null || singleTicketFieldData.isJsonNull()) {
             splunkEventJson.put(column.replace(" ", "_"), 0);
         } else {
-            int value = singleTicketFieldData.getAsString().equals("checked") ? 1 : 0;
+            int value = singleTicketFieldData.getAsString().equals(Enums.Strings.Checked.value) ? 1 : 0;
             splunkEventJson.put(column.replace(" ", "_"), value);
         }
     }

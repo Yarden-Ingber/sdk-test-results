@@ -24,7 +24,7 @@ public class EyesSlackReporterSender {
     private SlackReportNotificationJson requestJson;
     private static final String EndedTestTasksCounterFile = "EndedTestTasksCounterFile.txt";
     private static final String SplitString = "Split;Sign";
-    private static final int NumOfTestTasks = Integer.parseInt(System.getenv("EYES_TEST_TASKS_COUNT"));
+    private static final int NumOfTestTasks = Integer.parseInt(Enums.EnvVariables.EyesTestTasksCount.value);
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);

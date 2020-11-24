@@ -8,15 +8,11 @@ import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import javassist.NotFoundException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class KpisMonitoringService {
 
     SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
     TicketUpdateRequest ticketUpdateRequest;
     TicketStates newState;
-    public static final String TeamDelimiter = ",";
 
     public KpisMonitoringService(TicketUpdateRequest ticketUpdateRequest) {
         this.ticketUpdateRequest = ticketUpdateRequest;
@@ -55,7 +51,7 @@ public class KpisMonitoringService {
 
     public void archiveCard() {
         try {
-            ticketUpdateRequest.setTeam("archived");
+            ticketUpdateRequest.setTeam(Enums.Strings.Archived.value);
             JsonElement ticket = findSheetEntry();
             updateTicketFields(ticket);
         } catch (NotFoundException e) {
@@ -64,43 +60,11 @@ public class KpisMonitoringService {
         new KpiSplunkReporter(rawDataSheetData, ticketUpdateRequest).reportStandAloneEvent(newState);
     }
 
-    private String getTeamWithTrelloBoardsChange(JsonElement ticket){
-        String teams = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
-        if (teams.equals(ticketUpdateRequest.getTeam())) {
-            return ticketUpdateRequest.getTeam();
-        } else {
-            return addTeamLexicographically(teams);
-        }
-    }
-
-    private String addTeamLexicographically(String teams){
-        String[] teamsArray = teams.split(TeamDelimiter);
-        List<String> teamsListResult = new ArrayList<>();
-        boolean isTeamAdded = false;
-        for (String team : teamsArray) {
-            if (team.equals(ticketUpdateRequest.getTeam())) {
-                return teams;
-            }
-            if (team.compareTo(ticketUpdateRequest.getTeam()) > 0) {
-                teamsListResult.add(ticketUpdateRequest.getTeam());
-                isTeamAdded = true;
-            }
-            teamsListResult.add(team);
-        }
-        if (!isTeamAdded) {
-            teamsListResult.add(ticketUpdateRequest.getTeam());
-        }
-        String concatenatedList = "";
-        for (String team : teamsListResult) {
-            concatenatedList = concatenatedList + team + TeamDelimiter;
-        }
-        return concatenatedList.substring(0, concatenatedList.length() - 1);
-    }
-
     private void updateTicketFields(JsonElement ticket) {
         addTypeToTicket(ticket);
+        addIsCrossBoards(ticket);
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Workaround.value, ticketUpdateRequest.getWorkaround());
-        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, getTeamWithTrelloBoardsChange(ticket));
+        ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Team.value, ticketUpdateRequest.getTeam());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.SubProject.value, ticketUpdateRequest.getSubProject());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketID.value, ticketUpdateRequest.getTicketId());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.TicketTitle.value, ticketUpdateRequest.getTicketTitle());
@@ -108,6 +72,13 @@ public class KpisMonitoringService {
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CreatedBy.value, ticketUpdateRequest.getCreatedBy());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.CurrentTrelloList.value, ticketUpdateRequest.getCurrent_trello_list());
         ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.Labels.value, ticketUpdateRequest.getLabels());
+    }
+
+    private void addIsCrossBoards(JsonElement ticket) {
+        String team = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
+        if (!team.equals(ticketUpdateRequest.getTeam())) {
+            ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.IsCrossBoards.value, Enums.Strings.True.value);
+        }
     }
 
     private void addTypeToTicket(JsonElement ticket) {

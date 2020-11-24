@@ -30,6 +30,7 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
             timer = new Timer("WriteKpisToSplunkPeriodically");
             timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 1000 * 60 * 1);
             isRunning = true;
+            Logger.info("WriteKpisToSplunkPeriodically started");
         }
     }
 

@@ -3,7 +3,7 @@ package com.yarden.restServiceDemo;
 public class Enums {
 
     public enum Strings{
-        Generic("(generic)");
+        Generic("(generic)"), True("true"), Checked("checked"), Archived("archived");
 
         public final String value;
 
@@ -139,8 +139,8 @@ public class Enums {
     }
 
     public enum KPIsSheetColumnNames {
-        Team("Team"), SubProject("Sub project"), TicketID("Ticket ID"), TicketTitle("Ticket title"), TicketUrl("Ticket url"),
-        TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"), CurrentState("Current state"),
+        Team("Team"), SubProject("Sub project"), IsCrossBoards("Is cross boards"), TicketID("Ticket ID"), TicketTitle("Ticket title"),
+        TicketUrl("Ticket url"), TicketType("Ticket type"), CreationDate("Creation date"), CreatedBy("Created by"), CurrentState("Current state"),
         TimeUntilLeftNewForTheFirstTime("Time until left New for the first time"), EnterForTimeCalculationState("Enter for time calculation state "),
         LeftForTimeCalculationState("Left for time calculation state "), CalculatedTimeInState("Calculated time in state "), Labels("Labels"),
         MovedToStateDone("Moved to state Done"), Timestamp("Timestamp"), CurrentTrelloList("Current trello list"), Workaround("Workaround");
@@ -167,7 +167,8 @@ public class Enums {
         AwsS3SdkReportsBucketName(System.getenv("SDK_REPORTS_S3_BUCKET")), AwsS3EyesReportsBucketName(System.getenv("EYE_REPORTS_S3_BUCKET")),
         MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")), SlackSdkReleaseChannelEndpoint(System.getenv("SDK_RELEASE_SLACK_CHANNEL_ENDPOINT")),
         ApiToken(System.getenv("API_TOKEN")), TurnOffFullRegressionEmail(System.getenv("TURN_OFF_FULL_REGRESSION_EMAIL")),
-        SplunkUsername(System.getenv("SPLUNK_USERNAME")), SplunkPassword(System.getenv("SPLUNK_PASSWORD"));
+        SplunkUsername(System.getenv("SPLUNK_USERNAME")), SplunkPassword(System.getenv("SPLUNK_PASSWORD")),
+        EyesTestTasksCount(System.getenv("EYES_TEST_TASKS_COUNT"));
 
         public final String value;
 

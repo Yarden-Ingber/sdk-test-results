@@ -76,7 +76,7 @@ public class KpisMonitoringService {
 
     private void addIsCrossBoards(JsonElement ticket) {
         String team = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.Team.value).getAsString();
-        if (!team.equals(ticketUpdateRequest.getTeam())) {
+        if (!(team.equals(ticketUpdateRequest.getTeam()) || ticketUpdateRequest.getTeam().equals(Enums.Strings.Archived.value))) {
             ticket.getAsJsonObject().addProperty(Enums.KPIsSheetColumnNames.IsCrossBoards.value, Enums.Strings.True.value);
         }
     }

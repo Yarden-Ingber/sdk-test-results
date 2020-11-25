@@ -41,4 +41,3 @@
 @applitools/eyes-nightwatch
 @applitools/eyes-puppeteer
 @applitools/eyes-fake-sdk
-@applitools/sdk-fake-eyes-server

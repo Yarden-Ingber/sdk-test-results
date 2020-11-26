@@ -27,8 +27,9 @@ public class Logger {
     }
 
     public static Date timestampToDate(String timestamp) throws ParseException {
-        timestamp = timestamp.substring(0,timestamp.indexOf('.'));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String pattern = "yyyy-MM-dd hh:mm:ss";
+        timestamp = timestamp.substring(0,pattern.length());
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.parse(timestamp);
     }
 }

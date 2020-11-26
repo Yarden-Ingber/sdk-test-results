@@ -159,7 +159,9 @@ public class SdkReportService {
         String testResult = passed ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName)){
-                Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
+                if (!isSandbox()) {
+                    Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
+                }
                 sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
                 return;
             }

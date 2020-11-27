@@ -51,6 +51,8 @@ public class KpiSplunkReporter {
             JsonElement singleTicketFieldData = ticketAsJsonObject.get(column);
             if (column.equals(Enums.KPIsSheetColumnNames.IsCrossBoards.value)) {
                 addIsCrossBoardsValue(splunkEventJson, singleTicketFieldData, column);
+            } else if (column.equals(Enums.KPIsSheetColumnNames.Team.value)) {
+                splunkEventJson.put("Board", ticketUpdateRequest.getTeam());
             } else if (column.equals(Enums.KPIsSheetColumnNames.Workaround.value)) {
                 addWorkaroundValue(splunkEventJson, singleTicketFieldData, column);
             } else if (!column.contains(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value)){

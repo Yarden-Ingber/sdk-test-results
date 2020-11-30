@@ -44,7 +44,9 @@ public class ProductionMonitor extends TimerTask {
     @Override
     public void run() {
         try {
+            Logger.info("ProductionMonitor: Starting monitor");
             monitor();
+            Logger.info("ProductionMonitor: Monitor ended");
         } catch (Throwable t) {
             t.printStackTrace();
         }

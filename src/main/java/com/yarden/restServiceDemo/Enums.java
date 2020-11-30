@@ -13,7 +13,7 @@ public class Enums {
     }
 
     public enum SplunkSourceTypes{
-        RawKPILog("rawkpilog");
+        RawKPILog("rawkpilog"), ProductionMonitor("productionmonitor");
 
         public final String value;
 

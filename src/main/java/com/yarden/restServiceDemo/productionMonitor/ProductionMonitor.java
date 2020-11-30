@@ -2,7 +2,6 @@ package com.yarden.restServiceDemo.productionMonitor;
 
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.kpis.WriteKpisToSplunkPeriodically;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
@@ -51,6 +50,7 @@ public class ProductionMonitor extends TimerTask {
         StringBuilder failedVGBrowsers = new StringBuilder("");
         StringBuilder failedEndpoints = new StringBuilder("");
         JSONObject productionMonitorEventJson = new JSONObject();
+        productionMonitorEventJson.put("version", "2");
         if (isVGUp(failedVGBrowsers)) {
             productionMonitorEventJson.put("isVGUp", 1);
         } else {
@@ -89,7 +89,7 @@ public class ProductionMonitor extends TimerTask {
                 int responseStatusCode = con.getResponseCode();
                 if (responseStatusCode != 200 && responseStatusCode != 403) {
                     result = false;
-                    failedEndpoints.append(domain).append("-").append(con.getResponseCode()).append(";");
+                    failedEndpoints.append(domain).append("- HTTP ").append(con.getResponseCode()).append(";");
                 }
             } catch (Throwable t) {
                 result = false;

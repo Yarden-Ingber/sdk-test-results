@@ -30,15 +30,10 @@ public class ProductionMonitor extends TimerTask {
     public static synchronized void start() {
         if (!isRunning) {
             timer = new Timer("ProductionMonitor");
-            timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 1000 * 60 * 1);
+            timer.scheduleAtFixedRate(new ProductionMonitor(), 30, 1000 * 60 * 60);
             isRunning = true;
             Logger.info("ProductionMonitor started");
         }
-    }
-
-    public static synchronized void stop(){
-        isRunning = false;
-        timer.cancel();
     }
 
     @Override

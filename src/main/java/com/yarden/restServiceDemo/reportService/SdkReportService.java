@@ -104,7 +104,12 @@ public class SdkReportService {
             if (param.getValue() == null || param.getValue().isJsonNull()) {
                 value = "null";
             } else {
-                value = param.getValue().getAsString();
+                try {
+                    value = param.getValue().getAsString();
+                } catch (Exception e) {
+                    Logger.error("Failed to get a test parameter: " + param.getValue().toString());
+                    e.printStackTrace();
+                }
             }
             paramsString.append("(").append(capitalize(key)).append(":").append(capitalize(value)).append(") ");
         }

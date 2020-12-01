@@ -34,7 +34,9 @@ public class TicketsStateChanger {
 
     private void executeUpdateState(JsonElement ticket, TicketStates currentState, TicketStates newState) throws ParseException {
         String timeStamp = Logger.getTimaStamp();
-        if (ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value).getAsString().isEmpty()) {
+        JsonElement timeUntilLeftNewJsonElement = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TimeUntilLeftNewForTheFirstTime.value);
+        if (timeUntilLeftNewJsonElement == null || timeUntilLeftNewJsonElement.isJsonNull() ||
+                timeUntilLeftNewJsonElement.getAsString() == null || timeUntilLeftNewJsonElement.getAsString().isEmpty()) {
             setTimeUntilLeftNewForFirstTime(timeStamp, ticket);
         }
         if (!currentState.equals(TicketStates.Done)) {

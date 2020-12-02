@@ -18,7 +18,10 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/result");
+            String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
+            if (!jsonWithoutWhitespace.contains("\"sandbox\":true")) {
+                newRequestPrint(json, "/result");
+            }
             try {
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {

@@ -18,10 +18,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
-            if (!jsonWithoutWhitespace.contains("\"sandbox\":true")) {
-                newRequestPrint(json, "/result");
-            }
+            newRequestPrint(json, "/result");
             try {
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {
@@ -211,7 +208,12 @@ public class RestCalls {
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
-        Logger.info("New request detected: " + request + " === payload: " + json.replace(" ", ""));
+        String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
+        if (jsonWithoutWhitespace.contains("\"sandbox\":true")) {
+            Logger.info("New sandbox request detected: " + request);
+        } else {
+            Logger.info("New request detected: " + request + " === payload: " + json.replace(" ", ""));
+        }
     }
 
 }

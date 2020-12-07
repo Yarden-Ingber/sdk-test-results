@@ -60,7 +60,11 @@ public class TicketsStateChanger {
         Date endTime = Logger.timestampToDate(timeStamp);
         Date startTime = Logger.timestampToDate(ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.EnterForTimeCalculationState.value + currentState.name()).getAsString());
         Long newCalculatedTime = TimeUnit.MILLISECONDS.toHours(endTime.getTime() - startTime.getTime());
-        String currentCalculatedTimeString = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CalculatedTimeInState.value + currentState.name()).getAsString();
+        String currentCalculatedTimeString = "";
+        JsonElement previousStateTimeFromSheet = ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CalculatedTimeInState.value + currentState.name());
+        if (previousStateTimeFromSheet != null && !previousStateTimeFromSheet.isJsonNull()) {
+            currentCalculatedTimeString = previousStateTimeFromSheet.getAsString();
+        }
         Logger.info("Setting time in previous state: " + currentState.name() + " for ticket: " + ticket.getAsJsonObject().get(Enums.KPIsSheetColumnNames.TicketID.value).getAsString() +
                 " enter previous state: " + startTime.toString() + " enter new state: " + endTime.toString() + " calculated time before change: " + currentCalculatedTimeString + " new calculated time: " + newCalculatedTime.toString());
         Long currentCalculatedTime = 0l;

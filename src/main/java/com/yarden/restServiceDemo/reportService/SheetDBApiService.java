@@ -120,14 +120,18 @@ public class SheetDBApiService {
         return resultMatrix;
     }
 
-    public static synchronized List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier) {
+    public static synchronized List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier)  {
         ValueRange response = null;
         try {
             response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
         } catch (Throwable t) {
             sheetApiService = null;
             Logger.warn("Failed in getAllSheet");
-            response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
+            try {
+                response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
+            } catch (Throwable t2) {
+                t2.printStackTrace();
+            }
         }
         return response.getValues();
     }

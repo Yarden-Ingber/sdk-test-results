@@ -122,22 +122,12 @@ public class SheetDBApiService {
 
     public static synchronized List<List<Object>> getAllSheet(SheetTabIdentifier sheetTabIdentifier) {
         ValueRange response = null;
-        boolean isPassed = false;
-        int waitTime = 0;
-        while (!isPassed) {
-            try {
-                response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
-                if (response != null) {
-                    isPassed = true;
-                }
-            } catch (Throwable t) {
-                sheetApiService = null;
-                Logger.warn("Failed in getAllSheet");
-                waitTime = waitTime + 2000;
-                if (waitTime == 2000 * 5) {throw new RuntimeException("Failed in getAllSheet");}
-                try {Thread.currentThread().sleep(waitTime);} catch (InterruptedException e) {e.printStackTrace();}
-                Logger.warn("Retrying... waitTime=" + waitTime);
-            }
+        try {
+            response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
+        } catch (Throwable t) {
+            sheetApiService = null;
+            Logger.warn("Failed in getAllSheet");
+            response = getService().spreadsheets().values().get(sheetTabIdentifier.spreadsheetID, sheetTabIdentifier.sheetTabName).execute();
         }
         return response.getValues();
     }

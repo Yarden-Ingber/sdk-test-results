@@ -38,25 +38,25 @@ public class TicketsNewStateResolver {
     }
 
     private TicketStates resolveStateForUFG(){
-        if (request.getCurrent_trello_list().equals("New")) {
+        if (request.getCurrent_trello_list().equalsIgnoreCase("New")) {
             return TicketStates.New;
-        } else if (request.getCurrent_trello_list().equals("Doing")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field input")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Done")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Done")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Waiting for R&D")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Missing quality")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing quality")) {
             return TicketStates.MissingQuality;
-        } else if (request.getCurrent_trello_list().equals("Trying to reproduce")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to reproduce")) {
             return TicketStates.TryingToReproduce;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field approval")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field approval")) {
             return TicketStates.WaitingForFieldApproval;
-        } else if (request.getCurrent_trello_list().equals("RFE")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("RFE")) {
             return TicketStates.RFE;
-        } else if (request.getCurrent_trello_list().equals("Waiting for Product")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Product")) {
             return TicketStates.WaitingForProduct;
         } else  {
             return noStateFound();
@@ -64,39 +64,39 @@ public class TicketsNewStateResolver {
     }
 
     private TicketStates resolveStateForAlgoBugs() {
-        if (request.getCurrent_trello_list().equals("Waiting for field input")) {
+        if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("New/Pending")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("New/Pending")) {
             return TicketStates.New;
-        } else if (request.getCurrent_trello_list().equals("Layout")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Layout")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("RCA")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("RCA")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Contrast")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Contrast")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Waiting for Adam")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Adam")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Automated maintenance")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Automated maintenance")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Strict - Broken")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Strict - Broken")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Doing")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("Solved/Waiting for publish")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Solved/Waiting for publish")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("Deployed to cloud")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Deployed to cloud")) {
             return TicketStates.WaitingForFieldApproval;
-        } else if (request.getCurrent_trello_list().equals("Closed")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Closed")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("No Algo Change Required")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("No Algo Change Required")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Known limitations (RFE)")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Known limitations (RFE)")) {
             return TicketStates.RFE;
-        } else if (request.getCurrent_trello_list().equals("Waiting for other ticket")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for other ticket")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Missing information")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing information")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Waiting for product")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for product")) {
             return TicketStates.WaitingForProduct;
         } else {
             return noStateFound();
@@ -104,31 +104,31 @@ public class TicketsNewStateResolver {
     }
 
     private TicketStates resolveStateForJSSdks() {
-        if (request.getCurrent_trello_list().equals("Doing")) {
+        if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("New")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("New")) {
             return TicketStates.New;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field input")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Done")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Done")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Waiting for R&D")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Missing quality")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing quality")) {
             return TicketStates.MissingQuality;
-        } else if (request.getCurrent_trello_list().equals("Trying to reproduce")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to reproduce")) {
             return TicketStates.TryingToReproduce;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field approval")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field approval")) {
             return TicketStates.WaitingForFieldApproval;
-        } else if (request.getCurrent_trello_list().equals("RFEs")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("RFEs")) {
             return TicketStates.RFE;
-        } else if (request.getCurrent_trello_list().equals("Waiting for Product")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Product")) {
             return TicketStates.WaitingForProduct;
-        } else if (request.getCurrent_trello_list().equals("Next")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Next")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Bugs")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Bugs")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Fixed - need to release other SDK's")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Fixed - need to release other SDK's")) {
             return TicketStates.Done;
         } else {
             return noStateFound();
@@ -136,47 +136,47 @@ public class TicketsNewStateResolver {
     }
 
     private TicketStates resolveStateForGeneralSdks() {
-        if (request.getCurrent_trello_list().equals("New | Pending")) {
+        if (request.getCurrent_trello_list().equalsIgnoreCase("New | Pending")) {
             return TicketStates.New;
-        } else if (request.getCurrent_trello_list().equals("Trying to Reproduce")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to Reproduce")) {
             return TicketStates.TryingToReproduce;
-        } else if (request.getCurrent_trello_list().equals("Doing")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("Waiting For Release")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting For Release")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("Waiting For Field's Input")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting For Field's Input")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Missing information")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing information")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Waiting for Field Approval")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Field Approval")) {
             return TicketStates.WaitingForFieldApproval;
-        } else if (request.getCurrent_trello_list().equals("Done")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Done")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Refactor Tests to Generic")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Refactor Tests to Generic")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("All SDKs: Implementation updates")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("All SDKs: Implementation updates")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("On Hold")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("On Hold")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Known Limitations / Waiting for 3rd Party")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Known Limitations / Waiting for 3rd Party")) {
             return TicketStates.Done;
         } else if (request.getCurrent_trello_list().contains("RFEs")) {
             return TicketStates.RFE;
-        } else if (request.getCurrent_trello_list().equals("Waiting for Product")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Product")) {
             return TicketStates.WaitingForProduct;
         } else if (request.getCurrent_trello_list().contains("Waiting for R&D investigation")) {
             return TicketStates.WaitingForRD;
         } else if (request.getCurrent_trello_list().contains("BUGs")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Next")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Next")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("For Daniel's Review")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("For Daniel's Review")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Integrations")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Integrations")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("UFT")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("UFT")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Missing Quality Info")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing Quality Info")) {
             return TicketStates.MissingQuality;
         } else {
             return noStateFound();
@@ -184,27 +184,27 @@ public class TicketsNewStateResolver {
     }
 
     private TicketStates resolveStateForEyesIssues() {
-        if (request.getCurrent_trello_list().equals("New")) {
+        if (request.getCurrent_trello_list().equalsIgnoreCase("New")) {
             return TicketStates.New;
-        } else if (request.getCurrent_trello_list().equals("Waiting for R&D")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Trying to reproduce")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to reproduce")) {
             return TicketStates.TryingToReproduce;
-        } else if (request.getCurrent_trello_list().equals("Doing")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
-        } else if (request.getCurrent_trello_list().equals("On Hold / low priority")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("On Hold / low priority")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field input")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
-        } else if (request.getCurrent_trello_list().equals("Waiting for product")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for product")) {
             return TicketStates.WaitingForProduct;
-        } else if (request.getCurrent_trello_list().equals("For Amit to Review")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("For Amit to Review")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equals("To be Deployed next Hotfix")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("To be Deployed next Hotfix")) {
             return TicketStates.WaitingForRD;
         } else if (request.getCurrent_trello_list().contains("Done")) {
             return TicketStates.Done;
-        } else if (request.getCurrent_trello_list().equals("Waiting for field approval")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field approval")) {
             return TicketStates.WaitingForFieldApproval;
         } else {
             return noStateFound();

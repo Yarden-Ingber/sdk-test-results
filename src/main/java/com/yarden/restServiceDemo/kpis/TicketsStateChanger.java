@@ -39,7 +39,7 @@ public class TicketsStateChanger {
                 timeUntilLeftNewJsonElement.getAsString() == null || timeUntilLeftNewJsonElement.getAsString().isEmpty()) {
             setTimeUntilLeftNewForFirstTime(timeStamp, ticket);
         }
-        if (!currentState.equals(TicketStates.Done)) {
+        if (!(currentState.equals(TicketStates.Done) || currentState.equals(TicketStates.NoState))) {
             addCalculatedTimeInPreviousState(timeStamp, ticket, currentState);
         }
         writeNewStateTimestamp(timeStamp, ticket, newState);

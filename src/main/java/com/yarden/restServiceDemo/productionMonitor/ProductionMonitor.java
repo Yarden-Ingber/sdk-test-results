@@ -100,7 +100,7 @@ public class ProductionMonitor extends TimerTask {
             }
             new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
-        sendMailNotification(failedEndpoints.toString());
+//        sendMailNotification(failedEndpoints.toString());
     }
 
     private void sendVGEvent(){

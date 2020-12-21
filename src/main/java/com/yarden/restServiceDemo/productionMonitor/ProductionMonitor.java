@@ -1,10 +1,18 @@
 package com.yarden.restServiceDemo.productionMonitor;
 
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.mailjet.client.resource.Emailv31;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +32,13 @@ public class ProductionMonitor extends TimerTask {
 
     private static boolean isRunning = false;
     private static Timer timer;
+    private static final String VERSION = "3";
 
     @EventListener(ApplicationReadyEvent.class)
     public static synchronized void start() {
         if (!isRunning) {
             timer = new Timer("ProductionMonitor");
-            timer.scheduleAtFixedRate(new ProductionMonitor(), 30, 1000 * 60 * 60);
+            timer.scheduleAtFixedRate(new ProductionMonitor(), 30, 1000 * 60 * 10);
             isRunning = true;
             Logger.info("ProductionMonitor started");
         }
@@ -46,28 +55,12 @@ public class ProductionMonitor extends TimerTask {
         }
     }
 
-    private void monitor() throws IOException {
-        StringBuilder failedVGBrowsers = new StringBuilder("");
-        StringBuilder failedEndpoints = new StringBuilder("");
-        JSONObject productionMonitorEventJson = new JSONObject();
-        productionMonitorEventJson.put("version", "2");
-        if (isVGUp(failedVGBrowsers)) {
-            productionMonitorEventJson.put("isVGUp", 1);
-        } else {
-            productionMonitorEventJson.put("isVGUp", 0);
-            productionMonitorEventJson.put("failedBrowsers", failedVGBrowsers);
-        }
-        if (isEndpointsUp(failedEndpoints)) {
-            productionMonitorEventJson.put("isEndpointsUp", 1);
-        } else {
-            productionMonitorEventJson.put("isEndpointsUp", 0);
-            productionMonitorEventJson.put("failedEndpoints", failedEndpoints);
-        }
-        new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
+    private void monitor() throws IOException, MailjetSocketTimeoutException, MailjetException {
+        sendVGEvent();
+        sendEyesEndpointsEvents();
     }
 
-    private boolean isEndpointsUp(StringBuilder failedEndpoints) throws IOException {
-        boolean result = true;
+    private void sendEyesEndpointsEvents() throws IOException, MailjetSocketTimeoutException, MailjetException {
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
@@ -78,6 +71,7 @@ public class ProductionMonitor extends TimerTask {
         String theString = new SplunkReporter().search(query, "csv", 1000);
         theString = theString.replace("\"", "").replace("domain,site\n", "");
         String[] domainsSitesList = theString.split("\n");
+        StringBuilder failedEndpoints = new StringBuilder("");
         for (String domainSite : domainsSitesList) {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
@@ -85,34 +79,70 @@ public class ProductionMonitor extends TimerTask {
             URL endpoint = new URL(domain);
             HttpURLConnection con = (HttpURLConnection) endpoint.openConnection();
             con.setRequestMethod("GET");
+            JSONObject productionMonitorEventJson = new JSONObject();
+            productionMonitorEventJson.put("version", VERSION);
+            productionMonitorEventJson.put("site", site);
+            productionMonitorEventJson.put("domain", domain);
+            productionMonitorEventJson.put("eventType", "Endpoint");
             try {
                 int responseStatusCode = con.getResponseCode();
-                if (responseStatusCode != 200 && responseStatusCode != 403) {
-                    result = false;
-                    failedEndpoints.append(domain).append("- HTTP ").append(con.getResponseCode()).append(";");
+                if (responseStatusCode == 200 || responseStatusCode == 403) {
+                    productionMonitorEventJson.put("isUp", 1);
+                } else {
+                    productionMonitorEventJson.put("isUp", 0);
+                    failedEndpoints.append(site).append(";");
+                    productionMonitorEventJson.put("statusCode", responseStatusCode);
+                    new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
                 }
             } catch (Throwable t) {
-                result = false;
-                failedEndpoints.append(domain);
+                productionMonitorEventJson.put("isUp", 0);
+                failedEndpoints.append(site).append(";");
             }
+            new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
-        return result;
+        sendMailNotification(failedEndpoints.toString());
     }
 
-    private boolean isVGUp(StringBuilder failedVGBrowsers){
+    private void sendVGEvent(){
         SheetData vgStatusSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         vgStatusSheet.getSheetData();
-        int passedBrowsers = 0;
-        int failedBrowsers = 0;
         for (String browser : vgStatusSheet.getColumnNames()) {
+            JSONObject productionMonitorEventJson = new JSONObject();
+            productionMonitorEventJson.put("version", VERSION);
+            productionMonitorEventJson.put("eventType", "VG");
+            productionMonitorEventJson.put("Browser", browser);
             if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
-                passedBrowsers++;
+                productionMonitorEventJson.put("isUp", 1);
             } else if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
-                failedVGBrowsers.append(browser);
-                failedBrowsers++;
+                productionMonitorEventJson.put("isUp", 0);
             }
+            new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
-        return passedBrowsers >= failedBrowsers;
+    }
+
+    private void sendMailNotification(String endpoint) throws MailjetSocketTimeoutException, MailjetException {
+        JSONArray recipient = new JSONArray().put(new JSONObject().put("Email", "eyesops@applitools.com").put("Name", "Production_monitor"));
+        sendMailNotification(recipient, "Production monitor alert", "The GET request for endpoints: " + endpoint + " failed");
+    }
+
+    private void sendMailNotification(JSONArray recipient, String subject, String content) throws MailjetSocketTimeoutException, MailjetException {
+        MailjetClient client;
+        MailjetRequest request;
+        MailjetResponse response;
+        client = new MailjetClient(Enums.EnvVariables.MailjetApiKeyPublic.value, Enums.EnvVariables.MailjetApiKeyPrivate.value, new ClientOptions("v3.1"));
+        request = new MailjetRequest(Emailv31.resource)
+                .property(Emailv31.MESSAGES, new JSONArray()
+                        .put(new JSONObject()
+                                .put(Emailv31.Message.FROM, new JSONObject()
+                                        .put("Email", "yarden.ingber@applitools.com")
+                                        .put("Name", "Yarden Ingber"))
+                                .put(Emailv31.Message.TO, recipient)
+                                .put(Emailv31.Message.SUBJECT, subject)
+                                .put(Emailv31.Message.TEXTPART, content)
+                                .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
+        response = client.post(request);
+        Logger.info(Integer.toString(response.getStatus()));
+        Logger.info(response.getData().toString());
     }
 
 }

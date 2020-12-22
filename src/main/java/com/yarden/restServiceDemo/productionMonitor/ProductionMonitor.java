@@ -56,8 +56,8 @@ public class ProductionMonitor extends TimerTask {
     }
 
     private void monitor() throws IOException, MailjetSocketTimeoutException, MailjetException {
-        sendVGEvent();
         sendEyesEndpointsEvents();
+        sendVGEvent();
     }
 
     private void sendEyesEndpointsEvents() throws IOException, MailjetSocketTimeoutException, MailjetException {

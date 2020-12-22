@@ -72,6 +72,7 @@ public class ProductionMonitor extends TimerTask {
         theString = theString.replace("\"", "").replace("domain,site\n", "");
         String[] domainsSitesList = theString.split("\n");
         StringBuilder failedEndpoints = new StringBuilder("");
+        int i=0;
         for (String domainSite : domainsSitesList) {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
@@ -87,7 +88,11 @@ public class ProductionMonitor extends TimerTask {
             try {
                 int responseStatusCode = con.getResponseCode();
                 if (responseStatusCode == 200 || responseStatusCode == 403) {
-                    productionMonitorEventJson.put("isUp", 1);
+                    if (i==21) {
+                        productionMonitorEventJson.put("isUp", 0);
+                    } else {
+                        productionMonitorEventJson.put("isUp", 1);
+                    }
                 } else {
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
@@ -99,6 +104,7 @@ public class ProductionMonitor extends TimerTask {
                 failedEndpoints.append(site).append(";");
             }
             new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
+            i++;
         }
 //        sendMailNotification(failedEndpoints.toString());
     }

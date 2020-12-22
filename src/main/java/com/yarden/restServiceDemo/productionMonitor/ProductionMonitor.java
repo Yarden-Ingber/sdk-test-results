@@ -115,7 +115,7 @@ public class ProductionMonitor extends TimerTask {
             productionMonitorEventJson.put("Browser", browser);
             if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
                 productionMonitorEventJson.put("isUp", 1);
-            } else if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
+            } else {
                 productionMonitorEventJson.put("isUp", 0);
             }
             new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());

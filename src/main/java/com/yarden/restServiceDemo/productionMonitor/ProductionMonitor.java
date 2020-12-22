@@ -32,7 +32,7 @@ public class ProductionMonitor extends TimerTask {
 
     private static boolean isRunning = false;
     private static Timer timer;
-    private static final String VERSION = "3";
+    private static final String VERSION = "4";
 
     @EventListener(ApplicationReadyEvent.class)
     public static synchronized void start() {
@@ -100,7 +100,9 @@ public class ProductionMonitor extends TimerTask {
             }
             new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
-//        sendMailNotification(failedEndpoints.toString());
+        if (!failedEndpoints.toString().isEmpty()) {
+            sendMailNotification(failedEndpoints.toString());
+        }
     }
 
     private void sendVGEvent(){

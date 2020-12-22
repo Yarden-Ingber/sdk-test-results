@@ -15,6 +15,7 @@ import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
+import com.yarden.restServiceDemo.splunkService.SplunkReporter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -89,6 +90,17 @@ public class SdkSlackReportSender {
         slackReportData.setReportTextPart(slackReportData.getReportTextPart() +
                 "<br><br>" + sdkHighLevelFullRegressionReportTableBuilder.getHighLevelReportTable());
         new MailSender().send(slackReportData);
+        sendFullRegressionSplunkEvent(sdkHighLevelFullRegressionReportTableBuilder);
+    }
+
+    private void sendFullRegressionSplunkEvent(SdkHighLevelFullRegressionReportTableBuilder sdkHighLevelFullRegressionReportTableBuilder){
+        JSONObject splunkEventJson = new JSONObject();
+        splunkEventJson.put("version", 1);
+        splunkEventJson.put("sdk", sdk);
+        splunkEventJson.put("passedTests", Integer.parseInt(sdkHighLevelFullRegressionReportTableBuilder.currentPassedTestsCount));
+        splunkEventJson.put("failedTests", Integer.parseInt(sdkHighLevelFullRegressionReportTableBuilder.currentFailedTestsCount));
+        splunkEventJson.put("missingTests", Integer.parseInt(sdkHighLevelFullRegressionReportTableBuilder.currentMissingTestsCount));
+        new SplunkReporter().report(Enums.SplunkSourceTypes.FullCoverageReport, splunkEventJson.toString());
     }
 
     private String getVersion(){

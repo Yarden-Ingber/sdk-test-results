@@ -10,12 +10,12 @@ import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 
 public class SdkHighLevelFullRegressionReportTableBuilder extends SdkHighLevelTableBuilderBaseClass{
 
-    private String currentPassedTestsCount;
-    private String currentFailedTestsCount;
-    private String currentMissingTestsCount;
-    private String previousPassedTestsCount;
-    private String previousFailedTestsCount;
-    private String previousMissingTestsCount;
+    public final String currentPassedTestsCount;
+    public final String currentFailedTestsCount;
+    public final String currentMissingTestsCount;
+    public final String previousPassedTestsCount;
+    public final String previousFailedTestsCount;
+    public final String previousMissingTestsCount;
 
     public SdkHighLevelFullRegressionReportTableBuilder(SlackReportNotificationJson requestJson){
         super(requestJson);

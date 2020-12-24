@@ -1,5 +1,8 @@
 package com.yarden.restServiceDemo;
 
+import com.yarden.restServiceDemo.splunkService.SplunkReporter;
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,14 +14,20 @@ public class Logger {
 
     public static void info(String msg){
         System.out.println(getTimaStamp() + " == INFO: " + msg);
+        JSONObject log = new JSONObject().put("level", "info").put("text", msg);
+        new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 
     public static void warn(String msg){
         System.out.println(getTimaStamp() + " == WARNING: " + msg);
+        JSONObject log = new JSONObject().put("level", "warning").put("text", msg);
+        new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 
     public static void error(String msg){
         System.out.println(getTimaStamp() + " == ERROR: " + msg);
+        JSONObject log = new JSONObject().put("level", "error").put("text", msg);
+        new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 
     public static String getTimaStamp(){

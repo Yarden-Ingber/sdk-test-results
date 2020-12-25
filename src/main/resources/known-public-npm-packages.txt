@@ -43,3 +43,4 @@
 @applitools/eyes-fake-sdk
 @applitools/sdk-fake-eyes-server
 @applitools/driver
+@applitools/screenshoter

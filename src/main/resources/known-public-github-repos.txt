@@ -166,3 +166,4 @@ tutorial-nightwatch-basic
 tutorial-puppeteer-basic
 tutorial-puppeteer-ultrafastgrid
 tutorial-webdriverio5-applitools-service-ultrafastgrid
+tutorial-webdriverio6-ultrafastgrid

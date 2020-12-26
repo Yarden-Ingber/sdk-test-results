@@ -167,3 +167,4 @@ tutorial-puppeteer-basic
 tutorial-puppeteer-ultrafastgrid
 tutorial-webdriverio5-applitools-service-ultrafastgrid
 tutorial-webdriverio6-ultrafastgrid
+tutorial-webdriverio6-basic

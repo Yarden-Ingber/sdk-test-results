@@ -12,6 +12,7 @@ import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -69,7 +70,7 @@ public class ProductionMonitor extends TimerTask {
         String startTime = new SimpleDateFormat("MM/dd/yyyy:HH:mm:ss").format(calendar.getTime());
         String query = "search starttime=\"" + startTime + "\" endtime=\"" + endTime + "\" data.Info.RequestType=GetUserInfo OR data.Info.RequestType=StartSession OR data.Info.RequestType=MatchExpectedOutputAsSession | rex field=data.Context.RequestUrl \"(?<domain>https://.*\\.applitools.com)\" | stats count by domain data.Site | where NOT LIKE(domain, \"https://test%\") | rename data.Site as site | table domain site";
         String theString = new SplunkReporter().search(query, "csv", 1000);
-        new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, new JSONObject().put("eventType", "log").put("value", theString).toString());
+        new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, new JSONObject().put("eventType", "log").put("value", theString).put("domainsCount", StringUtils.countMatches(theString, "://")).toString());
         theString = theString.replace("\"", "").replace("domain,site\n", "");
         String[] domainsSitesList = theString.split("\n");
         StringBuilder failedEndpoints = new StringBuilder("");

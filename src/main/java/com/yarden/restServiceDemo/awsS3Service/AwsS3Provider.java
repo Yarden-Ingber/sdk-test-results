@@ -35,7 +35,7 @@ public class AwsS3Provider {
         S3Object object = s3Client.getObject(new GetObjectRequest(bucketName, fileNameInBucket));
         final InputStreamReader streamReader = new InputStreamReader(object.getObjectContent(), StandardCharsets.UTF_8);
         final BufferedReader reader = new BufferedReader(streamReader);
-        String result;
+        String result = "";
         try {
             result = reader.lines().collect(Collectors.joining());
         } finally {

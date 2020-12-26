@@ -193,7 +193,7 @@ public class TicketsNewStateResolver {
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("On Hold / low priority")) {
-            return TicketStates.WaitingForRD;
+            return TicketStates.Done;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for product")) {

@@ -168,7 +168,7 @@ public class Enums {
         MailReportRecipient(System.getenv("MAIL_REPORT_RECIPIENT")), SlackSdkReleaseChannelEndpoint(System.getenv("SDK_RELEASE_SLACK_CHANNEL_ENDPOINT")),
         ApiToken(System.getenv("API_TOKEN")), TurnOffFullRegressionEmail(System.getenv("TURN_OFF_FULL_REGRESSION_EMAIL")),
         SplunkUsername(System.getenv("SPLUNK_USERNAME")), SplunkPassword(System.getenv("SPLUNK_PASSWORD")),
-        EyesTestTasksCount(System.getenv("EYES_TEST_TASKS_COUNT"));
+        EyesTestTasksCount(System.getenv("EYES_TEST_TASKS_COUNT")), AwsS3ResultsJsonsBucketName("RESULTS_JSONS_S3_BUCKET");
 
         public final String value;
 

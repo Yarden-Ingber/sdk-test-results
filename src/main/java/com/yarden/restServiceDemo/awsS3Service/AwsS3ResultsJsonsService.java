@@ -12,7 +12,7 @@ public class AwsS3ResultsJsonsService {
 
     public static void addEyesRequestToS3File(String json) {
         EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(json, EyesResultRequestJson.class);
-        if (!((eyesResultRequestJson.getSandbox() != null) && eyesResultRequestJson.getSandbox())) {
+        if ((eyesResultRequestJson.getSandbox() != null) && eyesResultRequestJson.getSandbox()) {
             return;
         }
         EyesResultRequestJson eyesResultRequestJsonFromS3 = null;

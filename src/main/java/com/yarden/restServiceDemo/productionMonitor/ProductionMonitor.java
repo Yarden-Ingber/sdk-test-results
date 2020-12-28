@@ -87,7 +87,12 @@ public class ProductionMonitor extends TimerTask {
             productionMonitorEventJson.put("domain", domain);
             productionMonitorEventJson.put("eventType", "Endpoint");
             try {
-                int responseStatusCode = con.getResponseCode();
+                int responseStatusCode = 0;
+                try {
+                    responseStatusCode = con.getResponseCode();
+                } catch (Throwable t) {
+                    responseStatusCode = con.getResponseCode();
+                }
                 if (responseStatusCode == 200 || responseStatusCode == 403) {
                     productionMonitorEventJson.put("isUp", 1);
                 } else {

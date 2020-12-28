@@ -6,8 +6,6 @@ import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.EyesResultRequestJson;
 import javassist.NotFoundException;
 
-import java.io.IOException;
-
 public class AwsS3ResultsJsonsService {
 
     public static void addEyesRequestToS3File(String json) {

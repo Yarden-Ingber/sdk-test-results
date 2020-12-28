@@ -1,17 +1,17 @@
 package com.yarden.restServiceDemo;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3ResultsJsonsService;
-import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
-import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RestCalls {
@@ -161,13 +161,6 @@ public class RestCalls {
                 if (json == null) {
                     json = "{}";
                 }
-                SlackReportNotificationJson requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
-                for (Enums.EyesSheetTabsNames group : Enums.EyesSheetTabsNames.values()) {
-                    try {
-                        new EyesReportService().postResults(AwsS3ResultsJsonsService.getCurrentEyesRequestFromS3(requestJson.getId(), group.value));
-                    } catch (NotFoundException e) {}
-                }
-                SheetData.writeAllTabsToSheet();
                 new EyesSlackReporterSender().send(json);
             } catch (Throwable throwable) {
                 return new ResponseEntity("Failed sending email: " + throwable.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

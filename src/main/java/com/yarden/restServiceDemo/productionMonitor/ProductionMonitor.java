@@ -94,9 +94,9 @@ public class ProductionMonitor extends TimerTask {
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
                     productionMonitorEventJson.put("statusCode", responseStatusCode);
-                    new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
                 }
             } catch (Throwable t) {
+                t.printStackTrace();
                 productionMonitorEventJson.put("isUp", 0);
                 failedEndpoints.append(site).append(";");
             }

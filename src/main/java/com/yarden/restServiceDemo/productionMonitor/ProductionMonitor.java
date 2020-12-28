@@ -96,6 +96,7 @@ public class ProductionMonitor extends TimerTask {
                     productionMonitorEventJson.put("statusCode", responseStatusCode);
                 }
             } catch (Throwable t) {
+                Logger.error("ProductionMonitor: failed to get response from endpoint " + domain);
                 t.printStackTrace();
                 productionMonitorEventJson.put("isUp", 0);
                 failedEndpoints.append(site).append(";");

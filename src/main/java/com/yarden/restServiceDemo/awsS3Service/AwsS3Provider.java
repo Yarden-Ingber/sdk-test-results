@@ -27,7 +27,7 @@ public class AwsS3Provider {
     }
 
     public static void writeStringToFile(String bucketName, String fileNameInBucket, String string){
-        Logger.info("writing string: " + string + " to file " + fileNameInBucket);
+        Logger.info("writing string: " + string + " to file " + fileNameInBucket + " in bucket " + bucketName);
         s3Client.putObject(bucketName, fileNameInBucket, string);
     }
 

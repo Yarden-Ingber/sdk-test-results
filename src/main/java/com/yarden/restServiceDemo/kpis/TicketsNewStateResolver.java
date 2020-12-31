@@ -44,6 +44,8 @@ public class TicketsNewStateResolver {
             return TicketStates.Doing;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for customer response")) {
+            return TicketStates.WaitingForCustomerResponse;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Done")) {
             return TicketStates.Done;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
@@ -66,6 +68,8 @@ public class TicketsNewStateResolver {
     private TicketStates resolveStateForAlgoBugs() {
         if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for customer response")) {
+            return TicketStates.WaitingForCustomerResponse;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("New/Pending")) {
             return TicketStates.New;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Layout")) {
@@ -110,6 +114,8 @@ public class TicketsNewStateResolver {
             return TicketStates.New;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for customer response")) {
+            return TicketStates.WaitingForCustomerResponse;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Done")) {
             return TicketStates.Done;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
@@ -146,6 +152,8 @@ public class TicketsNewStateResolver {
             return TicketStates.Doing;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting For Field's Input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for customer response")) {
+            return TicketStates.WaitingForCustomerResponse;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Missing information")) {
             return TicketStates.WaitingForFieldInput;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for Field Approval")) {
@@ -196,6 +204,8 @@ public class TicketsNewStateResolver {
             return TicketStates.Done;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field input")) {
             return TicketStates.WaitingForFieldInput;
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for customer response")) {
+            return TicketStates.WaitingForCustomerResponse;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for product")) {
             return TicketStates.WaitingForProduct;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("For Amit to Review")) {

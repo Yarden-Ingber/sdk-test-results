@@ -9,13 +9,13 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.awsS3Service.AwsS3ResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
-import com.yarden.restServiceDemo.reportService.SdkVersionsReportService;
-import com.yarden.restServiceDemo.reportService.SheetData;
+import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
-import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
+import javassist.NotFoundException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -31,6 +31,7 @@ public class SdkSlackReportSender {
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
+        dumpResultsFromS3ToSheet(requestJson);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
@@ -68,6 +69,7 @@ public class SdkSlackReportSender {
 
     public void sendFullRegression(String json) throws MailjetSocketTimeoutException, MailjetException, IOException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
+        dumpResultsFromS3ToSheet(requestJson);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
@@ -91,6 +93,15 @@ public class SdkSlackReportSender {
                 "<br><br>" + sdkHighLevelFullRegressionReportTableBuilder.getHighLevelReportTable());
         new MailSender().send(slackReportData);
         sendFullRegressionSplunkEvent(sdkHighLevelFullRegressionReportTableBuilder);
+    }
+
+    private void dumpResultsFromS3ToSheet(SlackReportNotificationJson requestJson) throws IOException {
+        for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
+            try {
+                new SdkReportService().postResults(AwsS3ResultsJsonsService.getCurrentSdkRequestFromS3(requestJson.getId(), group.value));
+            } catch (NotFoundException e) {}
+        }
+        SheetData.writeAllTabsToSheet();
     }
 
     private void sendFullRegressionSplunkEvent(SdkHighLevelFullRegressionReportTableBuilder sdkHighLevelFullRegressionReportTableBuilder){

@@ -25,6 +25,7 @@ public class RestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/result");
             try {
+                AwsS3ResultsJsonsService.addSdkRequestToS3File(json);
                 new SdkReportService().postResults(json);
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
-public class EyesResultRequestJson {
+public class EyesResultRequestJson implements RequestInterface{
 
     @SerializedName("group")
     @Expose

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.pojos.EyesResultRequestJson;
+import com.yarden.restServiceDemo.pojos.RequestInterface;
 import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 import javassist.NotFoundException;
 
@@ -14,36 +15,14 @@ public class AwsS3ResultsJsonsService {
 
     public static void addSdkRequestToS3File(String json) {
         SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
-        if ((sdkResultRequestJson.getSandbox() != null) && sdkResultRequestJson.getSandbox()) {
-            return;
-        }
-        SdkResultRequestJson sdkResultRequestJsonFromS3 = null;
-        try {
-            sdkResultRequestJsonFromS3 = new Gson().fromJson(getCurrentSdkRequestFromS3(sdkResultRequestJson.getId(), sdkResultRequestJson.getGroup()), SdkResultRequestJson.class);
-            JsonArray testResultsFromS3 = sdkResultRequestJsonFromS3.getResults();
-            testResultsFromS3.addAll(sdkResultRequestJson.getResults());
-            sdkResultRequestJsonFromS3.setResults(testResultsFromS3);
-        } catch (NotFoundException t) {
-            sdkResultRequestJsonFromS3 = sdkResultRequestJson;
-        }
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3ResultsJsonsBucketName.value, getResultRequestJsonFileName(sdkResultRequestJson.getId(), sdkResultRequestJson.getGroup(), SdkRequestFileNamePrefix), new Gson().toJson(sdkResultRequestJsonFromS3));
+        addRequestToS3File(sdkResultRequestJson, S3PrefixStrings.Sdk);
+        System.gc();
     }
 
     public static void addEyesRequestToS3File(String json) {
         EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(json, EyesResultRequestJson.class);
-        if ((eyesResultRequestJson.getSandbox() != null) && eyesResultRequestJson.getSandbox()) {
-            return;
-        }
-        EyesResultRequestJson eyesResultRequestJsonFromS3 = null;
-        try {
-            eyesResultRequestJsonFromS3 = new Gson().fromJson(getCurrentEyesRequestFromS3(eyesResultRequestJson.getId(), eyesResultRequestJson.getGroup()), EyesResultRequestJson.class);
-            JsonArray testResultsFromS3 = eyesResultRequestJsonFromS3.getResults();
-            testResultsFromS3.addAll(eyesResultRequestJson.getResults());
-            eyesResultRequestJsonFromS3.setResults(testResultsFromS3);
-        } catch (NotFoundException t) {
-            eyesResultRequestJsonFromS3 = eyesResultRequestJson;
-        }
-        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3ResultsJsonsBucketName.value, getResultRequestJsonFileName(eyesResultRequestJson.getId(), eyesResultRequestJson.getGroup(), EyesRequestFileNamePrefix), new Gson().toJson(eyesResultRequestJsonFromS3));
+        addRequestToS3File(eyesResultRequestJson, S3PrefixStrings.Eyes);
+        System.gc();
     }
 
     public static String getCurrentSdkRequestFromS3(String id, String group) throws NotFoundException {
@@ -62,8 +41,36 @@ public class AwsS3ResultsJsonsService {
         }
     }
 
+    private static void addRequestToS3File(RequestInterface request, S3PrefixStrings fileNamePrefixInS3){
+        if ((request.getSandbox() != null) && request.getSandbox()) {
+            return;
+        }
+        RequestInterface resultRequestJsonFromS3 = null;
+        String resultRequestJsonFileName = getResultRequestJsonFileName(request.getId(), request.getGroup(), fileNamePrefixInS3.value);
+        try {
+            String currentRequestFromS3File = AwsS3Provider.getStringFromFile(Enums.EnvVariables.AwsS3ResultsJsonsBucketName.value, resultRequestJsonFileName);
+            resultRequestJsonFromS3 = new Gson().fromJson(currentRequestFromS3File, request.getClass());
+            JsonArray testResultsFromS3 = resultRequestJsonFromS3.getResults();
+            testResultsFromS3.addAll(request.getResults());
+            resultRequestJsonFromS3.setResults(testResultsFromS3);
+        } catch (Throwable t) {
+            resultRequestJsonFromS3 = request;
+        }
+        AwsS3Provider.writeStringToFile(Enums.EnvVariables.AwsS3ResultsJsonsBucketName.value, resultRequestJsonFileName, new Gson().toJson(resultRequestJsonFromS3));
+    }
+
     private static String getResultRequestJsonFileName(String id, String group, String requestFileNamePrefix){
         return requestFileNamePrefix + "-" + id + "-" + group;
+    }
+
+    private enum S3PrefixStrings {
+        Sdk("Sdk"), Eyes("Eyes");
+
+        public final String value;
+
+        S3PrefixStrings(String value) {
+            this.value = value;
+        }
     }
 
 }

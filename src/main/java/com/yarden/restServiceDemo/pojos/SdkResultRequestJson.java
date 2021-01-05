@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.UUID;
 
-public class SdkResultRequestJson {
+public class SdkResultRequestJson implements RequestInterface{
 
     @SerializedName("sdk")
     @Expose

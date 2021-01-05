@@ -16,6 +16,7 @@ public class EyesReportService {
     private EyesResultRequestJson eyesResultRequestJson;
     private String googleSheetTabName;
     private SheetData sheetData = null;
+    private Map<String, JsonElement> sheetResultsMap = new HashMap<>();
 
     public void postResults(String json) {
         SheetData.incrementResultsCounter();
@@ -129,7 +130,9 @@ public class EyesReportService {
 
     private void updateSingleTestResult(TestResultData testResult){
         String result = testResult.getPassed() ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
-        for (JsonElement sheetEntry: sheetData.getSheetData()){
+        initializeSheetResultsMap();
+        if(sheetResultsMap.containsKey(testResult.getTestName())) {
+            JsonElement sheetEntry = sheetResultsMap.get(testResult.getTestName());
             if (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(testResult.getTestName())){
                 Logger.info("Adding test result: " + testResult.getTestName() + "=" + result);
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Feature.value, testResult.getFeature());
@@ -138,12 +141,21 @@ public class EyesReportService {
                 if (!testResult.getPassed()) {
                     sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Url.value, testResult.getResultUrl());
                 }
-                return;
+            }
+        } else {
+            JsonElement newEntry = new JsonParser().parse("{\"" + Enums.EyesSheetColumnNames.TestName.value + "\":\"" + testResult.getTestName().replace("\"", "\\\"") + "\",\"" +Enums.EyesSheetColumnNames.Feature.value + "\":\"" + testResult.getFeature() + "\",\"" + Enums.EyesSheetColumnNames.FeatureSubCategory.value + "\":\"" + testResult.getFeature_sub_category() + "\",\"" + Enums.EyesSheetColumnNames.Status.value + "\":\"" + result + "\",\"" + Enums.EyesSheetColumnNames.Url.value + "\":\"" + testResult.getResultUrl() + "\"}");
+            Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
+            sheetData.getSheetData().add(newEntry);
+            sheetResultsMap.put(testResult.getTestName(), newEntry);
+        }
+    }
+
+    private void initializeSheetResultsMap(){
+        if (sheetResultsMap.isEmpty()) {
+            for (JsonElement sheetEntry: sheetData.getSheetData()){
+                sheetResultsMap.put(sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString(), sheetEntry);
             }
         }
-        JsonElement newEntry = new JsonParser().parse("{\"" + Enums.EyesSheetColumnNames.TestName.value + "\":\"" + testResult.getTestName() + "\",\"" +Enums.EyesSheetColumnNames.Feature.value + "\":\"" + testResult.getFeature() + "\",\"" + Enums.EyesSheetColumnNames.FeatureSubCategory.value + "\":\"" + testResult.getFeature_sub_category() + "\",\"" + Enums.EyesSheetColumnNames.Status.value + "\":\"" + result + "\",\"" + Enums.EyesSheetColumnNames.Url.value + "\":\"" + testResult.getResultUrl() + "\"}");
-        Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
-        sheetData.getSheetData().add(newEntry);
     }
 
     public void validateThereIsIdRowOnSheet(SheetData sheetData){

@@ -3,30 +3,43 @@ package com.yarden.restServiceDemo.splunkService;
 import com.splunk.*;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
+import com.yarden.restServiceDemo.kpis.WriteKpisToSplunkPeriodically;
 import org.apache.commons.io.IOUtils;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class SplunkReporter {
+@Configuration
+public class SplunkReporter extends TimerTask {
 
     private static Receiver receiver = null;
     private static Service service = null;
+    private static AtomicReference<LinkedList<SplunkReportObject>> reportQueue = new AtomicReference<>();
+    private static final String lock = "lock";
+    private static boolean isRunning = false;
+    private static Timer timer;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public static synchronized void start() {
+        if (!isRunning) {
+            timer = new Timer("SplunkReportQueue");
+            timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 500);
+            isRunning = true;
+            Logger.info("SplunkReportQueue started");
+        }
+    }
 
     public void report(Enums.SplunkSourceTypes sourcetype, String json){
-        Args args = new Args();
-        args.add("sourcetype", sourcetype.value);
-        try {
-            getReceiver().log("qualityevents", args, json);
-        } catch (Throwable t) {
-            Logger.warn("Retrying splunk log");
-            try {
-                resetSplunkConnection();
-                getReceiver().log("qualityevents", args, json);
-            } catch (Throwable t2) {
-                Logger.error("Failed logging to splunk: " + json);
-            }
+        synchronized (lock) {
+            reportQueue.get().add(new SplunkReportObject(sourcetype, json));
         }
     }
 
@@ -54,6 +67,29 @@ public class SplunkReporter {
         }
     }
 
+    @Override
+    public void run() {
+        synchronized (lock) {
+            if (!reportQueue.get().isEmpty()) {
+                System.out.println("Send splunk report");
+                SplunkReportObject reportObject = reportQueue.get().removeFirst();
+                Args args = new Args();
+                args.add("sourcetype", reportObject.sourcetype.value);
+                try {
+                    getReceiver().log("qualityevents", args, reportObject.json);
+                } catch (Throwable t) {
+                    System.out.println("Retrying splunk log");
+                    try {
+                        resetSplunkConnection();
+                        getReceiver().log("qualityevents", args, reportObject.json);
+                    } catch (Throwable t2) {
+                        System.out.println("Failed logging to splunk: " + reportObject.json);
+                    }
+                }
+            }
+        }
+    }
+
     private void resetSplunkConnection(){
         receiver = null;
         service = null;
@@ -78,5 +114,15 @@ public class SplunkReporter {
             return getService().getReceiver();
         }
         return receiver;
+    }
+
+    public class SplunkReportObject {
+        Enums.SplunkSourceTypes sourcetype;
+        String json;
+
+        public SplunkReportObject(Enums.SplunkSourceTypes sourcetype, String json) {
+            this.sourcetype = sourcetype;
+            this.json = json;
+        }
     }
 }

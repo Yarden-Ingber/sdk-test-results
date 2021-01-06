@@ -45,7 +45,7 @@ public class SdkSlackReportSender {
         SdkReleaseEventHighLevelReportTableBuilder sdkReleaseEventHighLevelReportTableBuilder = new SdkReleaseEventHighLevelReportTableBuilder(requestJson);
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") +
-                        "\n\n" + newVersionInstructions)
+                        "\n\n" + newVersionInstructions + "\n\nID:" + getRequestIDs())
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
                 .setSdk(sdk)
@@ -178,6 +178,23 @@ public class SdkSlackReportSender {
             }
         }
         return tableBuilder;
+    }
+
+    private String getRequestIDs() {
+        String result = "";
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
+                        result = result + row.getAsJsonObject().get(sdk).getAsString() + "-" + sdkGroup.value + ";";
+                        break;
+                    } else {
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @FunctionalInterface

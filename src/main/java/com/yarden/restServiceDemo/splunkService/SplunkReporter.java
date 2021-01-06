@@ -30,10 +30,10 @@ public class SplunkReporter extends TimerTask {
     @EventListener(ApplicationReadyEvent.class)
     public static synchronized void start() {
         if (!isRunning) {
+            timer = new Timer("SplunkReportQueue");
             if (reportQueue.get() == null) {
                 reportQueue.set(new LinkedList<>());
             }
-            timer = new Timer("SplunkReportQueue");
             timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 500);
             isRunning = true;
             Logger.info("SplunkReportQueue started");
@@ -77,10 +77,13 @@ public class SplunkReporter extends TimerTask {
 
     @Override
     public void run() {
+        System.out.println("run1");
         synchronized (lock) {
+            System.out.println("run2");
             if (!reportQueue.get().isEmpty()) {
-                System.out.println("Send splunk report");
+                System.out.println("run3");
                 SplunkReportObject reportObject = reportQueue.get().removeFirst();
+                System.out.println(reportObject.sourcetype + "," + reportObject.json);
                 Args args = new Args();
                 args.add("sourcetype", reportObject.sourcetype.value);
                 try {

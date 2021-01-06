@@ -30,6 +30,9 @@ public class SplunkReporter extends TimerTask {
     @EventListener(ApplicationReadyEvent.class)
     public static synchronized void start() {
         if (!isRunning) {
+            if (reportQueue.get() == null) {
+                reportQueue.set(new LinkedList<>());
+            }
             timer = new Timer("SplunkReportQueue");
             timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 500);
             isRunning = true;
@@ -39,10 +42,12 @@ public class SplunkReporter extends TimerTask {
 
     public void report(Enums.SplunkSourceTypes sourcetype, String json){
         synchronized (lock) {
-            if (reportQueue.get() == null) {
-                reportQueue.set(new LinkedList<>());
+            try {
+                reportQueue.get().add(new SplunkReportObject(sourcetype, json));
+            } catch (NullPointerException e) {
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-            reportQueue.get().add(new SplunkReportObject(sourcetype, json));
         }
     }
 

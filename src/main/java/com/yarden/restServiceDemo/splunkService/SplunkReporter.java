@@ -31,6 +31,7 @@ public class SplunkReporter extends TimerTask {
     public static synchronized void start() {
         if (!isRunning) {
             timer = new Timer("SplunkReportQueue");
+            reportQueue.set(new LinkedList<>());
             timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 500);
             isRunning = true;
             Logger.info("SplunkReportQueue started");

@@ -134,6 +134,7 @@ public class EyesReportService {
         if(sheetResultsMap.containsKey(testResult.getTestName())) {
             JsonElement sheetEntry = sheetResultsMap.get(testResult.getTestName());
             if (sheetEntry.getAsJsonObject().get(Enums.EyesSheetColumnNames.TestName.value).getAsString().equals(testResult.getTestName())){
+                Logger.info("Adding test result: " + testResult.getTestName() + "=" + result);
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Feature.value, testResult.getFeature());
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.FeatureSubCategory.value, testResult.getFeature_sub_category());
                 sheetEntry.getAsJsonObject().addProperty(Enums.EyesSheetColumnNames.Status.value, result);

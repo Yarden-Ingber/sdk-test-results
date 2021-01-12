@@ -45,7 +45,7 @@ public class SdkSlackReportSender {
         SdkReleaseEventHighLevelReportTableBuilder sdkReleaseEventHighLevelReportTableBuilder = new SdkReleaseEventHighLevelReportTableBuilder(requestJson);
         SlackReportData slackReportData = new SlackReportData()
                 .setReportTextPart("A new SDK is about to be released.\n\nSDK: " + sdk + "\nVersion:\n* " + version.replaceAll(";", "\n* ") +
-                        "\n\n" + newVersionInstructions + "\n\nID:" + getRequestIDs())
+                        "\n\n" + newVersionInstructions + "\n\nID:" + getRequestIDs() + "\n")
                 .setReportTitle("Test report for SDK: " + sdk)
                 .setMailSubject("Test report for SDK: " + sdk)
                 .setSdk(sdk)

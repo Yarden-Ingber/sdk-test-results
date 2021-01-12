@@ -106,6 +106,7 @@ public class ProductionMonitor extends TimerTask {
                 if (responseStatusCode == 200 || responseStatusCode == 403) {
                     productionMonitorEventJson.put("isUp", 1);
                 } else {
+                    Logger.error("ProductionMonitor: Status code for site " + site + " is: " + responseStatusCode);
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
                     productionMonitorEventJson.put("statusCode", responseStatusCode);

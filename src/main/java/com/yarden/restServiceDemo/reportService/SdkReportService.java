@@ -165,14 +165,14 @@ public class SdkReportService {
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName)){
                 if (!isSandbox()) {
-                    Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
+//                    Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
                 }
                 sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
                 return;
             }
         }
         JsonElement newEntry = new JsonParser().parse("{\"" + Enums.SdkSheetColumnNames.TestName.value + "\":\"" + testName + "\",\"" + sdk + "\":\"" + testResult + "\"}");
-        Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
+//        Logger.info("Adding new result entry: " + newEntry.toString() + " to sheet");
         sheetData.getSheetData().add(newEntry);
     }
 

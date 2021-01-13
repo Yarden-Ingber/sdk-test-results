@@ -6,6 +6,8 @@ import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
+import com.yarden.restServiceDemo.splunkService.SplunkReporter;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -216,10 +218,13 @@ public class RestCalls {
         Logger.info("**********************************************************************************************");
         String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
         if (jsonWithoutWhitespace.contains("\"sandbox\":true")) {
-            Logger.info("New sandbox request detected: " + request);
+            System.out.println(Logger.getTimaStamp() + " == INFO: " + "New sandbox request detected: " + request);
         } else {
-            Logger.info("New request detected: " + request + " === payload: " + json.replace(" ", ""));
+            System.out.println(Logger.getTimaStamp() + " == INFO: " + "New request detected: " + request + " === payload: " + json.replace(" ", ""));
         }
+        JSONObject log = new JSONObject().put("level", "info").put("text", "New request detected: " + request + " === payload: " + json.replace(" ", ""));
+        new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
+
 
 }

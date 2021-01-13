@@ -90,6 +90,7 @@ public class ProductionMonitor extends TimerTask {
             domain = domain + "/api/admin/userinfo";
             URL endpoint = new URL(domain);
             HttpURLConnection con = (HttpURLConnection) endpoint.openConnection();
+            con.setConnectTimeout(5000);
             con.setRequestMethod("GET");
             JSONObject productionMonitorEventJson = new JSONObject();
             productionMonitorEventJson.put("version", VERSION);
@@ -101,7 +102,11 @@ public class ProductionMonitor extends TimerTask {
                 try {
                     responseStatusCode = con.getResponseCode();
                 } catch (Throwable t) {
-                    responseStatusCode = con.getResponseCode();
+                    try {
+                        responseStatusCode = con.getResponseCode();
+                    } catch (Throwable t2) {
+                        responseStatusCode = con.getResponseCode();
+                    }
                 }
                 if (responseStatusCode == 200 || responseStatusCode == 403) {
                     productionMonitorEventJson.put("isUp", 1);

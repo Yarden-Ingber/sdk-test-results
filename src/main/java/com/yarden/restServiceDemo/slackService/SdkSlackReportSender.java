@@ -203,13 +203,14 @@ public class SdkSlackReportSender {
     }
 
     private void setRecipientMail(SlackReportData slackReportData) {
-        String recipientMail = "";
+        JSONArray recipients = new JSONArray();
         if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
-            recipientMail = requestJson.getSpecificRecipient();
+            recipients.put(new JSONObject().put("Email", requestJson.getSpecificRecipient()).put("Name", "Release_Report"));
         } else {
-            recipientMail = Enums.EnvVariables.MailReportRecipient.value;
+            recipients.put(new JSONObject().put("Email", "yarden.ingber@applitools.com").put("Name", "Release_Report"))
+                    .put(new JSONObject().put("Email", "daniel.puterman@applitools.com").put("Name", "Release_Report"));
         }
-        slackReportData.setRecipientsJsonArray(new JSONArray().put(new JSONObject().put("Email", recipientMail).put("Name", "Release_Report")));
+        slackReportData.setRecipientsJsonArray(recipients);
     }
 
     private String getNewVersionInstructions(){

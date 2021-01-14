@@ -90,7 +90,7 @@ public class ProductionMonitor extends TimerTask {
             domain = domain + "/api/admin/userinfo";
             URL endpoint = new URL(domain);
             HttpURLConnection con = (HttpURLConnection) endpoint.openConnection();
-            con.setConnectTimeout(5000);
+            con.setConnectTimeout(1000 * 60 * 2);
             con.setRequestMethod("GET");
             JSONObject productionMonitorEventJson = new JSONObject();
             productionMonitorEventJson.put("version", VERSION);

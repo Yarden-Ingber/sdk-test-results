@@ -89,9 +89,6 @@ public class ProductionMonitor extends TimerTask {
             String site = domainSite.split(",")[1];
             domain = domain + "/api/admin/userinfo";
             URL endpoint = new URL(domain);
-            HttpURLConnection con = (HttpURLConnection) endpoint.openConnection();
-            con.setConnectTimeout(1000 * 60 * 2);
-            con.setRequestMethod("GET");
             JSONObject productionMonitorEventJson = new JSONObject();
             productionMonitorEventJson.put("version", VERSION);
             productionMonitorEventJson.put("site", site);
@@ -100,12 +97,12 @@ public class ProductionMonitor extends TimerTask {
             try {
                 int responseStatusCode = 0;
                 try {
-                    responseStatusCode = con.getResponseCode();
+                    responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
                 } catch (Throwable t) {
                     try {
-                        responseStatusCode = con.getResponseCode();
+                        responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
                     } catch (Throwable t2) {
-                        responseStatusCode = con.getResponseCode();
+                        responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
                     }
                 }
                 if (responseStatusCode == 200 || responseStatusCode == 403) {
@@ -127,6 +124,13 @@ public class ProductionMonitor extends TimerTask {
         if (!failedEndpoints.toString().isEmpty()) {
             sendMailNotification(failedEndpoints.toString());
         }
+    }
+
+    private HttpURLConnection getEndpointRequestSession(URL endpoint) throws IOException {
+        HttpURLConnection con = (HttpURLConnection) endpoint.openConnection();
+        con.setConnectTimeout(1000 * 60 * 5);
+        con.setRequestMethod("GET");
+        return con;
     }
 
     private void sendVGEvent(){

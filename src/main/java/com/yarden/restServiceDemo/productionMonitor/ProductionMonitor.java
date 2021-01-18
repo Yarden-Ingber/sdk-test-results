@@ -87,39 +87,41 @@ public class ProductionMonitor extends TimerTask {
         for (String domainSite : domainsSitesList) {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
-            domain = domain + "/api/admin/userinfo";
-            URL endpoint = new URL(domain);
-            JSONObject productionMonitorEventJson = new JSONObject();
-            productionMonitorEventJson.put("version", VERSION);
-            productionMonitorEventJson.put("site", site);
-            productionMonitorEventJson.put("domain", domain);
-            productionMonitorEventJson.put("eventType", "Endpoint");
-            try {
-                int responseStatusCode = 0;
+            if (!site.equals("St")) {
+                domain = domain + "/api/admin/userinfo";
+                URL endpoint = new URL(domain);
+                JSONObject productionMonitorEventJson = new JSONObject();
+                productionMonitorEventJson.put("version", VERSION);
+                productionMonitorEventJson.put("site", site);
+                productionMonitorEventJson.put("domain", domain);
+                productionMonitorEventJson.put("eventType", "Endpoint");
                 try {
-                    responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
-                } catch (Throwable t) {
+                    int responseStatusCode = 0;
                     try {
                         responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
-                    } catch (Throwable t2) {
-                        responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
+                    } catch (Throwable t) {
+                        try {
+                            responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
+                        } catch (Throwable t2) {
+                            responseStatusCode = getEndpointRequestSession(endpoint).getResponseCode();
+                        }
                     }
-                }
-                if (responseStatusCode == 200 || responseStatusCode == 403) {
-                    productionMonitorEventJson.put("isUp", 1);
-                } else {
-                    Logger.error("ProductionMonitor: Status code for site " + site + " is: " + responseStatusCode);
+                    if (responseStatusCode == 200 || responseStatusCode == 403) {
+                        productionMonitorEventJson.put("isUp", 1);
+                    } else {
+                        Logger.error("ProductionMonitor: Status code for site " + site + " is: " + responseStatusCode);
+                        productionMonitorEventJson.put("isUp", 0);
+                        failedEndpoints.append(site).append(";");
+                        productionMonitorEventJson.put("statusCode", responseStatusCode);
+                    }
+                } catch (Throwable t) {
+                    Logger.error("ProductionMonitor: failed to get response from endpoint " + domain);
+                    t.printStackTrace();
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
-                    productionMonitorEventJson.put("statusCode", responseStatusCode);
                 }
-            } catch (Throwable t) {
-                Logger.error("ProductionMonitor: failed to get response from endpoint " + domain);
-                t.printStackTrace();
-                productionMonitorEventJson.put("isUp", 0);
-                failedEndpoints.append(site).append(";");
+                new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
             }
-            new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
         if (!failedEndpoints.toString().isEmpty()) {
             sendMailNotification(failedEndpoints.toString());

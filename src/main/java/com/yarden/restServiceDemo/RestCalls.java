@@ -19,13 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestCalls {
 
     public static final String lock = "LOCK";
+    private static final boolean PrintPayload = true;
+    private static final boolean DontPrintPayload = false;
 
     @RequestMapping(method = RequestMethod.POST, path = "/result")
     public ResponseEntity postResults(@RequestBody String json) {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/result");
+            newRequestPrint(json, "/result", DontPrintPayload);
             try {
                 AwsS3ResultsJsonsService.addSdkRequestToS3File(json);
                 new SdkReportService().postResults(json);
@@ -45,7 +47,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/delete_previous_results");
+            newRequestPrint(json, "/delete_previous_results", PrintPayload);
             try {
                 new SdkReportService().deleteAllColumnsForSdkInAllTabs(json);
             } catch (InternalError e) {
@@ -64,7 +66,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint(json, "/eyes_result");
+            newRequestPrint(json, "/eyes_result", DontPrintPayload);
             try {
                 AwsS3ResultsJsonsService.addEyesRequestToS3File(json);
                 new EyesReportService().postResults(json);
@@ -105,7 +107,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/extra_test_data")
     public ResponseEntity postExtraTestData(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json, "/health");
+            newRequestPrint(json, "/health", DontPrintPayload);
             try {
                 new SdkReportService().postExtraTestData(json);
             } catch (JsonSyntaxException e) {
@@ -125,7 +127,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/sdks")
     public ResponseEntity sendSdkMailReportOverload(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json, "/send_mail/sdks");
+            newRequestPrint(json, "/send_mail/sdks", PrintPayload);
             try {
                 SheetData.writeAllTabsToSheet();
                 new SdkSlackReportSender().send(json);
@@ -140,7 +142,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/send_full_regression/sdks")
     public ResponseEntity sendSdkFullRegressionReport(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json, "/send_full_regression/sdks");
+            newRequestPrint(json, "/send_full_regression/sdks", PrintPayload);
             Logger.info(Enums.EnvVariables.TurnOffFullRegressionEmail.value);
             if (Boolean.valueOf(Enums.EnvVariables.TurnOffFullRegressionEmail.value)) {
                 return new ResponseEntity("Mail is turned off by server", HttpStatus.OK);
@@ -159,7 +161,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/tests_end/eyes")
     public ResponseEntity sendEyesMailReport(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json, "/tests_end/eyes");
+            newRequestPrint(json, "/tests_end/eyes", PrintPayload);
             try {
                 if (json == null) {
                     json = "{}";
@@ -177,7 +179,7 @@ public class RestCalls {
         synchronized (lock) {
             WriteEntireSheetsPeriodically.shouldStopSheetWritingTimer = false;
             WriteEntireSheetsPeriodically.start();
-            newRequestPrint("", "/reset_eyes_report_data");
+            newRequestPrint("", "/reset_eyes_report_data", PrintPayload);
             try {
                 new EyesReportService().deleteAllData();
                 new EyesSlackReporterSender().resetEndTasksCounter();
@@ -191,7 +193,7 @@ public class RestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/send_mail/generic")
     public ResponseEntity sendGenericMailReport(@RequestBody String json){
         synchronized (lock) {
-            newRequestPrint(json, "/send_mail/generic");
+            newRequestPrint(json, "/send_mail/generic", PrintPayload);
             try {
                 new NonTestTableSlackReportSender().send(json);
             } catch (Throwable throwable) {
@@ -213,16 +215,17 @@ public class RestCalls {
         }
     }
 
-    private void newRequestPrint(String json, String request){
+    private void newRequestPrint(String json, String request, boolean shouldPrintPayload){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
+        String timestamp = Logger.getTimaStamp();
         String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
-        if (jsonWithoutWhitespace.contains("\"sandbox\":true")) {
-            System.out.println(Logger.getTimaStamp() + " == INFO: " + "New sandbox request detected: " + request);
+        if (shouldPrintPayload) {
+            System.out.println(timestamp + " == INFO: " + "New request detected: " + request + " === payload: " + json.replace(" ", ""));
         } else {
-            System.out.println(Logger.getTimaStamp() + " == INFO: " + "New request detected: " + request + " === payload: " + json.replace(" ", ""));
+            System.out.println(timestamp + " == INFO: " + "New request detected: " + request);
         }
-        JSONObject log = new JSONObject().put("level", "info").put("text", "New request detected: " + request + " === payload: " + json.replace(" ", ""));
+        JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + json.replace(" ", ""));
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 

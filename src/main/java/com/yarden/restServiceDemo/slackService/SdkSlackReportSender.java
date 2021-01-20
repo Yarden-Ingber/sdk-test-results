@@ -16,6 +16,7 @@ import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
 import javassist.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,6 +29,8 @@ public class SdkSlackReportSender {
     private String testCoverageGap;
     private String version;
     private SlackReportNotificationJson requestJson;
+    private static final boolean FullRegression = true;
+    private static final boolean ReleaseMail = false;
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
@@ -57,7 +60,7 @@ public class SdkSlackReportSender {
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
         slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
-        setRecipientMail(slackReportData);
+        slackReportData.setRecipientsJsonArray(getRecipientMail(ReleaseMail));
         if (requestJson.getSpecificRecipient() == null || requestJson.getSpecificRecipient().isEmpty()){
             new SlackReporter().report(slackReportData);
             new SdkVersionsReportService().updateVersion(json);
@@ -88,7 +91,7 @@ public class SdkSlackReportSender {
                 .setDetailedFailedTestsTable(getDetailedFailedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
         slackReportData.setHtmlReportUrl(new HtmlReportGenerator(slackReportData).getHtmlReportUrlInAwsS3(slackReportData.getHtmlReportS3BucketName()));
-        setRecipientMail(slackReportData);
+        slackReportData.setRecipientsJsonArray(getRecipientMail(FullRegression));
         slackReportData.setReportTextPart(slackReportData.getReportTextPart() +
                 "<br><br>" + sdkHighLevelFullRegressionReportTableBuilder.getHighLevelReportTable());
         new MailSender().send(slackReportData);
@@ -202,15 +205,35 @@ public class SdkSlackReportSender {
         boolean shouldAddTest(String testName);
     }
 
-    private void setRecipientMail(SlackReportData slackReportData) {
-        JSONArray recipients = new JSONArray();
-        if (requestJson.getSpecificRecipient() != null && !requestJson.getSpecificRecipient().isEmpty()) {
-            recipients.put(new JSONObject().put("Email", requestJson.getSpecificRecipient()).put("Name", "Release_Report"));
+    private JSONArray getRecipientMail(boolean isFullRegression) {
+        if (StringUtils.isEmpty(requestJson.getSpecificRecipient())) {
+            if (isFullRegression) {
+                return getFullRegressionRecipient();
+            } else {
+                return getReleaseMailRecipient();
+            }
         } else {
-            recipients.put(new JSONObject().put("Email", "yarden.ingber@applitools.com").put("Name", "Release_Report"))
-                    .put(new JSONObject().put("Email", "daniel.puterman@applitools.com").put("Name", "Release_Report"));
+            return getSpecificRecipient();
         }
-        slackReportData.setRecipientsJsonArray(recipients);
+    }
+
+    private JSONArray getFullRegressionRecipient(){
+        JSONArray recipients = new JSONArray();
+        recipients.put(new JSONObject().put("Email", "yarden.ingber@applitools.com").put("Name", "Release_Report"))
+                .put(new JSONObject().put("Email", "daniel.puterman@applitools.com").put("Name", "Release_Report"));
+        return recipients;
+    }
+
+    private JSONArray getReleaseMailRecipient(){
+        JSONArray recipients = new JSONArray();
+        recipients.put(new JSONObject().put("Email", Enums.EnvVariables.MailReportRecipient.value).put("Name", "Release_Report"));
+        return recipients;
+    }
+
+    private JSONArray getSpecificRecipient(){
+        JSONArray recipients = new JSONArray();
+        recipients.put(new JSONObject().put("Email", requestJson.getSpecificRecipient()).put("Name", "Release_Report"));
+        return recipients;
     }
 
     private String getNewVersionInstructions(){

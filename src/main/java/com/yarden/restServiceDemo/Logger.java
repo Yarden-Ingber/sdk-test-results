@@ -13,20 +13,23 @@ import java.util.Date;
 public class Logger {
 
     public static void info(String msg){
-        System.out.println(getTimaStamp() + " == INFO: " + msg);
-        JSONObject log = new JSONObject().put("level", "info").put("text", msg);
+        String timestamp = getTimaStamp();
+        System.out.println(timestamp + " == INFO: " + msg);
+        JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == " + msg);
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 
     public static void warn(String msg){
-        System.out.println(getTimaStamp() + " == WARNING: " + msg);
-        JSONObject log = new JSONObject().put("level", "warning").put("text", msg);
+        String timestamp = getTimaStamp();
+        System.out.println(timestamp + " == WARNING: " + msg);
+        JSONObject log = new JSONObject().put("level", "warning").put("text", timestamp + " == " + msg);
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 
     public static void error(String msg){
-        System.out.println(getTimaStamp() + " == ERROR: " + msg);
-        JSONObject log = new JSONObject().put("level", "error").put("text", msg);
+        String timestamp = getTimaStamp();
+        System.out.println(timestamp + " == ERROR: " + msg);
+        JSONObject log = new JSONObject().put("level", "error").put("text", timestamp + " == " + msg);
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 

@@ -35,7 +35,7 @@ public class SdkSlackReportSender {
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
         dumpResultsFromS3ToSheet(requestJson);
-        if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
+        if (StringUtils.isEmpty(requestJson.getSdk())) {
             Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
         } else {
@@ -56,6 +56,7 @@ public class SdkSlackReportSender {
                 .setChangeLog(changeLog)
                 .setCoverageGap(testCoverageGap)
                 .setHighLevelReportTable(sdkReleaseEventHighLevelReportTableBuilder.getHighLevelReportTable())
+                .setPassedTestsCount(Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentTotalTestCount))
                 .setDetailedMissingTestsTable(getDetailedMissingTestsTable())
                 .setDetailedPassedTestsTable(getDetailedPassedTestsTable())
                 .setHtmlReportS3BucketName(Enums.EnvVariables.AwsS3SdkReportsBucketName.value);
@@ -190,7 +191,10 @@ public class SdkSlackReportSender {
             if(reportSheet.get(0).getAsJsonObject().get(sdk) != null) {
                 for (JsonElement row: reportSheet) {
                     if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
-                        result = result + row.getAsJsonObject().get(sdk).getAsString() + "-" + sdkGroup.value + ";";
+                        if (row.getAsJsonObject().get(sdk) != null && !row.getAsJsonObject().get(sdk).isJsonNull()
+                                && StringUtils.isNotEmpty(row.getAsJsonObject().get(sdk).getAsString())) {
+                            result = result + row.getAsJsonObject().get(sdk).getAsString() + "-" + sdkGroup.value + ";";
+                        }
                         break;
                     } else {
                     }

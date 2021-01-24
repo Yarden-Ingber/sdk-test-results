@@ -60,7 +60,7 @@ public class AwsS3ResultsJsonsService {
     }
 
     private static String getResultRequestJsonFileName(String id, String group, String requestFileNamePrefix){
-        return requestFileNamePrefix + "-" + id + "-" + group;
+        return requestFileNamePrefix + "-" + id + "-" + group.toLowerCase();
     }
 
     private enum S3PrefixStrings {

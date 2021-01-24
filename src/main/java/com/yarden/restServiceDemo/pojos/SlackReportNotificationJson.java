@@ -56,7 +56,14 @@ public class SlackReportNotificationJson {
     }
 
     public String getTestCoverageGap() {
-        return testCoverageGap;
+//        return testCoverageGap;
+        return "Browser stack (mobile web)\n" +
+                "Browser stack (mobile native)\n" +
+                "Perfecto mobile (mobile web)\n" +
+                "Perfecto mobile (mobile native)\n" +
+                "All supported browser versions\n" +
+                "Public method names validation\n" +
+                "Default configuration validation";
     }
 
     public void setTestCoverageGap(String testCoverageGap) {

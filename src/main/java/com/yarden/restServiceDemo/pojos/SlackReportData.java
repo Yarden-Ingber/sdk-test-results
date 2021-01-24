@@ -23,6 +23,9 @@ public class SlackReportData {
     private JSONArray recipientsJsonArray = null;
     private String htmlReportS3BucketName = "";
     private String htmlReportUrl = "";
+    private int passedTestsCount = 0;
+    private int failedTestsCount = 0;
+    private int missingTestsCount = 0;
 
     public String getReportTitle() {
         return reportTitle;
@@ -166,6 +169,33 @@ public class SlackReportData {
 
     public SlackReportData setSdk(String sdk) {
         this.sdk = sdk;
+        return this;
+    }
+
+    public int getPassedTestsCount() {
+        return passedTestsCount;
+    }
+
+    public SlackReportData setPassedTestsCount(int passedTestsCount) {
+        this.passedTestsCount = passedTestsCount;
+        return this;
+    }
+
+    public int getFailedTestsCount() {
+        return failedTestsCount;
+    }
+
+    public SlackReportData setFailedTestsCount(int failedTestsCount) {
+        this.failedTestsCount = failedTestsCount;
+        return this;
+    }
+
+    public int getMissingTestsCount() {
+        return missingTestsCount;
+    }
+
+    public SlackReportData setMissingTestsCount(int missingTestsCount) {
+        this.missingTestsCount = missingTestsCount;
         return this;
     }
 }

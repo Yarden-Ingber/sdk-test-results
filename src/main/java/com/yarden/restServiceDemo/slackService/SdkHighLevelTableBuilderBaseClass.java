@@ -32,14 +32,36 @@ public class SdkHighLevelTableBuilderBaseClass {
         return totalAmount;
     }
 
-    protected int getFailedTestCountForSdk(){
+    protected int getFailedTestCountForSdk(SdkSlackReportSender.AddingTestCountCondition addingTestCountCondition){
         int totalAmount = 0;
         for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
             JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
             if (reportSheet.get(0).getAsJsonObject().keySet().contains(requestJson.getSdk())) {
                 for (JsonElement sheetEntry: reportSheet){
-                    if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Failed.value)) {
-                        totalAmount++;
+                    if (addingTestCountCondition.shouldAddTest(sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
+                        if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString().equals(Enums.TestResults.Failed.value)) {
+                            totalAmount++;
+                        }
+                    }
+                }
+            }
+        }
+        return totalAmount;
+    }
+
+    protected int getMissingTestsCountForSdk(SdkSlackReportSender.AddingTestCountCondition addingTestCountCondition) {
+        int totalAmount = 0;
+        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
+            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
+            if(reportSheet.get(0).getAsJsonObject().get(requestJson.getSdk()) != null) {
+                for (JsonElement row: reportSheet) {
+                    if (row.getAsJsonObject().get(requestJson.getSdk()).getAsString().isEmpty()) {
+                        if (addingTestCountCondition.shouldAddTest(row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString())) {
+                            if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
+                            } else {
+                                totalAmount++;
+                            }
+                        }
                     }
                 }
             }

@@ -20,8 +20,8 @@ public class SdkHighLevelFullRegressionReportTableBuilder extends SdkHighLevelTa
     public SdkHighLevelFullRegressionReportTableBuilder(SlackReportNotificationJson requestJson){
         super(requestJson);
         currentPassedTestsCount = Integer.toString(getPassedTestCountForSdk((String testName) -> true));
-        currentFailedTestsCount = Integer.toString(getFailedTestCountForSdk());
-        currentMissingTestsCount = Integer.toString(getMissingTestsCountForSdk());
+        currentFailedTestsCount = Integer.toString(getFailedTestCountForSdk((String testName) -> true));
+        currentMissingTestsCount = Integer.toString(getMissingTestsCountForSdk((String testName) -> true));
         previousPassedTestsCount = getPreviousTestCountInS3(TestCountType.PASSED, currentPassedTestsCount);
         previousFailedTestsCount = getPreviousTestCountInS3(TestCountType.FAILED, currentFailedTestsCount);
         previousMissingTestsCount = getPreviousTestCountInS3(TestCountType.MISSING, currentMissingTestsCount);
@@ -47,24 +47,6 @@ public class SdkHighLevelFullRegressionReportTableBuilder extends SdkHighLevelTa
 
     private enum TestCountType {
         PASSED, FAILED, MISSING;
-    }
-
-    private int getMissingTestsCountForSdk() {
-        int totalAmount = 0;
-        for (Enums.SdkGroupsSheetTabNames sdkGroup: Enums.SdkGroupsSheetTabNames.values()) {
-            JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, sdkGroup.value)).getSheetData();
-            if(reportSheet.get(0).getAsJsonObject().get(requestJson.getSdk()) != null) {
-                for (JsonElement row: reportSheet) {
-                    if (row.getAsJsonObject().get(requestJson.getSdk()).getAsString().isEmpty()) {
-                        if (row.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)) {
-                        } else {
-                            totalAmount++;
-                        }
-                    }
-                }
-            }
-        }
-        return totalAmount;
     }
 
 }

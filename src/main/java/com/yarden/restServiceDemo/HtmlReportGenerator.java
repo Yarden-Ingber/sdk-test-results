@@ -4,6 +4,7 @@ import com.lowagie.text.DocumentException;
 import com.mailjet.client.Base64;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
+import com.yarden.restServiceDemo.slackService.SdkHighLevelTableBuilderBaseClass;
 import org.apache.commons.io.IOUtils;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -92,6 +93,16 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append("<br/><h2>Test coverage gap</h2>");
             htmlReportStringBuilder.append(slackReportData.getCoverageGap() + "<br/><br/>");
         }
+        if (slackReportData.getDetailedPassedTestsTable() != null) {
+            if (slackReportData.getPassedTestsCount() > 0) {
+                htmlReportStringBuilder.append("<br/><details><summary><b>Executed tests (Total: " + (slackReportData.getPassedTestsCount()+slackReportData.getFailedTestsCount())
+                        + " Passed: " + slackReportData.getPassedTestsCount() + " Failed: " + slackReportData.getFailedTestsCount() + ")</b></summary>");
+            } else {
+                htmlReportStringBuilder.append("<br/><details><summary><b>Passed tests</b></summary>");
+            }
+            htmlReportStringBuilder.append(slackReportData.getDetailedPassedTestsTable());
+            htmlReportStringBuilder.append("</details>");
+        }
         if (slackReportData.getDetailedMissingTestsTable() != null){
             htmlReportStringBuilder.append("<br/><details><summary><b>Unexecuted tests</b></summary>");
             htmlReportStringBuilder.append(slackReportData.getDetailedMissingTestsTable());
@@ -101,11 +112,6 @@ public class HtmlReportGenerator {
             htmlReportStringBuilder.append("<br/><details><summary><b>Failed tests</b></summary>");
             htmlReportStringBuilder.append(slackReportData.getDetailedFailedTestsTable());
             htmlReportStringBuilder.append("</details><br/>");
-        }
-        if (slackReportData.getDetailedPassedTestsTable() != null) {
-            htmlReportStringBuilder.append("<br/><details><summary><b>Passed tests</b></summary>");
-            htmlReportStringBuilder.append(slackReportData.getDetailedPassedTestsTable());
-            htmlReportStringBuilder.append("</details>");
         }
         htmlReportStringBuilder.append("</div></div></body></html>");
         return htmlReportStringBuilder.toString();

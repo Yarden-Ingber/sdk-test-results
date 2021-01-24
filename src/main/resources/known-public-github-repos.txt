@@ -170,3 +170,4 @@ tutorial-webdriverio6-basic
 Applitools-Selenium-Javascript-Hackathon
 Applitools-Webdriverio-Hackathon
 netlify-plugin-visual-diff
+tutorial-images-javascript

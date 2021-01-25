@@ -1,7 +1,7 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.JsonSyntaxException;
-import com.yarden.restServiceDemo.awsS3Service.AwsS3ResultsJsonsService;
+import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 
 @RestController
 public class RestCalls {
@@ -29,9 +31,9 @@ public class RestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/result", DontPrintPayload);
             try {
-                AwsS3ResultsJsonsService.addSdkRequestToS3File(json);
+                FirebaseResultsJsonsService.addSdkRequestToFirebase(json);
                 new SdkReportService().postResults(json);
-            } catch (InternalError e) {
+            } catch (InternalError | InterruptedException | IOException e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
@@ -68,9 +70,9 @@ public class RestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/eyes_result", DontPrintPayload);
             try {
-                AwsS3ResultsJsonsService.addEyesRequestToS3File(json);
+                FirebaseResultsJsonsService.addEyesRequestToFirebase(json);
                 new EyesReportService().postResults(json);
-            } catch (InternalError e) {
+            } catch (InternalError | IOException | InterruptedException e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();

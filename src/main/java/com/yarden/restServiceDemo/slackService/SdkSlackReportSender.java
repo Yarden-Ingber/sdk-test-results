@@ -9,7 +9,7 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.awsS3Service.AwsS3ResultsJsonsService;
+import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
@@ -102,7 +102,7 @@ public class SdkSlackReportSender {
     private void dumpResultsFromS3ToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             try {
-                new SdkReportService().postResults(AwsS3ResultsJsonsService.getCurrentSdkRequestFromS3(requestJson.getId(), group.value));
+                new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {}
         }
         SheetData.writeAllTabsToSheet();

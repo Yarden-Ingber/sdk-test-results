@@ -8,7 +8,7 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
-import com.yarden.restServiceDemo.awsS3Service.AwsS3ResultsJsonsService;
+import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
@@ -48,7 +48,7 @@ public class EyesSlackReporterSender {
     private void dumpResultsFromS3ToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.EyesSheetTabsNames group : Enums.EyesSheetTabsNames.values()) {
             try {
-                new EyesReportService().postResults(AwsS3ResultsJsonsService.getCurrentEyesRequestFromS3(requestJson.getId(), group.value));
+                new EyesReportService().postResults(FirebaseResultsJsonsService.getCurrentEyesRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {}
         }
         SheetData.writeAllTabsToSheet();

@@ -1,7 +1,7 @@
 package com.yarden.restServiceDemo;
 
 import com.google.gson.JsonSyntaxException;
-import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
+import com.yarden.restServiceDemo.firebaseService.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
@@ -33,7 +33,7 @@ public class RestCalls {
             try {
                 FirebaseResultsJsonsService.addSdkRequestToFirebase(json);
                 new SdkReportService().postResults(json);
-            } catch (InternalError | InterruptedException | IOException e) {
+            } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();
@@ -72,7 +72,7 @@ public class RestCalls {
             try {
                 FirebaseResultsJsonsService.addEyesRequestToFirebase(json);
                 new EyesReportService().postResults(json);
-            } catch (InternalError | IOException | InterruptedException e) {
+            } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {
                 String errorMessage = "Failed parsing the json: \n\n" + json + "\n\n" + e.getMessage();

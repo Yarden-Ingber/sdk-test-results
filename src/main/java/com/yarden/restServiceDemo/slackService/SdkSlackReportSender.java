@@ -9,7 +9,7 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
+import com.yarden.restServiceDemo.firebaseService.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
@@ -103,7 +103,9 @@ public class SdkSlackReportSender {
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             try {
                 new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
-            } catch (NotFoundException e) {}
+            } catch (NotFoundException e) {
+                Logger.warn("SdkSlackReportSender: Failed to dump request from firebase to sheet");
+            }
         }
         SheetData.writeAllTabsToSheet();
     }

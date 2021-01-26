@@ -1,7 +1,8 @@
-package com.yarden.restServiceDemo.awsS3Service;
+package com.yarden.restServiceDemo.firebaseService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.pojos.EyesResultRequestJson;
 import com.yarden.restServiceDemo.pojos.RequestInterface;
 import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
@@ -15,21 +16,21 @@ import java.net.http.HttpResponse;
 
 public class FirebaseResultsJsonsService {
 
-    public static void addSdkRequestToFirebase(String json) throws IOException, InterruptedException {
+    public static void addSdkRequestToFirebase(String json) {
         SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
-        addRequestToFirebase(sdkResultRequestJson, FirebasePrefixStrings.Sdk);
+//        addRequestToFirebase(sdkResultRequestJson, FirebasePrefixStrings.Sdk);
         System.gc();
     }
 
-    public static void addEyesRequestToFirebase(String json) throws IOException, InterruptedException {
+    public static void addEyesRequestToFirebase(String json) {
         EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(json, EyesResultRequestJson.class);
-        addRequestToFirebase(eyesResultRequestJson, FirebasePrefixStrings.Eyes);
+//        addRequestToFirebase(eyesResultRequestJson, FirebasePrefixStrings.Eyes);
         System.gc();
     }
 
     public static String getCurrentSdkRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
-            return getCurrentSdkRequestFromFirebase(id, group, FirebasePrefixStrings.Sdk);
+//            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Sdk);
         } catch (Throwable t) {
             throw new NotFoundException("");
         }
@@ -37,19 +38,19 @@ public class FirebaseResultsJsonsService {
 
     public static String getCurrentEyesRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
-            return getCurrentSdkRequestFromFirebase(id, group, FirebasePrefixStrings.Eyes);
+//            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Eyes);
         } catch (Throwable t) {
             throw new NotFoundException("");
         }
     }
 
-    private static void addRequestToFirebase(RequestInterface request, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException {
+    private static void addRequestToFirebase(RequestInterface request, FirebasePrefixStrings fileNamePrefixInFirebase) {
         if ((request.getSandbox() != null) && request.getSandbox()) {
             return;
         }
         RequestInterface resultRequestJsonFromFirebase = null;
         try {
-            String currentRequestFromFirebase = getCurrentSdkRequestFromFirebase(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
+            String currentRequestFromFirebase = getCurrentRequestFromFirebase(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
             resultRequestJsonFromFirebase = new Gson().fromJson(currentRequestFromFirebase, request.getClass());
             JsonArray testResultsFromFirebase = resultRequestJsonFromFirebase.getResults();
             testResultsFromFirebase.addAll(request.getResults());
@@ -57,7 +58,11 @@ public class FirebaseResultsJsonsService {
         } catch (Throwable t) {
             resultRequestJsonFromFirebase = request;
         }
-        patchFirebase(request.getId(), request.getGroup(), new Gson().toJson(resultRequestJsonFromFirebase), fileNamePrefixInFirebase);
+        try {
+            patchFirebaseRequest(request.getId(), request.getGroup(), new Gson().toJson(resultRequestJsonFromFirebase), fileNamePrefixInFirebase);
+        } catch (IOException | InterruptedException e) {
+            Logger.error("FirebaseResultsJsonsService: Failed to add result to firebase");
+        }
     }
 
     private static String getResultRequestJsonFileName(String id, String group, String requestFileNamePrefix){
@@ -75,7 +80,7 @@ public class FirebaseResultsJsonsService {
 
     }
 
-    private static String getCurrentSdkRequestFromFirebase(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException, NotFoundException {
+    private static String getCurrentRequestFromFirebase(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException, NotFoundException {
         String url = getFirebaseUrl(id, group, fileNamePrefixInFirebase);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -89,7 +94,7 @@ public class FirebaseResultsJsonsService {
         return result;
     }
 
-    private static void patchFirebase(String id, String group, String payload, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException {
+    private static void patchFirebaseRequest(String id, String group, String payload, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException {
         String url = getFirebaseUrl(id, group, fileNamePrefixInFirebase);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

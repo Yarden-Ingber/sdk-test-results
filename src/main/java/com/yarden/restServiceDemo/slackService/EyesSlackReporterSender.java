@@ -7,8 +7,9 @@ import com.mailjet.client.errors.MailjetException;
 import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.HtmlReportGenerator;
+import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.awsS3Service.AwsS3Provider;
-import com.yarden.restServiceDemo.awsS3Service.FirebaseResultsJsonsService;
+import com.yarden.restServiceDemo.firebaseService.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
@@ -49,7 +50,9 @@ public class EyesSlackReporterSender {
         for (Enums.EyesSheetTabsNames group : Enums.EyesSheetTabsNames.values()) {
             try {
                 new EyesReportService().postResults(FirebaseResultsJsonsService.getCurrentEyesRequestFromFirebase(requestJson.getId(), group.value));
-            } catch (NotFoundException e) {}
+            } catch (NotFoundException e) {
+                Logger.error("EyesSlackReporterSender: Failed to dump request from firebase to sheet");
+            }
         }
         SheetData.writeAllTabsToSheet();
     }

@@ -108,7 +108,7 @@ public class SdkSlackReportSender {
                 }
                 new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
-                Logger.warn("SdkSlackReportSender: Failed to dump request from firebase to sheet");
+                Logger.error("SdkSlackReportSender: Failed to dump request from firebase to sheet for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
             }
         }
         SheetData.writeAllTabsToSheet();

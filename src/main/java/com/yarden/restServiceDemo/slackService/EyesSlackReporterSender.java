@@ -55,7 +55,7 @@ public class EyesSlackReporterSender {
                 }
                 new EyesReportService().postResults(FirebaseResultsJsonsService.getCurrentEyesRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
-                Logger.error("EyesSlackReporterSender: Failed to dump request from firebase to sheet");
+                Logger.error("EyesSlackReporterSender: Failed to dump request from firebase to sheet for group: " + group + " id: " + requestJson.getId());
             }
         }
         SheetData.writeAllTabsToSheet();

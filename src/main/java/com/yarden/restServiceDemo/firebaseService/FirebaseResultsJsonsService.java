@@ -7,31 +7,77 @@ import com.yarden.restServiceDemo.pojos.EyesResultRequestJson;
 import com.yarden.restServiceDemo.pojos.RequestInterface;
 import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 import javassist.NotFoundException;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class FirebaseResultsJsonsService {
+@Configuration
+public class FirebaseResultsJsonsService extends TimerTask {
+    private static AtomicReference<LinkedList<String>> sdkRequestQueue = new AtomicReference<>();
+    private static AtomicReference<LinkedList<String>> eyesRequestQueue = new AtomicReference<>();
+    private static boolean isRunning = false;
+    private static Timer timer;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public static synchronized void start() {
+        if (!isRunning) {
+            timer = new Timer("FirebaseQueue");
+            if (sdkRequestQueue.get() == null) {
+                sdkRequestQueue.set(new LinkedList<>());
+            }
+            if (eyesRequestQueue.get() == null) {
+                eyesRequestQueue.set(new LinkedList<>());
+            }
+            timer.scheduleAtFixedRate(new FirebaseResultsJsonsService(), 30, 100);
+            isRunning = true;
+            Logger.info("FirebaseQueue started");
+        }
+    }
+
+    @Override
+    public synchronized void run() {
+        if (!sdkRequestQueue.get().isEmpty()){
+            SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(sdkRequestQueue.get().removeFirst(), SdkResultRequestJson.class);
+            addRequestToFirebase(sdkResultRequestJson, FirebasePrefixStrings.Sdk);
+            System.gc();
+        }
+        if (!eyesRequestQueue.get().isEmpty()){
+            EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(eyesRequestQueue.get().removeFirst(), EyesResultRequestJson.class);
+            addRequestToFirebase(eyesResultRequestJson, FirebasePrefixStrings.Eyes);
+            System.gc();
+        }
+    }
+
+    private static void addRequestToQueue(String json, AtomicReference<LinkedList<String>> requestQueue){
+        try {
+            requestQueue.get().add(json);
+        } catch (NullPointerException e) {
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     public static void addSdkRequestToFirebase(String json) {
-        SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
-//        addRequestToFirebase(sdkResultRequestJson, FirebasePrefixStrings.Sdk);
-        System.gc();
+        addRequestToQueue(json, sdkRequestQueue);
     }
 
     public static void addEyesRequestToFirebase(String json) {
-        EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(json, EyesResultRequestJson.class);
-//        addRequestToFirebase(eyesResultRequestJson, FirebasePrefixStrings.Eyes);
-        System.gc();
+        addRequestToQueue(json, eyesRequestQueue);
     }
 
     public static String getCurrentSdkRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
-//            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Sdk);
-            return "";
+            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Sdk);
         } catch (Throwable t) {
             throw new NotFoundException("");
         }
@@ -39,8 +85,7 @@ public class FirebaseResultsJsonsService {
 
     public static String getCurrentEyesRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
-//            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Eyes);
-            return "";
+            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Eyes);
         } catch (Throwable t) {
             throw new NotFoundException("");
         }

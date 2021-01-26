@@ -32,7 +32,7 @@ public class EyesSlackReporterSender {
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
-        dumpResultsFromS3ToSheet(requestJson);
+        dumpResultsFromFirebaseToSheet(requestJson);
         if (requestJson.getId() == null || requestJson.getId().isEmpty()) {
             requestJson.setId(UUID.randomUUID().toString().substring(0, 6));
         }
@@ -46,9 +46,13 @@ public class EyesSlackReporterSender {
         wrtieNewEndTasksCounter(new EndTasksCounterObject("0", 0));
     }
 
-    private void dumpResultsFromS3ToSheet(SlackReportNotificationJson requestJson) throws IOException {
+    private void dumpResultsFromFirebaseToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.EyesSheetTabsNames group : Enums.EyesSheetTabsNames.values()) {
             try {
+                while (!FirebaseResultsJsonsService.eyesRequestQueue.get().isEmpty()) {
+                    Logger.info("EyesSlackReporterSender: waiting for firebase request queue to end");
+                    try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+                }
                 new EyesReportService().postResults(FirebaseResultsJsonsService.getCurrentEyesRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
                 Logger.error("EyesSlackReporterSender: Failed to dump request from firebase to sheet");

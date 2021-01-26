@@ -34,7 +34,7 @@ public class SdkSlackReportSender {
 
     public void send(String json) throws IOException, MailjetSocketTimeoutException, MailjetException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
-        dumpResultsFromS3ToSheet(requestJson);
+        dumpResultsFromFirebaseToSheet(requestJson);
         if (StringUtils.isEmpty(requestJson.getSdk())) {
             Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
@@ -73,7 +73,7 @@ public class SdkSlackReportSender {
 
     public void sendFullRegression(String json) throws MailjetSocketTimeoutException, MailjetException, IOException {
         requestJson = new Gson().fromJson(json, SlackReportNotificationJson.class);
-        dumpResultsFromS3ToSheet(requestJson);
+        dumpResultsFromFirebaseToSheet(requestJson);
         if (requestJson.getSdk() == null || requestJson.getSdk().isEmpty()) {
             Logger.error("Failed sending report, Missing SDK in request json.");
             throw new JsonParseException("No SDK in request JSON");
@@ -99,9 +99,13 @@ public class SdkSlackReportSender {
         sendFullRegressionSplunkEvent(sdkHighLevelFullRegressionReportTableBuilder);
     }
 
-    private void dumpResultsFromS3ToSheet(SlackReportNotificationJson requestJson) throws IOException {
+    private void dumpResultsFromFirebaseToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             try {
+                while (!FirebaseResultsJsonsService.sdkRequestQueue.get().isEmpty()) {
+                    Logger.info("SdkSlackReportSender: waiting for firebase request queue to end");
+                    try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+                }
                 new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
                 Logger.warn("SdkSlackReportSender: Failed to dump request from firebase to sheet");

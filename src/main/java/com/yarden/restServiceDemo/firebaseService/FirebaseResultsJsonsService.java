@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
 public class FirebaseResultsJsonsService extends TimerTask {
-    private static AtomicReference<LinkedList<String>> sdkRequestQueue = new AtomicReference<>();
-    private static AtomicReference<LinkedList<String>> eyesRequestQueue = new AtomicReference<>();
+    public static AtomicReference<LinkedList<String>> sdkRequestQueue = new AtomicReference<>();
+    public static AtomicReference<LinkedList<String>> eyesRequestQueue = new AtomicReference<>();
     private static boolean isRunning = false;
     private static Timer timer;
 

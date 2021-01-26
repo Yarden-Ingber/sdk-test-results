@@ -31,6 +31,7 @@ public class FirebaseResultsJsonsService {
     public static String getCurrentSdkRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
 //            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Sdk);
+            return "";
         } catch (Throwable t) {
             throw new NotFoundException("");
         }
@@ -39,6 +40,7 @@ public class FirebaseResultsJsonsService {
     public static String getCurrentEyesRequestFromFirebase(String id, String group) throws NotFoundException {
         try {
 //            return getCurrentRequestFromFirebase(id, group, FirebasePrefixStrings.Eyes);
+            return "";
         } catch (Throwable t) {
             throw new NotFoundException("");
         }

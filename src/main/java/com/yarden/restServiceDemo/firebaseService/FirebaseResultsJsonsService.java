@@ -55,12 +55,12 @@ public class FirebaseResultsJsonsService extends TimerTask {
     public static void dumpMappedRequestsToFirebase(){
         synchronized (lock) {
             for (RequestInterface request : sdkRequestMap.get().values()) {
-                Logger.info("FirebaseResultsJsonsService: sending request: " + new Gson().toJson(request));
+                Logger.info("FirebaseResultsJsonsService: sending request for sdk: " + request.getId());
                 addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
             }
             sdkRequestMap.get().clear();
             for (RequestInterface request : eyesRequestMap.get().values()) {
-                Logger.info("FirebaseResultsJsonsService: sending request: " + new Gson().toJson(request));
+                Logger.info("FirebaseResultsJsonsService: sending request for eyes: " + request.getId());
                 addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
             }
             eyesRequestMap.get().clear();
@@ -73,6 +73,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
                 if (requestMap.get().containsKey(request.getId())) {
                     request = joinRequests(request, requestMap.get().get(request.getId()));
                 }
+                Logger.info("FirebaseResultsJsonsService: adding request to queue: " + request.getId());
                 requestMap.get().put(request.getId(), request);
             } catch (NullPointerException e) {
             } catch (Throwable t) {

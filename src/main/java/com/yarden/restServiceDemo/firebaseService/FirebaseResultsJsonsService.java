@@ -49,17 +49,18 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     @Override
     public synchronized void run() {
-        Logger.info("FirebaseResultsJsonsService run");
         dumpMappedRequestsToFirebase();
     }
 
     public static void dumpMappedRequestsToFirebase(){
         synchronized (lock) {
             for (RequestInterface request : sdkRequestMap.get().values()) {
+                Logger.info("FirebaseResultsJsonsService: sending request: " + new Gson().toJson(request));
                 addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
             }
             sdkRequestMap.get().clear();
             for (RequestInterface request : eyesRequestMap.get().values()) {
+                Logger.info("FirebaseResultsJsonsService: sending request: " + new Gson().toJson(request));
                 addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
             }
             eyesRequestMap.get().clear();

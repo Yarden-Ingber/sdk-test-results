@@ -54,7 +54,9 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     public static void dumpMappedRequestsToFirebase(){
         synchronized (lock) {
+            Logger.info("1");
             for (RequestInterface request : sdkRequestMap.get().values()) {
+                Logger.info("2");
                 addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
             }
             sdkRequestMap.get().clear();
@@ -107,20 +109,25 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     private static void addRequestToFirebase(RequestInterface request, FirebasePrefixStrings fileNamePrefixInFirebase) {
+        Logger.info("3");
         if ((request.getSandbox() != null) && request.getSandbox()) {
             return;
         }
+        Logger.info("4");
         RequestInterface resultRequestJsonFromFirebase = null;
         try {
+            Logger.info("5");
             String currentRequestFromFirebase = getCurrentRequestFromFirebase(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
             resultRequestJsonFromFirebase = new Gson().fromJson(currentRequestFromFirebase, request.getClass());
             JsonArray testResultsFromFirebase = resultRequestJsonFromFirebase.getResults();
             testResultsFromFirebase.addAll(request.getResults());
             resultRequestJsonFromFirebase.setResults(testResultsFromFirebase);
         } catch (Throwable t) {
+            Logger.info("6");
             resultRequestJsonFromFirebase = request;
         }
         try {
+            Logger.info("7");
             patchFirebaseRequest(request.getId(), request.getGroup(), new Gson().toJson(resultRequestJsonFromFirebase), fileNamePrefixInFirebase);
         } catch (IOException | InterruptedException e) {
             Logger.error("FirebaseResultsJsonsService: Failed to add result to firebase");

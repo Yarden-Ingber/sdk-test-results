@@ -49,10 +49,7 @@ public class EyesSlackReporterSender {
     private void dumpResultsFromFirebaseToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.EyesSheetTabsNames group : Enums.EyesSheetTabsNames.values()) {
             try {
-                while (!FirebaseResultsJsonsService.eyesRequestQueue.get().isEmpty()) {
-                    Logger.info("EyesSlackReporterSender: waiting for firebase request queue to end");
-                    try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
-                }
+                FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
                 new EyesReportService().postResults(FirebaseResultsJsonsService.getCurrentEyesRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
                 Logger.error("EyesSlackReporterSender: Failed to dump request from firebase to sheet for group: " + group + " id: " + requestJson.getId());

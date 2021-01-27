@@ -221,13 +221,13 @@ public class RestCalls {
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");
         String timestamp = Logger.getTimaStamp();
-        String jsonWithoutWhitespace = json.replace(" ", "").replace("\n", "");
+        String jsonWithoutWhitespace = json.replace(" ", "");
         if (shouldPrintPayload) {
-            System.out.println(timestamp + " == INFO: " + "New request detected: " + request + " === payload: " + json.replace(" ", ""));
+            System.out.println(timestamp + " == INFO: " + "New request detected: " + request + " === payload: " + jsonWithoutWhitespace);
         } else {
             System.out.println(timestamp + " == INFO: " + "New request detected: " + request);
         }
-        JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + json.replace(" ", ""));
+        JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + jsonWithoutWhitespace);
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 

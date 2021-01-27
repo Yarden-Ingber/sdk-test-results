@@ -102,10 +102,7 @@ public class SdkSlackReportSender {
     private void dumpResultsFromFirebaseToSheet(SlackReportNotificationJson requestJson) throws IOException {
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             try {
-                while (!FirebaseResultsJsonsService.sdkRequestQueue.get().isEmpty()) {
-                    Logger.info("SdkSlackReportSender: waiting for firebase request queue to end");
-                    try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
-                }
+                FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
                 new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
             } catch (NotFoundException e) {
                 Logger.error("SdkSlackReportSender: Failed to dump request from firebase to sheet for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());

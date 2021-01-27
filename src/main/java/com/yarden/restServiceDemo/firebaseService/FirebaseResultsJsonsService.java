@@ -16,63 +16,77 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
 public class FirebaseResultsJsonsService extends TimerTask {
-    public static AtomicReference<LinkedList<String>> sdkRequestQueue = new AtomicReference<>();
-    public static AtomicReference<LinkedList<String>> eyesRequestQueue = new AtomicReference<>();
+    public static AtomicReference<HashMap<String, RequestInterface>> sdkRequestMap = new AtomicReference<>();
+    public static AtomicReference<HashMap<String, RequestInterface>> eyesRequestMap = new AtomicReference<>();
     private static boolean isRunning = false;
+    private static final String lock = "LOCK";
     private static Timer timer;
 
     @EventListener(ApplicationReadyEvent.class)
-    public static synchronized void start() {
-        if (!isRunning) {
-            timer = new Timer("FirebaseQueue");
-            if (sdkRequestQueue.get() == null) {
-                sdkRequestQueue.set(new LinkedList<>());
+    public static void start() {
+        synchronized (lock) {
+            if (!isRunning) {
+                timer = new Timer("FirebaseQueue");
+                if (sdkRequestMap.get() == null) {
+                    sdkRequestMap.set(new HashMap<>());
+                }
+                if (eyesRequestMap.get() == null) {
+                    eyesRequestMap.set(new HashMap<>());
+                }
+                timer.scheduleAtFixedRate(new FirebaseResultsJsonsService(), 30, 1000 * 10);
+                isRunning = true;
+                Logger.info("FirebaseQueue started");
             }
-            if (eyesRequestQueue.get() == null) {
-                eyesRequestQueue.set(new LinkedList<>());
-            }
-            timer.scheduleAtFixedRate(new FirebaseResultsJsonsService(), 30, 100);
-            isRunning = true;
-            Logger.info("FirebaseQueue started");
         }
     }
 
     @Override
     public synchronized void run() {
-        if (!sdkRequestQueue.get().isEmpty()){
-            SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(sdkRequestQueue.get().removeFirst(), SdkResultRequestJson.class);
-            addRequestToFirebase(sdkResultRequestJson, FirebasePrefixStrings.Sdk);
-            System.gc();
-        }
-        if (!eyesRequestQueue.get().isEmpty()){
-            EyesResultRequestJson eyesResultRequestJson = new Gson().fromJson(eyesRequestQueue.get().removeFirst(), EyesResultRequestJson.class);
-            addRequestToFirebase(eyesResultRequestJson, FirebasePrefixStrings.Eyes);
-            System.gc();
+        dumpMappedRequestsToFirebase();
+    }
+
+    public static void dumpMappedRequestsToFirebase(){
+        synchronized (lock) {
+            for (RequestInterface request : sdkRequestMap.get().values()) {
+                addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
+            }
+            sdkRequestMap.get().clear();
+            for (RequestInterface request : eyesRequestMap.get().values()) {
+                addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
+            }
+            eyesRequestMap.get().clear();
         }
     }
 
-    private static void addRequestToQueue(String json, AtomicReference<LinkedList<String>> requestQueue){
-        try {
-            requestQueue.get().add(json);
-        } catch (NullPointerException e) {
-        } catch (Throwable t) {
-            t.printStackTrace();
+    private static void addRequestToMap(RequestInterface request, AtomicReference<HashMap<String, RequestInterface>> requestMap){
+        synchronized (lock) {
+            try {
+                if (requestMap.get().containsKey(request.getId())) {
+                    request = joinRequests(request, requestMap.get().get(request.getId()));
+                }
+                requestMap.get().put(request.getId(), request);
+            } catch (NullPointerException e) {
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
     public static void addSdkRequestToFirebase(String json) {
-        addRequestToQueue(json, sdkRequestQueue);
+        SdkResultRequestJson request = new Gson().fromJson(json, SdkResultRequestJson.class);
+        addRequestToMap(request, sdkRequestMap);
     }
 
     public static void addEyesRequestToFirebase(String json) {
-        addRequestToQueue(json, eyesRequestQueue);
+        EyesResultRequestJson request = new Gson().fromJson(json, EyesResultRequestJson.class);
+        addRequestToMap(request, eyesRequestMap);
     }
 
     public static String getCurrentSdkRequestFromFirebase(String id, String group) throws NotFoundException {
@@ -110,6 +124,14 @@ public class FirebaseResultsJsonsService extends TimerTask {
         } catch (IOException | InterruptedException e) {
             Logger.error("FirebaseResultsJsonsService: Failed to add result to firebase");
         }
+    }
+
+    private static RequestInterface joinRequests(RequestInterface firstRequest, RequestInterface secondRequest) {
+        RequestInterface resultRequest = firstRequest;
+        JsonArray results = firstRequest.getResults();
+        results.addAll(secondRequest.getResults());
+        resultRequest.setResults(results);
+        return resultRequest;
     }
 
     private static String getResultRequestJsonFileName(String id, String group, String requestFileNamePrefix){

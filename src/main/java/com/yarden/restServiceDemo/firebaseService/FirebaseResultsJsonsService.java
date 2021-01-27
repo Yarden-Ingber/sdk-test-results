@@ -49,6 +49,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     @Override
     public synchronized void run() {
+        Logger.info("FirebaseResultsJsonsService run");
         dumpMappedRequestsToFirebase();
     }
 

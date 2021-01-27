@@ -55,12 +55,10 @@ public class FirebaseResultsJsonsService extends TimerTask {
     public static void dumpMappedRequestsToFirebase(){
         synchronized (lock) {
             for (RequestInterface request : sdkRequestMap.get().values()) {
-                Logger.info("FirebaseResultsJsonsService: sending request for sdk: " + request.getId());
                 addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
             }
             sdkRequestMap.get().clear();
             for (RequestInterface request : eyesRequestMap.get().values()) {
-                Logger.info("FirebaseResultsJsonsService: sending request for eyes: " + request.getId());
                 addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
             }
             eyesRequestMap.get().clear();
@@ -167,6 +165,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     private static void patchFirebaseRequest(String id, String group, String payload, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException {
+        Logger.info("FirebaseResultsJsonsService: sending request to firebase: " + id + "; " + group + "; " + fileNamePrefixInFirebase);
         String url = getFirebaseUrl(id, group, fileNamePrefixInFirebase);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -177,6 +176,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
                 .version(HttpClient.Version.HTTP_2)
                 .build();
         HttpResponse response = httpClient.send(request,HttpResponse.BodyHandlers.ofString());
+        Logger.info("FirebaseResultsJsonsService: response from firebase: " + response.statusCode() + "; " + response.body());
     }
 
     private static String getFirebaseUrl(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase){

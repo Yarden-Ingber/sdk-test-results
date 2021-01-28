@@ -62,10 +62,14 @@ public class FirebaseResultsJsonsService extends TimerTask {
                 addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
             }
             eyesRequestMap.get().clear();
+            System.gc();
         }
     }
 
     private static void addRequestToMap(RequestInterface request, AtomicReference<HashMap<String, RequestInterface>> requestMap){
+        if (isSandbox(request)) {
+            return;
+        }
         synchronized (lock) {
             try {
                 if (requestMap.get().containsKey(request.getId())) {
@@ -107,7 +111,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     private static void addRequestToFirebase(RequestInterface request, FirebasePrefixStrings fileNamePrefixInFirebase) {
-        if ((request.getSandbox() != null) && request.getSandbox()) {
+        if (isSandbox(request)) {
             return;
         }
         RequestInterface resultRequestJsonFromFirebase = null;
@@ -181,6 +185,10 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     private static String getFirebaseUrl(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase){
         return "https://sdk-reports.firebaseio.com/" + getResultRequestJsonFileName(id, group, fileNamePrefixInFirebase.value) + ".json";
+    }
+
+    private static boolean isSandbox(RequestInterface request) {
+        return (request.getSandbox() != null) && request.getSandbox();
     }
 
 }

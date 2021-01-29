@@ -6,7 +6,6 @@ import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
-import org.junit.Test;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -67,8 +66,7 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
                 isKpisDumped = true;
                 return true;
             }
-        }
-        if (hour != 5) {
+        } else {
             isKpisDumped = false;
         }
         return false;

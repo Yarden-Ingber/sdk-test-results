@@ -6,6 +6,7 @@ import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
+import org.junit.Test;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -26,7 +27,7 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
     public static synchronized void start() {
         if (!isRunning) {
             timer = new Timer("WriteKpisToSplunkPeriodically");
-            timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 1000 * 60 * 1);
+            timer.scheduleAtFixedRate(new WriteKpisToSplunkPeriodically(), 30, 1000 * 60 * 10);
             isRunning = true;
             Logger.info("WriteKpisToSplunkPeriodically started");
         }
@@ -60,14 +61,14 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
         calendar.setTime(date);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        if (hour == 23 && minute > 50) {
+        if (hour == 5) {
             Logger.info("WriteKpisToSplunkPeriodically: Dump window is open. Don't restart server!!!!!!!!!!!!!!");
             if (!isKpisDumped) {
                 isKpisDumped = true;
                 return true;
             }
         }
-        if (hour < 23) {
+        if (hour != 5) {
             isKpisDumped = false;
         }
         return false;

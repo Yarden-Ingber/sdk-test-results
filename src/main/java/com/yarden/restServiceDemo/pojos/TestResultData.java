@@ -27,6 +27,9 @@ public class TestResultData {
     @SerializedName("isGeneric")
     @Expose
     private Boolean isGeneric;
+    @SerializedName("isSkipped")
+    @Expose
+    private Boolean isSkipped;
 
     public String getTestName() {
         return testName;
@@ -80,8 +83,8 @@ public class TestResultData {
         this.feature_sub_category = feature_sub_category;
     }
 
-    public Boolean isGeneric() {
-        return isGeneric;
+    public boolean isGeneric() {
+        return (isGeneric != null && isGeneric);
     }
 
     public void setGeneric(Boolean generic) {
@@ -98,6 +101,15 @@ public class TestResultData {
                 ", passed=" + passed +
                 ", resultUrl='" + resultUrl + '\'' +
                 ", isGeneric=" + isGeneric +
+                ", isSkipped=" + isSkipped +
                 '}';
+    }
+
+    public boolean isSkipped() {
+        return (isSkipped != null && isSkipped);
+    }
+
+    public void setSkipped(Boolean skipped) {
+        isSkipped = skipped;
     }
 }

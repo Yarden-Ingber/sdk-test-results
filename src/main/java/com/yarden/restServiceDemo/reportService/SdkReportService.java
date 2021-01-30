@@ -77,16 +77,18 @@ public class SdkReportService {
         for (JsonElement result: resultsArray) {
             if (result != null && !result.isJsonNull()) {
                 TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
-                String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
-                String paramsString = getTestParamsAsString(testResult);
-                testName = testName + paramsString;
-                updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
+                if (!(testResult.isGeneric() && testResult.isSkipped())) {
+                    String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
+                    String paramsString = getTestParamsAsString(testResult);
+                    testName = testName + paramsString;
+                    updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
+                }
             }
         }
     }
 
     private String addGenericTestFlag(TestResultData testResult, String testName){
-        if (testResult.isGeneric() != null && testResult.isGeneric()) {
+        if (testResult.isGeneric()) {
             return testName + Enums.Strings.Generic.value;
         }
         return testName;

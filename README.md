@@ -43,6 +43,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"chrome",
         "stitching":"css"
       },
+      "isSkipped":false,
       "passed":true
     },
     {  
@@ -51,6 +52,7 @@ Send a `POST` to `/result` with the JSON payload (below) - returns a `200` and t
         "browser":"firefox",
         "stitching":"scroll"
       },
+      "isSkipped":false,
       "passed":false
     }
   ]
@@ -163,7 +165,6 @@ Send a `POST` to `/extra_test_data` with the JSON payload (below) - returns a `2
   "version":"RELEASE_CANDIDATE;Eyes.Appium@4.0.5;Eyes.Images@2.4.4",
   "changeLog":"### Fixed
                 - Updated accessibility enums (experimental).",
-  "skippedGenericTests":32,
   "testCoverageGap": "coverage gap",
   "specificRecipient":"optional_specific_mail@applitools.com"
 }

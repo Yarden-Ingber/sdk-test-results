@@ -26,6 +26,9 @@ public class SdkResultRequestJson implements RequestInterface{
     @SerializedName("mandatory")
     @Expose
     private Boolean mandatory;
+    @SerializedName("timestamp")
+    @Expose
+    private String timestamp;
 
     public String getSdk() {
         return sdk;
@@ -79,5 +82,14 @@ public class SdkResultRequestJson implements RequestInterface{
 
     public void setMandatory(Boolean mandatory) {
         this.mandatory = mandatory;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

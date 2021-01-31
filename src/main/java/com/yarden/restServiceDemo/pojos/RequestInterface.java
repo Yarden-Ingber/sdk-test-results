@@ -13,4 +13,8 @@ public interface RequestInterface {
     String getGroup();
 
     void setResults(JsonArray results);
+
+    void setTimestamp(String timestamp);
+
+
 }

@@ -20,6 +20,9 @@ public class EyesResultRequestJson implements RequestInterface{
     @SerializedName("results")
     @Expose
     private JsonArray results;
+    @SerializedName("timestamp")
+    @Expose
+    private String timestamp;
 
     public String getId() {
         if (id == null || id.isEmpty()) {
@@ -54,5 +57,14 @@ public class EyesResultRequestJson implements RequestInterface{
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

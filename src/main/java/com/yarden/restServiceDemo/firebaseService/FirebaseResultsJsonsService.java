@@ -52,6 +52,13 @@ public class FirebaseResultsJsonsService extends TimerTask {
         dumpMappedRequestsToFirebase();
     }
 
+    public static void dumpSingleRequestFromMapToFirebase(String id) {
+        synchronized (lock) {
+            addRequestToFirebase(sdkRequestMap.get().get(id), FirebasePrefixStrings.Sdk);
+            sdkRequestMap.get().remove(id);
+        }
+    }
+
     public static void dumpMappedRequestsToFirebase(){
         synchronized (lock) {
             for (RequestInterface request : sdkRequestMap.get().values()) {
@@ -125,6 +132,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
             resultRequestJsonFromFirebase = request;
         }
         try {
+            resultRequestJsonFromFirebase.setTimestamp(Logger.getTimaStamp());
             patchFirebaseRequest(request.getId(), request.getGroup(), new Gson().toJson(resultRequestJsonFromFirebase), fileNamePrefixInFirebase);
         } catch (IOException | InterruptedException e) {
             Logger.error("FirebaseResultsJsonsService: Failed to add result to firebase");

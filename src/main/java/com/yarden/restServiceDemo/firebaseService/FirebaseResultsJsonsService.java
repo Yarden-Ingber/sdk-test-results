@@ -49,13 +49,11 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     @Override
     public synchronized void run() {
-        dumpMappedRequestsToFirebase();
-    }
-
-    public static void dumpSingleRequestFromMapToFirebase(String id) {
-        synchronized (lock) {
-            addRequestToFirebase(sdkRequestMap.get().get(id), FirebasePrefixStrings.Sdk);
-            sdkRequestMap.get().remove(id);
+        try {
+            dumpMappedRequestsToFirebase();
+        } catch (Throwable t) {
+            Logger.error("FirebaseResultsJsonsService: Failed to dump requests to firebase");
+            t.printStackTrace();
         }
     }
 
@@ -192,7 +190,8 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     private static String getFirebaseUrl(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase){
-        return "https://sdk-reports.firebaseio.com/" + getResultRequestJsonFileName(id, group, fileNamePrefixInFirebase.value) + ".json";
+        return "https://sdk-reports.firebaseio.com/" + getResultRequestJsonFileName(id, group, fileNamePrefixInFirebase.value) + ".json"
+                .replace(" ", "_");
     }
 
     private static boolean isSandbox(RequestInterface request) {

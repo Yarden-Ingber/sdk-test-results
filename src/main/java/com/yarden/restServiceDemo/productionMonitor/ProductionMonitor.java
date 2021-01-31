@@ -23,10 +23,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 @Configuration
 public class ProductionMonitor extends TimerTask {
@@ -120,6 +117,7 @@ public class ProductionMonitor extends TimerTask {
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
                 }
+                productionMonitorEventJson.put("uuid", UUID.randomUUID());
                 new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
             }
         }
@@ -148,6 +146,7 @@ public class ProductionMonitor extends TimerTask {
             } else {
                 productionMonitorEventJson.put("isUp", 0);
             }
+            productionMonitorEventJson.put("uuid", UUID.randomUUID());
             new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
         }
     }

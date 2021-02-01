@@ -189,8 +189,8 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     private static String getFirebaseUrl(String id, String group, FirebasePrefixStrings fileNamePrefixInFirebase){
-        return "https://sdk-reports.firebaseio.com/" + getResultRequestJsonFileName(id, group, fileNamePrefixInFirebase.value) + ".json"
-                .replace(" ", "_");
+        String url = "https://sdk-reports.firebaseio.com/" + getResultRequestJsonFileName(id, group, fileNamePrefixInFirebase.value) + ".json";
+        return url.replace(" ", "_");
     }
 
     private static boolean isSandbox(RequestInterface request) {

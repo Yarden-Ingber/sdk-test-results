@@ -17,9 +17,9 @@ public class SdkReportService {
     private String googleSheetTabName;
     private SheetData sheetData = null;
 
-    public void postResults(String json) throws JsonSyntaxException, InternalError{
+    public void postResults(SdkResultRequestJson _sdkResultRequestJson) throws JsonSyntaxException, InternalError{
         SheetData.incrementResultsCounter();
-        sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        this.sdkResultRequestJson = _sdkResultRequestJson;
         if (sdkResultRequestJson.getGroup() == null || sdkResultRequestJson.getGroup().isEmpty()){
             throw new JsonSyntaxException("Missing group parameter in json");
         }

@@ -11,6 +11,7 @@ import com.yarden.restServiceDemo.HtmlReportGenerator;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.firebaseService.FirebaseResultsJsonsService;
 import com.yarden.restServiceDemo.mailService.MailSender;
+import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.pojos.SlackReportNotificationJson;
 import com.yarden.restServiceDemo.pojos.SlackReportData;
@@ -103,7 +104,9 @@ public class SdkSlackReportSender {
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             try {
                 FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
-                new SdkReportService().postResults(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value));
+                String json = FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value);
+                SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+                new SdkReportService().postResults(sdkResultRequestJson);
             } catch (NotFoundException e) {
                 Logger.error("SdkSlackReportSender: Failed to dump request from firebase to sheet for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
             }

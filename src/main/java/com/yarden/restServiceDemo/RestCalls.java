@@ -1,7 +1,9 @@
 package com.yarden.restServiceDemo;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.yarden.restServiceDemo.firebaseService.FirebaseResultsJsonsService;
+import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 import com.yarden.restServiceDemo.reportService.*;
 import com.yarden.restServiceDemo.slackService.EyesSlackReporterSender;
 import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
@@ -31,8 +33,9 @@ public class RestCalls {
             WriteEntireSheetsPeriodically.start();
             newRequestPrint(json, "/result", DontPrintPayload);
             try {
-                FirebaseResultsJsonsService.addSdkRequestToFirebase(json);
-                new SdkReportService().postResults(json);
+                SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+                FirebaseResultsJsonsService.addSdkRequestToFirebase(sdkResultRequestJson);
+                new SdkReportService().postResults(sdkResultRequestJson);
             } catch (InternalError e) {
                 return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (JsonSyntaxException e) {

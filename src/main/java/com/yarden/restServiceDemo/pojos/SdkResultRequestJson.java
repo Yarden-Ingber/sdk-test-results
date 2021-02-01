@@ -3,6 +3,7 @@ package com.yarden.restServiceDemo.pojos;
 import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -39,10 +40,10 @@ public class SdkResultRequestJson implements RequestInterface{
     }
 
     public String getId() {
-        if (id == null || id.isEmpty()) {
-            id = UUID.randomUUID().toString().substring(0, 6);
+        if (StringUtils.isEmpty(this.id)) {
+            setId(UUID.randomUUID().toString().substring(0, 6));
         }
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {

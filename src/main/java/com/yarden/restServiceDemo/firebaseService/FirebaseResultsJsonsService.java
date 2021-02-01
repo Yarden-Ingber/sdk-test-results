@@ -89,8 +89,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         }
     }
 
-    public static void addSdkRequestToFirebase(String json) {
-        SdkResultRequestJson request = new Gson().fromJson(json, SdkResultRequestJson.class);
+    public static void addSdkRequestToFirebase(SdkResultRequestJson request) {
         addRequestToMap(request, sdkRequestMap);
     }
 

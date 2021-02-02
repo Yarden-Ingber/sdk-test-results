@@ -15,8 +15,6 @@ import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import javassist.NotFoundException;
 import org.apache.http.impl.execchain.RequestAbortedException;
 
-import java.util.HashSet;
-
 public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTableBuilderBaseClass{
 
     public final String currentTotalTestCount;
@@ -97,7 +95,11 @@ public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTabl
         JsonArray reportSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.SDK.value, group.value)).getSheetData();
         for (JsonElement sheetEntry: reportSheet){
             if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(Enums.SdkSheetColumnNames.IDRow.value)){
-                return sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString();
+                if (sheetEntry.getAsJsonObject().get(requestJson.getSdk()) != null) {
+                    return sheetEntry.getAsJsonObject().get(requestJson.getSdk()).getAsString();
+                } else {
+                    return "";
+                }
             }
         }
         return "";

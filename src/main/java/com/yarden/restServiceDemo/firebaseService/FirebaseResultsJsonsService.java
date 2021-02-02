@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,12 +27,13 @@ public class FirebaseResultsJsonsService extends TimerTask {
     public static AtomicReference<HashMap<String, RequestInterface>> sdkRequestMap = new AtomicReference<>();
     public static AtomicReference<HashMap<String, RequestInterface>> eyesRequestMap = new AtomicReference<>();
     private static boolean isRunning = false;
-    private static final String lock = "LOCK";
+    private static final String lockQueue = "LOCK_QUEUE";
+    private static final String lockFirebaseConnection = "LOCK_FIREBASE_CONNECTION";
     private static Timer timer;
 
     @EventListener(ApplicationReadyEvent.class)
     public static void start() {
-        synchronized (lock) {
+        synchronized (lockQueue) {
             if (!isRunning) {
                 timer = new Timer("FirebaseQueue");
                 if (sdkRequestMap.get() == null) {
@@ -58,16 +60,24 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     public static void dumpMappedRequestsToFirebase(){
-        synchronized (lock) {
-            for (RequestInterface request : sdkRequestMap.get().values()) {
-                addRequestToFirebase(request, FirebasePrefixStrings.Sdk);
+        synchronizedDumpRequests(sdkRequestMap, FirebasePrefixStrings.Sdk);
+        synchronizedDumpRequests(eyesRequestMap, FirebasePrefixStrings.Eyes);
+        System.gc();
+    }
+
+    private static void synchronizedDumpRequests(AtomicReference<HashMap<String, RequestInterface>> queue, FirebasePrefixStrings prefix){
+        Set<String> queueKeys;
+        synchronized (lockQueue) {
+            queueKeys = queue.get().keySet();
+        }
+        for (String key : queueKeys) {
+            RequestInterface request;
+            synchronized (lockQueue) {
+                request = queue.get().remove(key);
             }
-            sdkRequestMap.get().clear();
-            for (RequestInterface request : eyesRequestMap.get().values()) {
-                addRequestToFirebase(request, FirebasePrefixStrings.Eyes);
+            synchronized (lockFirebaseConnection) {
+                addRequestToFirebase(request, prefix);
             }
-            eyesRequestMap.get().clear();
-            System.gc();
         }
     }
 
@@ -75,7 +85,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         if (isSandbox(request)) {
             return;
         }
-        synchronized (lock) {
+        synchronized (lockQueue) {
             try {
                 if (requestMap.get().containsKey(request.getId())) {
                     request = joinRequests(request, requestMap.get().get(request.getId()));

@@ -40,7 +40,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
                 if (eyesRequestMap.get() == null) {
                     eyesRequestMap.set(new HashMap<>());
                 }
-                timer.scheduleAtFixedRate(new FirebaseResultsJsonsService(), 30, 1000 * 15);
+                timer.scheduleAtFixedRate(new FirebaseResultsJsonsService(), 30, 1000 * 60 * 5);
                 isRunning = true;
                 Logger.info("FirebaseQueue started");
             }

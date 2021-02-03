@@ -13,6 +13,7 @@ import com.yarden.restServiceDemo.pojos.TestResultData;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
 import javassist.NotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.execchain.RequestAbortedException;
 
 public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTableBuilderBaseClass{
@@ -75,17 +76,19 @@ public class SdkReleaseEventHighLevelReportTableBuilder extends SdkHighLevelTabl
         FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
         for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
             String id = getIdForSdkByGroup(group);
-            try {
-                SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(id, group.value), SdkResultRequestJson.class);
-                JsonArray resultsArray = sdkResultRequestJson.getResults();
-                for (JsonElement result: resultsArray) {
-                    TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
-                    if (testResult.isGeneric() && testResult.isSkipped()) {
-                        count++;
+            if (StringUtils.isNotEmpty(id) && !id.equals("null")) {
+                try {
+                    SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(id, group.value), SdkResultRequestJson.class);
+                    JsonArray resultsArray = sdkResultRequestJson.getResults();
+                    for (JsonElement result : resultsArray) {
+                        TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
+                        if (testResult.isGeneric() && testResult.isSkipped()) {
+                            count++;
+                        }
                     }
+                } catch (NotFoundException e) {
+                    Logger.warn("SdkReleaseEventHighLevelReportTableBuilder: Failed to count missing generic tests for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
                 }
-            } catch (NotFoundException e) {
-                Logger.warn("SdkReleaseEventHighLevelReportTableBuilder: Failed to count missing generic tests for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
             }
         }
         return count;

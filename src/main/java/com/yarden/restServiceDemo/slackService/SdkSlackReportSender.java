@@ -101,17 +101,19 @@ public class SdkSlackReportSender {
     }
 
     private void dumpResultsFromFirebaseToSheet(SlackReportNotificationJson requestJson) throws IOException {
-        for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
-            try {
-                FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
-                String json = FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value);
-                SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
-                new SdkReportService().postResults(sdkResultRequestJson);
-            } catch (NotFoundException e) {
-                Logger.error("SdkSlackReportSender: Failed to dump request from firebase to sheet for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
+        if (StringUtils.isNotEmpty(requestJson.getId()) && !requestJson.getId().equals("null")) {
+            for (Enums.SdkGroupsSheetTabNames group : Enums.SdkGroupsSheetTabNames.values()) {
+                try {
+                    FirebaseResultsJsonsService.dumpMappedRequestsToFirebase();
+                    String json = FirebaseResultsJsonsService.getCurrentSdkRequestFromFirebase(requestJson.getId(), group.value);
+                    SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+                    new SdkReportService().postResults(sdkResultRequestJson);
+                } catch (NotFoundException e) {
+                    Logger.error("SdkSlackReportSender: Failed to dump request from firebase to sheet for sdk: " + requestJson.getSdk() + " group: " + group + " id: " + requestJson.getId());
+                }
             }
+            SheetData.writeAllTabsToSheet();
         }
-        SheetData.writeAllTabsToSheet();
     }
 
     private void sendFullRegressionSplunkEvent(SdkHighLevelFullRegressionReportTableBuilder sdkHighLevelFullRegressionReportTableBuilder){

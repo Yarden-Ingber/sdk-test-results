@@ -65,7 +65,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         System.gc();
     }
 
-    private static void synchronizedDumpRequests(AtomicReference<HashMap<String, RequestInterface>> queue, FirebasePrefixStrings prefix){
+    private static synchronized void synchronizedDumpRequests(AtomicReference<HashMap<String, RequestInterface>> queue, FirebasePrefixStrings prefix){
         Set<String> queueKeys;
         synchronized (lockQueue) {
             queueKeys = queue.get().keySet();
@@ -75,9 +75,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
             synchronized (lockQueue) {
                 request = queue.get().remove(key);
             }
-            synchronized (lockFirebaseConnection) {
-                addRequestToFirebase(request, prefix);
-            }
+            addRequestToFirebase(request, prefix);
         }
     }
 

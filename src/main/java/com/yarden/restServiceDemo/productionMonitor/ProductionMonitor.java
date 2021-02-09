@@ -84,7 +84,7 @@ public class ProductionMonitor extends TimerTask {
         for (String domainSite : domainsSitesList) {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
-            if (!(site.equals("St") || site.equals("Amazon"))) {
+            if (!(site.equals("St") || site.equals("Amazon") || site.equals("Adobe"))) {
                 domain = domain + "/api/admin/userinfo";
                 URL endpoint = new URL(domain);
                 JSONObject productionMonitorEventJson = new JSONObject();

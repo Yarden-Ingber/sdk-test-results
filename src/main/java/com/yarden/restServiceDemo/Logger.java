@@ -39,7 +39,7 @@ public class Logger {
     }
 
     public static Date timestampToDate(String timestamp) throws ParseException {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         timestamp = timestamp.substring(0,pattern.length());
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.parse(timestamp);

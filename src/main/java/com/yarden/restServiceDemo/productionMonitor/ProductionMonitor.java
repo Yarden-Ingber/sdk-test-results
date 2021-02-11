@@ -122,7 +122,7 @@ public class ProductionMonitor extends TimerTask {
             }
         }
         if (!failedEndpoints.toString().isEmpty()) {
-            sendMailNotification(failedEndpoints.toString());
+            sendEndpointMailNotification(failedEndpoints.toString());
         }
     }
 
@@ -133,25 +133,39 @@ public class ProductionMonitor extends TimerTask {
         return con;
     }
 
-    private void sendVGEvent(){
+    private void sendVGEvent() throws MailjetSocketTimeoutException, MailjetException {
+        int failedBrowsers = 0;
+        int totalBrowsers = 0;
         SheetData vgStatusSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         vgStatusSheet.getSheetData();
         for (String browser : vgStatusSheet.getColumnNames()) {
-            JSONObject productionMonitorEventJson = new JSONObject();
-            productionMonitorEventJson.put("version", VERSION);
-            productionMonitorEventJson.put("eventType", "VG");
-            productionMonitorEventJson.put("Browser", browser);
-            if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
-                productionMonitorEventJson.put("isUp", 1);
-            } else {
-                productionMonitorEventJson.put("isUp", 0);
+            if (!browser.equals(Enums.VisualGridSheetColumnNames.Timestamp.value)) {
+                totalBrowsers++;
+                JSONObject productionMonitorEventJson = new JSONObject();
+                productionMonitorEventJson.put("version", VERSION);
+                productionMonitorEventJson.put("eventType", "VG");
+                productionMonitorEventJson.put("Browser", browser);
+                if (vgStatusSheet.getSheetData().get(0).getAsJsonObject().get(browser).getAsString().equals(Enums.TestResults.Passed.value)) {
+                    productionMonitorEventJson.put("isUp", 1);
+                } else {
+                    failedBrowsers++;
+                    productionMonitorEventJson.put("isUp", 0);
+                }
+                productionMonitorEventJson.put("uuid", UUID.randomUUID());
+                new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
             }
-            productionMonitorEventJson.put("uuid", UUID.randomUUID());
-            new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
+        }
+        if ((totalBrowsers/2) < failedBrowsers) {
+            sendVGMailNotification();
         }
     }
 
-    private void sendMailNotification(String endpoint) throws MailjetSocketTimeoutException, MailjetException {
+    private void sendVGMailNotification() throws MailjetSocketTimeoutException, MailjetException {
+        JSONArray recipient = new JSONArray().put(new JSONObject().put("Email", "eyesops@applitools.com").put("Name", "Production_monitor"));
+        sendMailNotification(recipient, "Production monitor alert", "Alert that more than 50% of the browsers in the VG failed");
+    }
+
+    private void sendEndpointMailNotification(String endpoint) throws MailjetSocketTimeoutException, MailjetException {
         JSONArray recipient = new JSONArray().put(new JSONObject().put("Email", "eyesops@applitools.com").put("Name", "Production_monitor"));
         sendMailNotification(recipient, "Production monitor alert", "The GET request for endpoints: " + endpoint + " failed");
     }
@@ -170,7 +184,7 @@ public class ProductionMonitor extends TimerTask {
                                 .put(Emailv31.Message.TO, recipient)
                                 .put(Emailv31.Message.SUBJECT, subject)
                                 .put(Emailv31.Message.TEXTPART, content)
-                                .put(Emailv31.Message.CUSTOMID, "SdkRelease")));
+                                .put(Emailv31.Message.CUSTOMID, "ProductionMonitor")));
         response = client.post(request);
         Logger.info(Integer.toString(response.getStatus()));
         Logger.info(response.getData().toString());

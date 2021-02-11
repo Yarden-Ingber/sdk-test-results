@@ -128,19 +128,26 @@ public class FirebaseResultsJsonsService extends TimerTask {
         RequestInterface resultRequestJsonFromFirebase = null;
         try {
             String currentRequestFromFirebase = getCurrentRequestFromFirebase(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
-            resultRequestJsonFromFirebase = new Gson().fromJson(currentRequestFromFirebase, request.getClass());
-            JsonArray testResultsFromFirebase = resultRequestJsonFromFirebase.getResults();
-            testResultsFromFirebase.addAll(request.getResults());
-            resultRequestJsonFromFirebase.setResults(testResultsFromFirebase);
+            resultRequestJsonFromFirebase = joinRequests(resultRequestJsonFromFirebase, new Gson().fromJson(currentRequestFromFirebase, request.getClass()));
         } catch (Throwable t) {
             resultRequestJsonFromFirebase = request;
         }
         try {
+            logRequestSentToFirebase(request, fileNamePrefixInFirebase);
             resultRequestJsonFromFirebase.setTimestamp(Logger.getTimaStamp());
-            patchFirebaseRequest(request.getId(), request.getGroup(), new Gson().toJson(resultRequestJsonFromFirebase), fileNamePrefixInFirebase);
+            String jsonUrlInFirebase = getFirebaseUrl(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
+            patchFirebaseRequest(jsonUrlInFirebase, new Gson().toJson(resultRequestJsonFromFirebase));
         } catch (IOException | InterruptedException e) {
             Logger.error("FirebaseResultsJsonsService: Failed to add result to firebase");
         }
+    }
+
+    private static void logRequestSentToFirebase(RequestInterface request, FirebasePrefixStrings fileNamePrefixInFirebase){
+        String sdk = "";
+        if (request.getClass().isInstance(SdkResultRequestJson.class)) {
+            sdk = ((SdkResultRequestJson) request).getSdk();
+        }
+        Logger.info("FirebaseResultsJsonsService: sending request to firebase: " + request.getId() + "; " + request.getGroup() + "; " + fileNamePrefixInFirebase + "; " + sdk);
     }
 
     private static RequestInterface joinRequests(RequestInterface firstRequest, RequestInterface secondRequest) {
@@ -180,9 +187,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         return result;
     }
 
-    private static void patchFirebaseRequest(String id, String group, String payload, FirebasePrefixStrings fileNamePrefixInFirebase) throws IOException, InterruptedException {
-        Logger.info("FirebaseResultsJsonsService: sending request to firebase: " + id + "; " + group + "; " + fileNamePrefixInFirebase);
-        String url = getFirebaseUrl(id, group, fileNamePrefixInFirebase);
+    private static void patchFirebaseRequest(String url, String payload) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(payload))

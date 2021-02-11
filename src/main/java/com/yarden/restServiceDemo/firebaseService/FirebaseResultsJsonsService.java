@@ -128,7 +128,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         RequestInterface resultRequestJsonFromFirebase = null;
         try {
             String currentRequestFromFirebase = getCurrentRequestFromFirebase(request.getId(), request.getGroup(), fileNamePrefixInFirebase);
-            resultRequestJsonFromFirebase = joinRequests(resultRequestJsonFromFirebase, new Gson().fromJson(currentRequestFromFirebase, request.getClass()));
+            resultRequestJsonFromFirebase = joinRequests(request, new Gson().fromJson(currentRequestFromFirebase, request.getClass()));
         } catch (Throwable t) {
             resultRequestJsonFromFirebase = request;
         }

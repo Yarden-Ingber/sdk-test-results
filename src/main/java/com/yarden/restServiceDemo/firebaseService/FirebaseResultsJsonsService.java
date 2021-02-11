@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
 public class FirebaseResultsJsonsService extends TimerTask {
-    public static AtomicReference<HashMap<String, RequestInterface>> sdkRequestMap = new AtomicReference<>();
-    public static AtomicReference<HashMap<String, RequestInterface>> eyesRequestMap = new AtomicReference<>();
+    private static AtomicReference<HashMap<String, RequestInterface>> sdkRequestMap = new AtomicReference<>();
+    private static AtomicReference<HashMap<String, RequestInterface>> eyesRequestMap = new AtomicReference<>();
     private static boolean isRunning = false;
     private static final String lockQueue = "LOCK_QUEUE";
     private static final String lockFirebaseConnection = "LOCK_FIREBASE_CONNECTION";
@@ -78,7 +78,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         }
     }
 
-    private static void addRequestToMap(RequestInterface request, AtomicReference<HashMap<String, RequestInterface>> requestMap){
+    private static void addRequestToMap(RequestInterface request, AtomicReference<HashMap<String, RequestInterface>> requestMap, FirebasePrefixStrings fileNamePrefixInFirebase){
         if (isSandbox(request)) {
             return;
         }
@@ -88,7 +88,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
                     request = joinRequests(request, requestMap.get().get(request.getId()));
                 }
                 Logger.info("FirebaseResultsJsonsService: adding request to queue: " + request.getId());
-                requestMap.get().put(request.getId(), request);
+                requestMap.get().put(getResultRequestJsonFileName(request.getId(), request.getGroup(), fileNamePrefixInFirebase.value), request);
             } catch (NullPointerException e) {
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -97,12 +97,12 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     public static void addSdkRequestToFirebase(SdkResultRequestJson request) {
-        addRequestToMap(request, sdkRequestMap);
+        addRequestToMap(request, sdkRequestMap, FirebasePrefixStrings.Sdk);
     }
 
     public static void addEyesRequestToFirebase(String json) {
         EyesResultRequestJson request = new Gson().fromJson(json, EyesResultRequestJson.class);
-        addRequestToMap(request, eyesRequestMap);
+        addRequestToMap(request, eyesRequestMap, FirebasePrefixStrings.Eyes);
     }
 
     public static String getCurrentSdkRequestFromFirebase(String id, String group) throws NotFoundException {

@@ -16,10 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Configuration
@@ -67,9 +64,9 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     private static synchronized void synchronizedDumpRequests(AtomicReference<HashMap<String, RequestInterface>> queue, FirebasePrefixStrings prefix){
         synchronized (lockFirebaseConnection) {
-            Set<String> queueKeys;
+            Set<String> queueKeys = new HashSet<>();
             synchronized (lockQueue) {
-                queueKeys = queue.get().keySet();
+                queueKeys.addAll(queue.get().keySet());
             }
             for (String key : queueKeys) {
                 RequestInterface request;

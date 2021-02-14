@@ -79,6 +79,7 @@ public class SplunkReporter extends TimerTask {
             if (!reportQueue.get().isEmpty()) {
                 System.out.println("SplunkReporter: reporting splunk");
                 SplunkReportObject reportObject = reportQueue.get().removeFirst();
+                System.out.println("SplunkReporter: reportObject: " + reportObject);
                 Args args = new Args();
                 args.add("sourcetype", reportObject.sourcetype.value);
                 try {

@@ -2,8 +2,6 @@ package com.yarden.restServiceDemo.splunkService;
 
 import com.splunk.*;
 import com.yarden.restServiceDemo.Enums;
-import com.yarden.restServiceDemo.Logger;
-import com.yarden.restServiceDemo.kpis.WriteKpisToSplunkPeriodically;
 import org.apache.commons.io.IOUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
@@ -34,9 +32,9 @@ public class SplunkReporter extends TimerTask {
             if (reportQueue.get() == null) {
                 reportQueue.set(new LinkedList<>());
             }
-            timer.scheduleAtFixedRate(new SplunkReporter(), 30, 500);
+            timer.scheduleAtFixedRate(new SplunkReporter(), 30, 50);
             isRunning = true;
-            Logger.info("SplunkReportQueue started");
+            System.out.println("SplunkReportQueue started");
         }
     }
 
@@ -79,11 +77,13 @@ public class SplunkReporter extends TimerTask {
     public void run() {
         synchronized (lock) {
             if (!reportQueue.get().isEmpty()) {
+                System.out.println("SplunkReporter: reporting splunk");
                 SplunkReportObject reportObject = reportQueue.get().removeFirst();
                 Args args = new Args();
                 args.add("sourcetype", reportObject.sourcetype.value);
                 try {
                     getReceiver().log("qualityevents", args, reportObject.json);
+                    System.out.println("SplunkReporter: reported");
                 } catch (Throwable t) {
                     System.out.println("Retrying splunk log");
                     try {

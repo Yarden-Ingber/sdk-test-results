@@ -77,21 +77,18 @@ public class SplunkReporter extends TimerTask {
     public void run() {
         synchronized (lock) {
             if (!reportQueue.get().isEmpty()) {
-                System.out.println("SplunkReporter: reporting splunk");
                 SplunkReportObject reportObject = reportQueue.get().removeFirst();
-                System.out.println("SplunkReporter: reportObject: " + reportObject.json);
                 Args args = new Args();
                 args.add("sourcetype", reportObject.sourcetype.value);
                 try {
                     getReceiver().log("qualityevents", args, reportObject.json);
-                    System.out.println("SplunkReporter: reported");
                 } catch (Throwable t) {
-                    System.out.println("Retrying splunk log");
+                    System.out.println("SplunkReporter: Retrying splunk log");
                     try {
                         resetSplunkConnection();
                         getReceiver().log("qualityevents", args, reportObject.json);
                     } catch (Throwable t2) {
-                        System.out.println("Failed logging to splunk: " + reportObject.json);
+                        System.out.println("SplunkReporter: Failed logging to splunk: " + reportObject.json);
                     }
                 }
             }

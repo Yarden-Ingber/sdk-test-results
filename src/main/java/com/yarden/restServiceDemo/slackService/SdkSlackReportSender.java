@@ -70,6 +70,7 @@ public class SdkSlackReportSender {
         slackReportData.setReportTextPart(slackReportData.getReportTextPart() +
                 "<br>" + sdkReleaseEventHighLevelReportTableBuilder.getHighLevelReportTable());
         new MailSender().send(slackReportData);
+        sendMissingRegressionTestsSplunkEvent(sdkReleaseEventHighLevelReportTableBuilder);
     }
 
     public void sendFullRegression(String json) throws MailjetSocketTimeoutException, MailjetException, IOException {
@@ -124,6 +125,18 @@ public class SdkSlackReportSender {
         splunkEventJson.put("failedTests", Integer.parseInt(sdkHighLevelFullRegressionReportTableBuilder.currentFailedTestsCount));
         splunkEventJson.put("missingTests", Integer.parseInt(sdkHighLevelFullRegressionReportTableBuilder.currentMissingTestsCount));
         new SplunkReporter().report(Enums.SplunkSourceTypes.FullCoverageReport, splunkEventJson.toString());
+    }
+
+    private void sendMissingRegressionTestsSplunkEvent(SdkReleaseEventHighLevelReportTableBuilder sdkReleaseEventHighLevelReportTableBuilder){
+        JSONObject splunkEventJson = new JSONObject();
+        splunkEventJson.put("version", 1);
+        splunkEventJson.put("sdk", sdk);
+        splunkEventJson.put("version", version);
+        splunkEventJson.put("missingGenericTests", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentUnexecutedGenericTestCount));
+        splunkEventJson.put("totalTestCount", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentTotalTestCount));
+        splunkEventJson.put("genericTestCount", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentGenericTestCount));
+        splunkEventJson.put("specificTestCount", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentSpecificTestCount));
+        new SplunkReporter().report(Enums.SplunkSourceTypes.SdkReleaseEvent, splunkEventJson.toString());
     }
 
     private String getVersion(){

@@ -234,6 +234,7 @@ public class RestCalls {
         JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + jsonWithoutWhitespace);
         Logger.info("debug: newRequestPrint 2");
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
+        Logger.info("debug: newRequestPrint 3");
     }
 
 

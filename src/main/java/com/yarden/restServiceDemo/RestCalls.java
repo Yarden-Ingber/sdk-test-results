@@ -230,7 +230,9 @@ public class RestCalls {
         } else {
             System.out.println(timestamp + " == INFO: " + "New request detected: " + request);
         }
+        Logger.info("debug: newRequestPrint 1");
         JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + jsonWithoutWhitespace);
+        Logger.info("debug: newRequestPrint 2");
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
     }
 

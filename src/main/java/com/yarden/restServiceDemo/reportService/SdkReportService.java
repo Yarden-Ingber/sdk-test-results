@@ -166,7 +166,7 @@ public class SdkReportService {
         String testResult = passed ? Enums.TestResults.Passed.value : Enums.TestResults.Failed.value;
         for (JsonElement sheetEntry: sheetData.getSheetData()){
             if (sheetEntry.getAsJsonObject().get(Enums.SdkSheetColumnNames.TestName.value).getAsString().equals(testName)){
-                if (!isSandbox()) {
+                if (!isSandbox(sdkResultRequestJson)) {
 //                    Logger.info("Adding test result for sdk: " + sdk + ", " + testName + "=" + testResult);
                 }
                 sheetEntry.getAsJsonObject().addProperty(sdk, testResult);
@@ -193,7 +193,7 @@ public class SdkReportService {
     }
 
     private void deleteEntireSdkExtraDataColumn(String sdk) {
-        if (isSandbox()) {
+        if (isSandbox(sdkResultRequestJson)) {
             for (JsonElement sheetEntry: sheetData.getSheetData()){
                 sheetEntry.getAsJsonObject().addProperty(sdk + Enums.SdkSheetColumnNames.ExtraData.value, "");
             }
@@ -258,18 +258,18 @@ public class SdkReportService {
 
     private void setGoogleSheetTabName(){
         googleSheetTabName = sdkResultRequestJson.getGroup();
-        if (isSandbox()) {
+        if (isSandbox(sdkResultRequestJson)) {
             googleSheetTabName = Enums.SdkGeneralSheetTabsNames.Sandbox.value;
         }
         Logger.info("Posting result to sheet: " + googleSheetTabName);
     }
 
-    private boolean isSandbox(){
+    public static boolean isSandbox(SdkResultRequestJson sdkResultRequestJson){
         return (((sdkResultRequestJson.getSandbox() != null) && sdkResultRequestJson.getSandbox())
-                || isTestedLocally());
+                || isTestedLocally(sdkResultRequestJson));
     }
 
-    private boolean isTestedLocally(){
+    private static boolean isTestedLocally(SdkResultRequestJson sdkResultRequestJson){
         return sdkResultRequestJson.getId().equals("0000-0000") || sdkResultRequestJson.getId().equals("aaaa-aaaa");
     }
 

@@ -10,6 +10,7 @@ import com.yarden.restServiceDemo.slackService.NonTestTableSlackReportSender;
 import com.yarden.restServiceDemo.slackService.SdkSlackReportSender;
 import com.yarden.restServiceDemo.splunkService.SplunkReporter;
 import org.json.JSONObject;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,9 @@ public class RestCalls {
             newRequestPrint(json, "/result", DontPrintPayload);
             try {
                 SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+                if (!SdkReportService.isSandbox(sdkResultRequestJson)) {
+                    Logger.info("Non sandbox request: " + json.replace(" ", ""));
+                }
                 FirebaseResultsJsonsService.addSdkRequestToFirebase(sdkResultRequestJson);
                 new SdkReportService().postResults(sdkResultRequestJson);
             } catch (InternalError e) {
@@ -230,11 +234,8 @@ public class RestCalls {
         } else {
             System.out.println(timestamp + " == INFO: " + "New request detected: " + request);
         }
-        Logger.info("debug: newRequestPrint 1");
         JSONObject log = new JSONObject().put("level", "info").put("text", timestamp + " == New request detected: " + request + " === payload: " + jsonWithoutWhitespace);
-        Logger.info("debug: newRequestPrint 2");
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawServerLog, log.toString());
-        Logger.info("debug: newRequestPrint 3");
     }
 
 

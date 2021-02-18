@@ -78,10 +78,15 @@ public class SdkReportService {
             if (result != null && !result.isJsonNull()) {
                 TestResultData testResult = new Gson().fromJson(result, TestResultData.class);
                 if (!(testResult.isGeneric() && testResult.isSkipped())) {
-                    String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
-                    String paramsString = getTestParamsAsString(testResult);
-                    testName = testName + paramsString;
-                    updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
+                    try {
+                        String testName = addGenericTestFlag(testResult, capitalize(testResult.getTestName()));
+                        String paramsString = getTestParamsAsString(testResult);
+                        testName = testName + paramsString;
+                        updateSingleTestResult(sdkResultRequestJson.getSdk(), testName, testResult.getPassed());
+                    } catch (Exception e) {
+                        Logger.error("Failed to add a test result: TestName=" + testResult.getTestName() + "; " + " Parameters=" + testResult.getParameters().toString());
+                        e.printStackTrace();
+                    }
                 }
             }
         }

@@ -37,6 +37,8 @@ public class RestCalls {
                 SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
                 if (!SdkReportService.isSandbox(sdkResultRequestJson)) {
                     Logger.info("Non sandbox request: " + json.replace(" ", ""));
+                } else {
+                    Logger.info("sandbox request: sdk=" + sdkResultRequestJson.getSdk() + "; id=" + sdkResultRequestJson.getId() + "; isSandbox=" + sdkResultRequestJson.getSandbox() + "; group=" + sdkResultRequestJson.getGroup());
                 }
                 FirebaseResultsJsonsService.addSdkRequestToFirebase(sdkResultRequestJson);
                 new SdkReportService().postResults(sdkResultRequestJson);

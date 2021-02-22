@@ -62,7 +62,11 @@ public class RepoMonitor extends TimerTask{
         List<String> npmPublicPackagesNames = getAllNpmPublicPackagesNames();
         List<String> knownPublicPackages = getKnownPublicNpmPackages();
         if (!areListsEqual(npmPublicPackagesNames, knownPublicPackages)) {
-            sendMailWarning("NPM", findNewPackageName(knownPublicPackages, npmPublicPackagesNames));
+            npmPublicPackagesNames = getAllNpmPublicPackagesNames();
+            knownPublicPackages = getKnownPublicNpmPackages();
+            if (!areListsEqual(npmPublicPackagesNames, knownPublicPackages)) {
+                sendMailWarning("NPM", findNewPackageName(knownPublicPackages, npmPublicPackagesNames));
+            }
         } else {
             Logger.info("RepoMonitor: No changes in NPM packages");
         }

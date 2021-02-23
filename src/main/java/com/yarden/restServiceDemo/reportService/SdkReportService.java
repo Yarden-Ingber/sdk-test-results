@@ -125,10 +125,14 @@ public class SdkReportService {
 
     private void deleteColumnForNewTestId(){
         String currentColumnId = getCurrentColumnId(sdkResultRequestJson.getSdk());
-        Logger.info("Current id in sheet for sdk " + sdkResultRequestJson.getSdk() + " is: " + currentColumnId);
-        Logger.info("New requested id for sdk " + sdkResultRequestJson.getSdk() + " is: " + sdkResultRequestJson.getId());
+        if (!isSandbox(sdkResultRequestJson)) {
+            Logger.info("Current id in sheet for sdk " + sdkResultRequestJson.getSdk() + " is: " + currentColumnId);
+            Logger.info("New requested id for sdk " + sdkResultRequestJson.getSdk() + " is: " + sdkResultRequestJson.getId());
+        }
         if (!sdkResultRequestJson.getId().equals(currentColumnId)){
-            Logger.info("Updating id for sdk: " + sdkResultRequestJson.getSdk());
+            if (!isSandbox(sdkResultRequestJson)) {
+                Logger.info("Updating id for sdk: " + sdkResultRequestJson.getSdk());
+            }
             deleteEntireSdkColumn(sdkResultRequestJson.getSdk());
             updateTestResultId(sdkResultRequestJson.getSdk(), sdkResultRequestJson.getId());
         }
@@ -265,8 +269,9 @@ public class SdkReportService {
         googleSheetTabName = sdkResultRequestJson.getGroup();
         if (isSandbox(sdkResultRequestJson)) {
             googleSheetTabName = Enums.SdkGeneralSheetTabsNames.Sandbox.value;
+        } else {
+            Logger.info("Posting result to sheet: " + googleSheetTabName);
         }
-        Logger.info("Posting result to sheet: " + googleSheetTabName);
     }
 
     public static boolean isSandbox(SdkResultRequestJson sdkResultRequestJson){

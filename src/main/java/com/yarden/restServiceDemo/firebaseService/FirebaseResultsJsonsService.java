@@ -226,11 +226,11 @@ public class FirebaseResultsJsonsService extends TimerTask {
         }
         InputStream inputStream = null;
         String json = null;
-        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/request1.txt");
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/testResources/request1.txt");
         json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
         SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
         addSdkRequestToFirebase(sdkResultRequestJson);
-        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/request2.txt");
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/testResources/request2.txt");
         json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
         sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
         addSdkRequestToFirebase(sdkResultRequestJson);

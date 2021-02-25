@@ -72,7 +72,9 @@ public class SdkReportService {
     }
 
     private void updateSheetWithNewResults(){
-        Logger.info("Updating results in local cached sheet");
+        if (!isSandbox(sdkResultRequestJson)) {
+            Logger.info("Updating results in local cached sheet");
+        }
         JsonArray resultsArray = sdkResultRequestJson.getResults();
         for (JsonElement result: resultsArray) {
             if (result != null && !result.isJsonNull()) {

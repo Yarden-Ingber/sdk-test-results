@@ -6,12 +6,13 @@ import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.kpis.TicketStates;
 import com.yarden.restServiceDemo.reportService.SheetData;
 import com.yarden.restServiceDemo.reportService.SheetTabIdentifier;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class KpiCalculator {
@@ -20,7 +21,6 @@ public class KpiCalculator {
     private SheetData kpiSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.KPIs.value));
     private KpiSheetEntries kpiSheetEntries = new KpiSheetEntries();
 
-    @Test
     public void buildKpisSheet() throws IOException {
         calculate();
         dumpKpisToSheet();

@@ -7,15 +7,20 @@ import com.yarden.restServiceDemo.pojos.EyesResultRequestJson;
 import com.yarden.restServiceDemo.pojos.RequestInterface;
 import com.yarden.restServiceDemo.pojos.SdkResultRequestJson;
 import javassist.NotFoundException;
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -82,13 +87,14 @@ public class FirebaseResultsJsonsService extends TimerTask {
         if (isSandbox(request)) {
             return;
         }
+        String requestMapKey = getResultRequestJsonFileName(request.getId(), request.getGroup(), fileNamePrefixInFirebase.value);
         synchronized (lockQueue) {
             try {
-                if (requestMap.get().containsKey(request.getId())) {
-                    request = joinRequests(request, requestMap.get().get(request.getId()));
+                if (requestMap.get().containsKey(requestMapKey)) {
+                    request = joinRequests(request, requestMap.get().get(requestMapKey));
                 }
                 Logger.info("FirebaseResultsJsonsService: adding request to queue: " + request.getId());
-                requestMap.get().put(getResultRequestJsonFileName(request.getId(), request.getGroup(), fileNamePrefixInFirebase.value), request);
+                requestMap.get().put(requestMapKey, request);
             } catch (NullPointerException e) {
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -207,6 +213,31 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     private static boolean isSandbox(RequestInterface request) {
         return (request.getSandbox() != null) && request.getSandbox();
+    }
+
+    @Test
+    public void testClass() throws IOException {
+        testAddingMultipleRequestsToFirebase();
+    }
+
+    private void testAddingMultipleRequestsToFirebase() throws IOException {
+        if (sdkRequestMap.get() == null) {
+            sdkRequestMap.set(new HashMap<>());
+        }
+        InputStream inputStream = null;
+        String json = null;
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/request1.txt");
+        json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        addSdkRequestToFirebase(sdkResultRequestJson);
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/request2.txt");
+        json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        addSdkRequestToFirebase(sdkResultRequestJson);
+        String key = (String)sdkRequestMap.get().keySet().toArray()[0];
+        Assert.assertTrue(sdkRequestMap.get().get(key).getResults().size() == 337);
+        sdkRequestMap.get().clear();
+        sdkRequestMap = null;
     }
 
 }

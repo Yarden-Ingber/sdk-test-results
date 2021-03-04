@@ -216,7 +216,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
     }
 
     @Test
-    public void testClass() throws IOException {
+    public void unitTests() throws IOException {
         testAddingMultipleRequestsToFirebase();
     }
 

@@ -138,6 +138,7 @@ public class ProductionMonitor extends TimerTask {
         int totalBrowsers = 0;
         SheetData vgStatusSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         vgStatusSheet.getSheetData();
+        String uuid = UUID.randomUUID().toString();
         for (String browser : vgStatusSheet.getColumnNames()) {
             if (!browser.equals(Enums.VisualGridSheetColumnNames.Timestamp.value)) {
                 totalBrowsers++;
@@ -151,7 +152,7 @@ public class ProductionMonitor extends TimerTask {
                     failedBrowsers++;
                     productionMonitorEventJson.put("isUp", 0);
                 }
-                productionMonitorEventJson.put("uuid", UUID.randomUUID());
+                productionMonitorEventJson.put("uuid", uuid);
                 new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
             }
         }

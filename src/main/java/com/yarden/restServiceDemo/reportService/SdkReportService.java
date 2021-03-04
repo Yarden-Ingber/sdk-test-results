@@ -116,8 +116,12 @@ public class SdkReportService {
                 try {
                     value = param.getValue().getAsString();
                 } catch (Exception e) {
-                    Logger.error("Failed to get a test parameter: (" + key + ":" + param.getValue().toString() + ") for test " + testResult.getTestName());
-                    e.printStackTrace();
+                    try {
+                        value = param.getValue().toString();
+                    } catch (Exception ex) {
+                        Logger.error("Failed to get a test parameter: (" + key + ":" + param.getValue() + ") for test " + testResult.getTestName());
+                        ex.printStackTrace();
+                    }
                 }
             }
             paramsString.append("(").append(capitalize(key)).append(":").append(capitalize(value)).append(") ");

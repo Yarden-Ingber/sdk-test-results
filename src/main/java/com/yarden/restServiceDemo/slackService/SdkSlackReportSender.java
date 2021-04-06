@@ -131,7 +131,7 @@ public class SdkSlackReportSender {
         JSONObject splunkEventJson = new JSONObject();
         splunkEventJson.put("version", 1);
         splunkEventJson.put("sdk", sdk);
-        splunkEventJson.put("version", version);
+        splunkEventJson.put("sdkVersion", version);
         splunkEventJson.put("missingGenericTests", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentUnexecutedGenericTestCount));
         splunkEventJson.put("totalTestCount", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentTotalTestCount));
         splunkEventJson.put("genericTestCount", Integer.parseInt(sdkReleaseEventHighLevelReportTableBuilder.currentGenericTestCount));

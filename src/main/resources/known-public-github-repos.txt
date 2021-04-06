@@ -173,6 +173,5 @@ netlify-plugin-visual-diff
 tutorial-images-javascript
 tutorial-storybook-csf-react
 karate_imagesdk_example
-automation-recipes
 the-kitchen
 automation-cookbook

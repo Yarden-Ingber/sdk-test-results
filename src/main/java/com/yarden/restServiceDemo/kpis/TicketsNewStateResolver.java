@@ -196,7 +196,9 @@ public class TicketsNewStateResolver {
             return TicketStates.New;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for R&D")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to reproduce")) {
+        } else if (request.getCurrent_trello_list().equalsIgnoreCase("Not an issue")) {
+            return TicketStates.WaitingForRD;
+        }else if (request.getCurrent_trello_list().equalsIgnoreCase("Trying to reproduce")) {
             return TicketStates.TryingToReproduce;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Doing")) {
             return TicketStates.Doing;

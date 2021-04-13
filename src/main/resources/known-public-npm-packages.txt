@@ -45,3 +45,4 @@
 @applitools/driver
 @applitools/screenshoter
 @applitools/utils
+@applitools/logger

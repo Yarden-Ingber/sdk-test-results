@@ -46,3 +46,4 @@
 @applitools/screenshoter
 @applitools/utils
 @applitools/logger
+@applitools/eyes-api

@@ -20,6 +20,8 @@ import com.yarden.restServiceDemo.reportService.SdkReportService;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Test;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -82,22 +84,28 @@ public class RepoMonitor extends TimerTask{
         }
     }
 
-    private String findNewPackageName(List<String> knownList, List<String> receivedList) {
+    private PackageDifference findNewPackageName(List<String> knownList, List<String> receivedList) {
         for (String packageName : receivedList) {
             if (!knownList.contains(packageName)) {
-                return packageName + ", is public but doesn't exist in the known list of public packages";
+                PackageDifference result = new PackageDifference();
+                result.packageName = packageName;
+                result.WarningMessage = packageName + ", is public but doesn't exist in the known list of public packages";
+                return result;
             }
         }
         for (String packageName : knownList) {
             if (!receivedList.contains(packageName)) {
-                return packageName + ", was public but not any more";
+                PackageDifference result = new PackageDifference();
+                result.packageName = packageName;
+                result.WarningMessage = packageName + ", was public but not any more";
+                return result;
             }
         }
-        return "";
+        return new PackageDifference();
     }
 
-    private void sendMailWarning(String codeManagerName, String packageDifferenceMessage) throws MailjetSocketTimeoutException, MailjetException {
-        Logger.warn("RepoMonitor: A difference in repo\\package was discovered in " + codeManagerName + ": " + packageDifferenceMessage);
+    private void sendMailWarning(String codeManagerName, PackageDifference packageDifference) throws MailjetSocketTimeoutException, MailjetException {
+        Logger.warn("RepoMonitor: A difference in repo\\package was discovered in " + codeManagerName + ": " + packageDifference.WarningMessage);
         MailjetClient client;
         MailjetRequest request;
         MailjetResponse response;
@@ -125,8 +133,8 @@ public class RepoMonitor extends TimerTask{
                                                 .put("Email", "amit.zur@applitools.com")
                                                 .put("Name", "Amit Zur"))
                                 )
-                                .put(Emailv31.Message.SUBJECT, "WARNING!! Public package difference found in " + codeManagerName)
-                                .put(Emailv31.Message.TEXTPART, "A difference in the expected public packages list found in " + codeManagerName + ". package name: " + packageDifferenceMessage)
+                                .put(Emailv31.Message.SUBJECT, "WARNING!! Public package difference found in " + codeManagerName + ": " + packageDifference.packageName)
+                                .put(Emailv31.Message.TEXTPART, "A difference in the expected public packages list found in " + codeManagerName + ". package name: " + packageDifference.WarningMessage)
                                 .put(Emailv31.Message.CUSTOMID, "RepoMonitor")));
         response = client.post(request);
         Logger.info("RepoMonitor: " + response.getStatus());
@@ -177,6 +185,22 @@ public class RepoMonitor extends TimerTask{
 
     private boolean areListsEqual(List list1, List list2){
         return new HashSet<>(list1).equals(new HashSet<>(list2));
+    }
+
+    private class PackageDifference {
+
+        public String packageName = "";
+        public String WarningMessage = "";
+
+    }
+
+    @Test
+    public void test() throws IOException {
+        List<String> knownPublicPackages = getKnownPublicGithubRepos();
+        List<String> repoNames = getPublicGithubRepoNames();
+        repoNames.add("false package");
+        PackageDifference packageDifference = findNewPackageName(knownPublicPackages, repoNames);
+        Assert.assertFalse(packageDifference.packageName.isEmpty());
     }
 
 }

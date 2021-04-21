@@ -175,3 +175,4 @@ tutorial-storybook-csf-react
 karate_imagesdk_example
 the-kitchen
 automation-cookbook
+Applitools-Webdriverio-GithubActions

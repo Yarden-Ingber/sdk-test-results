@@ -195,12 +195,15 @@ public class RepoMonitor extends TimerTask{
     }
 
     @Test
-    public void test() throws IOException {
+    public void unitTests() throws IOException {
         List<String> knownPublicPackages = getKnownPublicGithubRepos();
-        List<String> repoNames = getPublicGithubRepoNames();
+        List<String> repoNames = new LinkedList<>();
+        for (String repo : knownPublicPackages) {
+            repoNames.add(repo);
+        }
         repoNames.add("false package");
         PackageDifference packageDifference = findNewPackageName(knownPublicPackages, repoNames);
-        Assert.assertFalse(packageDifference.packageName.isEmpty());
+        Assert.assertEquals("false package", packageDifference.packageName);
     }
 
 }

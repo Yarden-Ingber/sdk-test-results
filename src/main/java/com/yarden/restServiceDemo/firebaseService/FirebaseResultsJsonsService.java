@@ -91,7 +91,7 @@ public class FirebaseResultsJsonsService extends TimerTask {
         synchronized (lockQueue) {
             try {
                 if (requestMap.get().containsKey(requestMapKey)) {
-                    request = joinRequests(request, requestMap.get().get(requestMapKey));
+                    request = joinRequests(requestMap.get().get(requestMapKey), request);
                 }
                 Logger.info("FirebaseResultsJsonsService: adding request to queue: " + request.getId());
                 requestMap.get().put(requestMapKey, request);
@@ -217,10 +217,11 @@ public class FirebaseResultsJsonsService extends TimerTask {
 
     @Test
     public void unitTests() throws IOException {
-        testAddingMultipleRequestsToFirebase();
+        testAddingMultipleRequestsToFirebaseResultsInCorrectResultSize();
+        testAddingMultipleRequestsToFirebaseResultsInCorrectRequestBody();
     }
 
-    private void testAddingMultipleRequestsToFirebase() throws IOException {
+    private void testAddingMultipleRequestsToFirebaseResultsInCorrectResultSize() throws IOException {
         if (sdkRequestMap.get() == null) {
             sdkRequestMap.set(new HashMap<>());
         }
@@ -237,7 +238,27 @@ public class FirebaseResultsJsonsService extends TimerTask {
         String key = (String)sdkRequestMap.get().keySet().toArray()[0];
         Assert.assertTrue(sdkRequestMap.get().get(key).getResults().size() == 337);
         sdkRequestMap.get().clear();
-        sdkRequestMap = null;
+    }
+
+    private void testAddingMultipleRequestsToFirebaseResultsInCorrectRequestBody() throws IOException {
+        if (sdkRequestMap.get() == null) {
+            sdkRequestMap.set(new HashMap<>());
+        }
+        InputStream inputStream = null;
+        String json = null;
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/testResources/request3.txt");
+        json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        SdkResultRequestJson sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        addSdkRequestToFirebase(sdkResultRequestJson);
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/testResources/request4.txt");
+        json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        sdkResultRequestJson = new Gson().fromJson(json, SdkResultRequestJson.class);
+        addSdkRequestToFirebase(sdkResultRequestJson);
+        String key = (String)sdkRequestMap.get().keySet().toArray()[0];
+        inputStream = FirebaseResultsJsonsService.class.getResourceAsStream("/testResources/resultRequestAfterJoin.txt");
+        json = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        Assert.assertEquals(json, new Gson().toJson(sdkRequestMap.get().get(key)));
+        sdkRequestMap.get().clear();
     }
 
 }

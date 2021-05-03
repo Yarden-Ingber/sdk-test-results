@@ -1,0 +1,1 @@
+{"group":"appium","sdk":"dotnet","id":"40d62d5-1465","sandbox":false,"results":[{"test_name":"Appium_iOS_CheckWindow","parameters":{},"passed":true}]}

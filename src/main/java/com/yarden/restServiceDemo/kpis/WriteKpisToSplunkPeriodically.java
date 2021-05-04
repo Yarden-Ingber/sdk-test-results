@@ -43,7 +43,9 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
             synchronized (RestCalls.lock) {
                 try {
                     if (shouldDumpTickets()) {
+                        Logger.info("WriteKpisToSplunkPeriodically: Starting KPI dump");
                         periodicDumpTickets();
+                        Logger.info("WriteKpisToSplunkPeriodically: KPI dump ended");
                     }
                 } catch (Throwable t) {
                     t.printStackTrace();

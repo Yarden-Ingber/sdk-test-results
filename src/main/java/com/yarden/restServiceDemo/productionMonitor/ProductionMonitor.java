@@ -117,7 +117,7 @@ public class ProductionMonitor extends TimerTask {
                     productionMonitorEventJson.put("isUp", 0);
                     failedEndpoints.append(site).append(";");
                 }
-                productionMonitorEventJson.put("uuid", UUID.randomUUID());
+                productionMonitorEventJson.put("uuid", UUID.randomUUID().toString().substring(0, 8));
                 new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
             }
         }
@@ -138,7 +138,7 @@ public class ProductionMonitor extends TimerTask {
         int totalBrowsers = 0;
         SheetData vgStatusSheet = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.VisualGrid.value, Enums.VisualGridSheetTabsNames.Status.value));
         vgStatusSheet.getSheetData();
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString().substring(0, 8);
         for (String browser : vgStatusSheet.getColumnNames()) {
             if (!browser.equals(Enums.VisualGridSheetColumnNames.Timestamp.value)) {
                 totalBrowsers++;
@@ -157,13 +157,13 @@ public class ProductionMonitor extends TimerTask {
             }
         }
         if ((totalBrowsers/2) < failedBrowsers) {
-            sendVGMailNotification();
+            sendVGMailNotification(uuid);
         }
     }
 
-    private void sendVGMailNotification() throws MailjetSocketTimeoutException, MailjetException {
+    private void sendVGMailNotification(String uuid) throws MailjetSocketTimeoutException, MailjetException {
         JSONArray recipient = new JSONArray().put(new JSONObject().put("Email", "eyesops@applitools.com").put("Name", "Production_monitor"));
-        sendMailNotification(recipient, "Production monitor alert", "Alert that more than 50% of the browsers in the VG failed");
+        sendMailNotification(recipient, "Production monitor alert", "Alert that more than 50% of the browsers in the VG failed \n\n uuid: " + uuid);
     }
 
     private void sendEndpointMailNotification(String endpoint) throws MailjetSocketTimeoutException, MailjetException {

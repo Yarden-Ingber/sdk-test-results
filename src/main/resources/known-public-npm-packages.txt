@@ -47,3 +47,4 @@
 @applitools/utils
 @applitools/logger
 @applitools/eyes-api
+@applitools/eyes-scm

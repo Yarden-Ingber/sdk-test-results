@@ -75,18 +75,23 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
     }
 
     private void periodicDumpTickets() {
-        TicketsStateChanger ticketsStateChanger = new TicketsStateChanger();
-        String timeStamp = Logger.getTimaStamp();
         SheetData rawDataSheetData = new SheetData(new SheetTabIdentifier(Enums.SpreadsheetIDs.KPIS.value, Enums.KPIsSheetTabsNames.RawData.value));
+        String timeStamp = Logger.getTimaStamp();
+        updateCurrentTimestampToAllTickets(rawDataSheetData, timeStamp);
+        dumpAllTicketsToSplunk(rawDataSheetData);
+    }
+
+    private void updateCurrentTimestampToAllTickets(SheetData rawDataSheetData, String timeStamp) {
+        TicketsStateChanger ticketsStateChanger = new TicketsStateChanger();
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
-            TicketStates currentState = TicketStates.valueOf(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString());
-            if (!(currentState.equals(TicketStates.Done) || currentState.equals(TicketStates.NoState))) {
-                try {
-                    ticketsStateChanger.addCalculatedTimeInPreviousState(timeStamp, sheetEntry, currentState);
-                    ticketsStateChanger.writeNewStateTimestamp(timeStamp, sheetEntry, currentState);
-                } catch (Throwable t) {}
-            }
+            try {
+                TicketStates currentState = TicketStates.valueOf(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString());
+                ticketsStateChanger.executeUpdateState(sheetEntry, currentState, currentState, timeStamp);
+            } catch (Throwable t) {}
         }
+    }
+
+    private void dumpAllTicketsToSplunk(SheetData rawDataSheetData) {
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
             TicketUpdateRequest ticketUpdateRequest = new TicketUpdateRequest();
             ticketUpdateRequest.setTeam(sheetEntry.getAsJsonObject().get("Team").getAsString());

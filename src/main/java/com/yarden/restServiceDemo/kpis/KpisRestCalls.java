@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class KpisRestCalls {
@@ -78,25 +75,15 @@ public class KpisRestCalls {
     @ResponseBody
     public String get_create_ticket_page() throws IOException {
         InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
-        return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        String page = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        inputStream.close();
+        return page;
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
     public ResponseEntity create_trello_ticket(@RequestBody String formParams) {
-        synchronized (RestCalls.lock) {
-            Logger.info(urlParamsToMap(formParams).toString());
-        }
+        TrelloTicketCreator.create(formParams);
         return new ResponseEntity("Got the request", HttpStatus.OK);
-    }
-
-    private Map urlParamsToMap(String urlParams) {
-        Map map = new HashMap();
-        String[] paramsList = urlParams.split("&");
-        for (String param : paramsList) {
-            String[] singleParamList = param.split("=");
-            map.put(singleParamList[0], singleParamList[1]);
-        }
-        return map;
     }
 
     private void newRequestPrint(String json, String request){

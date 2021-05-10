@@ -13,7 +13,7 @@ public class TrelloTicketCreator {
 
     private static Map urlParamsToMap(String urlParams) {
         Map map = new HashMap();
-        String[] paramsList = urlParams.split("&");
+        String[] paramsList = urlParams.replace("+", " ").split("&");
         for (String param : paramsList) {
             String[] singleParamList = param.split("=");
             map.put(singleParamList[0], singleParamList[1]);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 @RestController
@@ -82,7 +83,11 @@ public class KpisRestCalls {
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
     public ResponseEntity create_trello_ticket(@RequestBody String formParams) {
-        TrelloTicketCreator.create(formParams);
+        try {
+            TrelloTicketCreator.create(formParams);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return new ResponseEntity("Got the request", HttpStatus.OK);
     }
 

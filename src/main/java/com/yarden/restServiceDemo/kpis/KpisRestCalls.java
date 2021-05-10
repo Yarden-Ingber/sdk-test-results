@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class KpisRestCalls {
@@ -70,11 +72,21 @@ public class KpisRestCalls {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
-    public ResponseEntity create_trello_ticket(@RequestBody String json) {
+    public ResponseEntity create_trello_ticket(@RequestBody String formParams) {
         synchronized (RestCalls.lock) {
-            Logger.info(json);
+            Logger.info(urlParamsToMap(formParams).toString());
         }
         return new ResponseEntity("Got the request", HttpStatus.OK);
+    }
+
+    private Map urlParamsToMap(String urlParams) {
+        Map map = new HashMap();
+        String[] paramsList = urlParams.split("&");
+        for (String param : paramsList) {
+            String[] singleParamList = param.split("=");
+            map.put(singleParamList[0], singleParamList[1]);
+        }
+        return map;
     }
 
     private void newRequestPrint(String json, String request){

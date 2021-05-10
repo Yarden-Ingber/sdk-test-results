@@ -86,7 +86,9 @@ public class WriteKpisToSplunkPeriodically extends TimerTask{
         for (JsonElement sheetEntry: rawDataSheetData.getSheetData()){
             try {
                 TicketStates currentState = TicketStates.valueOf(sheetEntry.getAsJsonObject().get(Enums.KPIsSheetColumnNames.CurrentState.value).getAsString());
-                ticketsStateChanger.executeUpdateState(sheetEntry, currentState, currentState, timeStamp);
+                if (!(currentState.equals(TicketStates.Done) || currentState.equals(TicketStates.NoState))) {
+                    ticketsStateChanger.executeUpdateState(sheetEntry, currentState, currentState, timeStamp);
+                }
             } catch (Throwable t) {}
         }
     }

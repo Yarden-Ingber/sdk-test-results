@@ -1,0 +1,64 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>The HTML5 Herald</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+
+</head>
+
+<body>
+
+<center>
+    <form name="myForm" method="POST" action="https://sdk-test-results.herokuapp.com/create_trello_ticket">
+
+        <label for="boards">Select a board:</label><br>
+        <select id="boards" required name="boards" size="3">
+            <option value="JS SDKs">JS SDKs</option>
+            <option value="SDKs">SDKs</option>
+            <option value="Ultrafast Grid">Ultrafast Grid</option>
+        </select><br><br>
+
+        <label for="ticketTitle">Ticket title:</label><br>
+        <input type="text" id="ticketTitle" name="ticketTitle" size="80" required><br><br>
+
+        <label for="ticketDescription">Ticket description:</label><br>
+        <textarea name="ticketDescription" cols="60" rows="4" required></textarea><br><br>
+
+        <label for="customerWebsite">Customer website:</label><br>
+        <input type="text" id="customerWebsite" name="customerWebsite" size="80" required><br><br>
+
+        <label for="sdk">Select an SDK:</label><br>
+        <select id="sdk" required name="sdk" size="5">
+            <option value="Java">Java</option>
+            <option value="Python">Python</option>
+            <option value="Ruby">Ruby</option>
+            <option value="Dotnet">Dotnet</option>
+            <option value="Not relevant">Not relevant</option>
+        </select><br><br>
+
+        <label for="sdkVersion">SDK version:</label><br>
+        <input type="text" id="sdkVersion" name="sdkVersion" required><br><br>
+
+        <label for="linkToTestResults">Link to dashboard test results:</label><br>
+        <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required><br><br>
+
+        <label for="testCode">Test code:</label><br>
+        <textarea name="testCode" cols="60" rows="4" required></textarea><br><br>
+
+        <input type="checkbox" required id="isAppAccessible" name="isAppAccessible">
+        <label for="isAppAccessible">Is the customer app accessible to the R&D?</label><br><br>
+
+        <input type="checkbox" required id="isTestResultsAccessible" name="isTestResultsAccessible">
+        <label for="isTestResultsAccessible">Are the dashboard test results accessible to an R&D account?</label><br><br>
+
+        <button type="submit" id="btn-submit" onclick="submitform()">Create ticket</button><br>
+    </form>
+</center>
+
+
+</body>
+</html>

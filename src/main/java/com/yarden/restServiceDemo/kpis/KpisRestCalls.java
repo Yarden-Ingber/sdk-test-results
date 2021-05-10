@@ -77,7 +77,7 @@ public class KpisRestCalls {
     @GetMapping(value = "/get_create_ticket_page", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String get_create_ticket_page() throws IOException {
-        InputStream inputStream = SdkReportService.class.getResourceAsStream("/known-public-npm-packages.txt");
+        InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
         return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
     }
 

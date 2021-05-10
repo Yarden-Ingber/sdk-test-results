@@ -74,6 +74,7 @@ public class KpisRestCalls {
         synchronized (RestCalls.lock) {
             Logger.info(json);
         }
+        return new ResponseEntity("Got the request", HttpStatus.OK);
     }
 
     private void newRequestPrint(String json, String request){

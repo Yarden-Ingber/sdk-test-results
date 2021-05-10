@@ -3,15 +3,18 @@ package com.yarden.restServiceDemo.kpis;
 import com.google.gson.Gson;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
+import com.yarden.restServiceDemo.reportService.SdkReportService;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
+import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +72,13 @@ public class KpisRestCalls {
             new KpisMonitoringService(ticketUpdateRequest).updateOnlyTrelloList();
             return new ResponseEntity(ticketUpdateRequest.toString(), HttpStatus.OK);
         }
+    }
+
+    @GetMapping(value = "/get_create_ticket_page", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseBody
+    public String get_create_ticket_page() throws IOException {
+        InputStream inputStream = SdkReportService.class.getResourceAsStream("/known-public-npm-packages.txt");
+        return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")

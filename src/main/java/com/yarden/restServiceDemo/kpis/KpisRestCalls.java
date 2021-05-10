@@ -69,6 +69,13 @@ public class KpisRestCalls {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
+    public ResponseEntity create_trello_ticket(@RequestBody String json) {
+        synchronized (RestCalls.lock) {
+            Logger.info(json);
+        }
+    }
+
     private void newRequestPrint(String json, String request){
         Logger.info("**********************************************************************************************");
         Logger.info("**********************************************************************************************");

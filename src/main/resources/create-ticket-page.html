@@ -20,7 +20,7 @@
 .form-style-3 label > span{
 	float: left;
 	width: 100px;
-	color: #F072A9;
+	color: #0a8073;
 	font-weight: bold;
 	font-size: 13px;
 	text-shadow: 1px 1px 1px #fff;
@@ -30,22 +30,22 @@
 	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	margin: 0px 0px 10px 0px;
-	border: 1px solid #FFD2D2;
+	border: 1px solid #0a9176;
 	padding: 20px;
-	background: #FFF4F4;
+	background: #f4f7f8;
 	box-shadow: inset 0px 0px 15px #FFE5E5;
 	-moz-box-shadow: inset 0px 0px 15px #FFE5E5;
 	-webkit-box-shadow: inset 0px 0px 15px #FFE5E5;
 }
 .form-style-3 fieldset legend{
-	color: #FFA0C9;
-	border-top: 1px solid #FFD2D2;
-	border-left: 1px solid #FFD2D2;
-	border-right: 1px solid #FFD2D2;
+	color: #fff;
+	border-top: 1px solid #0a9176;
+	border-left: 1px solid #0a9176;
+	border-right: 1px solid #0a9176;
 	border-radius: 5px 5px 0px 0px;
 	-webkit-border-radius: 5px 5px 0px 0px;
 	-moz-border-radius: 5px 5px 0px 0px;
-	background: #FFF4F4;
+	background: #1abc9c;
 	padding: 0px 8px 3px 8px;
 	box-shadow: -0px -1px 2px #F1F1F1;
 	-moz-box-shadow:-0px -1px 2px #F1F1F1;
@@ -72,20 +72,24 @@
 	-moz-border-radius: 3px;
 	border: 1px solid #FFC2DC;
 	outline: none;
-	color: #F072A9;
+	color: #8a97a0;
 	padding: 5px 8px 5px 8px;
 	box-shadow: inset 1px 1px 4px #FFD5E7;
 	-moz-box-shadow: inset 1px 1px 4px #FFD5E7;
 	-webkit-box-shadow: inset 1px 1px 4px #FFD5E7;
-	background: #FFEFF6;
+	background: #e8eeef;
 	width:50%;
 }
+.form-style-3 select:focus{
+	background: #d2d9dd;
+}
 .form-style-3  input[type=submit],
+.form-style-3  button[type=submit],
 .form-style-3  input[type=button]{
-	background: #EB3B88;
+	background: #1abc9c;
 	border: 1px solid #C94A81;
 	padding: 5px 15px 5px 15px;
-	color: #FFCBE2;
+	color: #FFF;
 	box-shadow: inset -1px -1px 3px #FF62A7;
 	-moz-box-shadow: inset -1px -1px 3px #FF62A7;
 	-webkit-box-shadow: inset -1px -1px 3px #FF62A7;
@@ -106,25 +110,28 @@
 <body>
 
 <center>
-    <form name="myForm" method="POST" action="https://sdk-test-results.herokuapp.com/create_trello_ticket">
+    <div class="form-style-3">
+        <form name="myForm" method="POST" action="https://sdk-test-results.herokuapp.com/create_trello_ticket">
+        <fieldset><legend>Ticket data</legend>
 
-        <label for="boards">Select a board:</label><br>
+
+        <label for="boards"><span>Select a board:</span>
         <select id="boards" required name="boards" size="3">
             <option value="JS SDKs">JS SDKs</option>
             <option value="SDKs">SDKs</option>
             <option value="Ultrafast Grid">Ultrafast Grid</option>
-        </select><br><br>
+        </select></label><br>
 
-        <label for="ticketTitle">Ticket title:</label><br>
-        <input type="text" id="ticketTitle" name="ticketTitle" size="80" required><br><br>
+        <label for="ticketTitle"><span>Ticket title:</span>
+        <input type="text" id="ticketTitle" name="ticketTitle" size="80" required></label><br>
 
-        <label for="ticketDescription">Ticket description:</label><br>
-        <textarea name="ticketDescription" cols="60" rows="4" required></textarea><br><br>
+        <label for="ticketDescription"><span>Ticket description:</span>
+        <textarea name="ticketDescription" cols="60" rows="4" required></textarea></label><br>
 
-        <label for="customerWebsite">Customer website:</label><br>
-        <input type="text" id="customerWebsite" name="customerWebsite" size="80" required><br><br>
+        <label for="customerWebsite"><span>Customer website:</span>
+            <input type="text" id="customerWebsite" name="customerWebsite" size="80" required></label><br>
 
-        <label for="sdk">Select an SDK:</label><br>
+        <label for="sdk"><span>Select an SDK:</span>
         <select id="sdk" required name="sdk" size="7">
             <option value="Java">Java</option>
             <option value="Java Appium">Java Appium</option>
@@ -154,25 +161,26 @@
             <option value="Selenium IDE">Selenium IDE</option>
             <option value="JS images">JS images</option>
             <option value="Not relevant">Not relevant</option>
-        </select><br><br>
+        </select></label><br>
 
-        <label for="sdkVersion">SDK version:</label><br>
-        <input type="text" id="sdkVersion" name="sdkVersion" required><br><br>
+        <label for="sdkVersion"><span>SDK version:</span>
+        <input type="text" id="sdkVersion" name="sdkVersion" required></label><br>
 
-        <label for="linkToTestResults">Link to dashboard test results:</label><br>
-        <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required><br><br>
+        <label for="linkToTestResults"><span>Link to dashboard test results:</span>
+        <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required></label><br><br>
 
-        <label for="testCode">Test code:</label><br>
-        <textarea name="testCode" cols="60" rows="4" required></textarea><br><br>
+        <label for="testCode"><span>Test code:</span>
+        <textarea name="testCode" cols="60" rows="4" required></textarea></label><br>
 
-        <input type="checkbox" required id="isAppAccessible" name="isAppAccessible">
-        <label for="isAppAccessible">Check if the customer app is accessible to the R&D</label><br><br>
+        <label for="isAppAccessible"><span>Check if the customer app is accessible to the R&D</span>
+            <input type="checkbox" required id="isAppAccessible" name="isAppAccessible"></label><br><br><br>
 
-        <input type="checkbox" required id="isTestResultsAccessible" name="isTestResultsAccessible">
-        <label for="isTestResultsAccessible">Are the dashboard test results accessible to an R&D account?</label><br><br>
+        <label for="isTestResultsAccessible"><span>Are the dashboard test results accessible to an R&D account?</span>
+            <input type="checkbox" required id="isTestResultsAccessible" name="isTestResultsAccessible"></label><br><br><br><br><br>
 
-        <button type="submit" id="btn-submit" onclick="submitform()">Create ticket</button><br>
-    </form>
+        <label><span> </span><button type="submit" id="btn-submit" onclick="submitform()">Create ticket</button></label>
+    </fieldset></form>
+    </div>
 </center>
 
 

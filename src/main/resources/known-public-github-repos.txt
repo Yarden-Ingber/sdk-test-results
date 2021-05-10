@@ -122,7 +122,6 @@ tutorial-testcafe
 tutorial-appium-csharp-basic
 tutorial-images-csharp-basic
 jsdom
-EyesLibrary
 storybook_on_travis
 tutorial-ruby-screenshots
 tutorial-watir-ruby-basic

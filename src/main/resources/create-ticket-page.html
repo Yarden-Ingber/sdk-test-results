@@ -1,14 +1,14 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="en" style="min-width:500px;>
 <head>
     <meta charset="utf-8">
 
-    <title>Trello ticket creation</title>
-    <meta name="description" content="Trello ticket creation">
-    <meta name="author" content="Bongo">
+<title>Trello ticket creation</title>
+<meta name="description" content="Trello ticket creation">
+<meta name="author" content="Bongo">
 
-    <style type="text/css">
+<style type="text/css">
 .form-style-3{
 	max-width: 450px;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
@@ -104,85 +104,64 @@
 	font-weight:normal;
 }
 </style>
-
 </head>
 
-<body>
+<body min-width="100px">
 
 <center>
     <div class="form-style-3">
-        <form name="myForm" method="POST" action="https://sdk-test-results.herokuapp.com/create_trello_ticket">
-        <fieldset><legend>Ticket data</legend>
+        <form id="myForm" name="myForm" method="POST" action="https://sdk-test-results.herokuapp.com/create_trello_ticket">
+            <fieldset><legend>Ticket data</legend>
 
 
-        <label for="boards"><span>Select a board:</span>
-        <select id="boards" required name="boards" size="3">
-            <option value="JS SDKs">JS SDKs</option>
-            <option value="SDKs">SDKs</option>
-            <option value="Ultrafast Grid">Ultrafast Grid</option>
-        </select></label><br>
+                <label for="boards"><span>Select a board:</span>
+                    <select id="boards" required name="boards" size="3">
+                        <option value="JS SDKs">JS SDKs</option>
+                        <option value="SDKs">SDKs</option>
+                        <option value="Ultrafast Grid">Ultrafast Grid</option>
+                    </select></label><br>
 
-        <label for="ticketTitle"><span>Ticket title:</span>
-        <input type="text" id="ticketTitle" name="ticketTitle" size="80" required></label><br>
+                <label for="ticketTitle"><span>Ticket title:</span>
+                    <input type="text" id="ticketTitle" name="ticketTitle" size="80" required></label><br>
 
-        <label for="ticketDescription"><span>Ticket description:</span>
-        <textarea name="ticketDescription" cols="60" rows="4" required></textarea></label><br>
+                <label for="ticketDescription"><span>Ticket description:</span>
+                    <textarea name="ticketDescription" cols="60" rows="4" required></textarea></label><br>
 
-        <label for="customerWebsite"><span>Customer website:</span>
-            <input type="text" id="customerWebsite" name="customerWebsite" size="80" required></label><br>
+                <label for="customerAppUrl"><span>Customer app url:</span>
+                    <input type="text" id="customerAppUrl" name="customerAppUrl" size="80" required></label><br>
 
-        <label for="sdk"><span>Select an SDK:</span>
-        <select id="sdk" required name="sdk" size="7">
-            <option value="Java">Java</option>
-            <option value="Java Appium">Java Appium</option>
-            <option value="Python">Python</option>
-            <option value="Ruby">Ruby</option>
-            <option value="Dotnet">Dotnet</option>
-            <option value="Espresso">Espresso</option>
-            <option value="XCUI">XCUI</option>
-            <option value="Earlgrey">Earlgrey</option>
-            <option value="PHP">PHP</option>
-            <option value="Images">Images</option>
-            <option value="DOM capture">DOM capture</option>
-            <option value="UFT">UFT</option>
-            <option value="XCTest">XCTest</option>
-            <option value="DOM snapshot">DOM snapshot</option>
-            <option value="Integrations">Integrations</option>
-            <option value="Storybook">Storybook</option>
-            <option value="Cypress">Cypress</option>
-            <option value="Testcafe">Testcafe</option>
-            <option value="JS Selenium 4">JS Selenium 4</option>
-            <option value="JS Selenium 3">JS Selenium 3</option>
-            <option value="WDIO 4">WDIO 4</option>
-            <option value="WDIO 5">WDIO 5</option>
-            <option value="Protractor">Protractor</option>
-            <option value="Playwright">Playwright</option>
-            <option value="Nightwatch">Nightwatch</option>
-            <option value="Selenium IDE">Selenium IDE</option>
-            <option value="JS images">JS images</option>
-            <option value="Not relevant">Not relevant</option>
-        </select></label><br>
+                <label for="sdk"><span>Select an SDK:</span>
+                    <select id="sdk" required name="sdk" size="7">
+                    </select></label><br>
 
-        <label for="sdkVersion"><span>SDK version:</span>
-        <input type="text" id="sdkVersion" name="sdkVersion" required></label><br>
+                <label for="sdkVersion"><span>SDK version:</span>
+                    <input type="text" id="sdkVersion" name="sdkVersion" required></label><br>
 
-        <label for="linkToTestResults"><span>Link to dashboard test results:</span>
-        <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required></label><br><br>
+                <label for="linkToTestResults"><span>Link to dashboard test results:</span>
+                    <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required></label><br><br>
 
-        <label for="testCode"><span>Test code:</span>
-        <textarea name="testCode" cols="60" rows="4" required></textarea></label><br>
+                <label for="isAppAccessible"><span>Check if the customer app is accessible to the R&D</span><br><br>
+                    <input type="checkbox" required id="isAppAccessible" name="isAppAccessible"></label><br><br><br>
 
-        <label for="isAppAccessible"><span>Check if the customer app is accessible to the R&D</span>
-            <input type="checkbox" required id="isAppAccessible" name="isAppAccessible"></label><br><br><br>
+                <label for="logFiles"><span>Log files:</span>
+                    <input type="file" id="logFiles" name="logFiles" required multiple><br>
+                    Disable log upload<input type="checkbox" required id="isLogFileAvailable" name="isLogFileAvailable"></label><br><br>
 
-        <label for="isTestResultsAccessible"><span>Are the dashboard test results accessible to an R&D account?</span>
-            <input type="checkbox" required id="isTestResultsAccessible" name="isTestResultsAccessible"></label><br><br><br><br><br>
 
-        <label><span> </span><button type="submit" id="btn-submit" onclick="submitform()">Create ticket</button></label>
-    </fieldset></form>
+                <label for="reproducable"><span>Reproducable:</span>
+                    <input type="file" id="reproducable" name="reproducable" required multiple><br>
+                    Disable reproducable upload<input type="checkbox" required id="isReproducableAvailable" name="isReproducableAvailable"></label><br><br>
+
+                <input type="submit" id="btn-submit" value="Create ticket" />
+
+                <input type="hidden" id="extensionVersion" name="extensionVersion"value="1.0">
+
+
+            </fieldset></form>
     </div>
 </center>
 
 
+<script src="background.js"></script>
 </body>
 </html>

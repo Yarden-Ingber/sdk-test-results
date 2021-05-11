@@ -75,10 +75,7 @@ public class KpisRestCalls {
     @GetMapping(value = "/get_create_ticket_page", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String get_create_ticket_page() throws IOException {
-        InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
-        String page = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
-        inputStream.close();
-        return page;
+        return TrelloTicketCreator.getTicketCreationForm();
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
@@ -89,6 +86,11 @@ public class KpisRestCalls {
             e.printStackTrace();
         }
         return new ResponseEntity("Got the request", HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/get_list_of_sdks")
+    public ResponseEntity get_list_of_sdks() {
+        return new ResponseEntity(TrelloTicketCreator.getSdksList(), HttpStatus.OK);
     }
 
     private void newRequestPrint(String json, String request){

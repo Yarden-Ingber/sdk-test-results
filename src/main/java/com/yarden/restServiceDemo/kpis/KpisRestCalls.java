@@ -85,7 +85,7 @@ public class KpisRestCalls {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity("Got the request", HttpStatus.OK);
+        return new ResponseEntity("Ticket created", HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/get_list_of_sdks")

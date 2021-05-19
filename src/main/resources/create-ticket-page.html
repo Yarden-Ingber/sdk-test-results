@@ -112,7 +112,9 @@
   animation: spin 2s linear infinite;
   display: none;
 }
-
+.creationDone {
+  display: none;
+}
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -129,7 +131,6 @@
 
                 <label for="account"><span>Account:</span>
                     <select id="account" required name="account" size="7">
-                        <option value="Yarden Ingber,5d53b42fe917d95914ee0e8e">###########DELETE THIS############</option>
                     </select></label><br>
 
                 <label for="boards"><span>Select a board:</span>
@@ -153,7 +154,6 @@
 
                 <label for="sdk"><span>Select an SDK:</span>
                     <select id="sdk" required name="sdk" size="7">
-                        <option value="Java">###########DELETE THIS############</option>
                     </select></label><br>
 
                 <label for="sdkVersion"><span>SDK version:</span>
@@ -175,6 +175,7 @@
                     <span>Disable:</span><input type="checkbox" id="isReproducableAvailable" name="isReproducableAvailable"></label><br><br>
 
                 <div id="loader" class="loader"></div>
+                <label id="creationDone" class="creationDone"><span>Done!</span>
 
                 <input type="submit" id="btn-submit" value="Create ticket">
 
@@ -334,7 +335,8 @@
 
                 // #### Hide loader ####
                 loader.style.display = 'none';
-                alert('Ticket created');
+                var doneLabel = document.getElementById('creationDone');
+                doneLabel.style.display = 'block';
             }
         };
     }

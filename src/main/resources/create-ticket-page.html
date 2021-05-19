@@ -189,8 +189,8 @@
 
 <script>
 
-    const TOKEN = "e337a661acce99aec8fbb3f0b8e4c346f78d4c9b9cfc08cdb10fc6637b3d2ff7";
-    const KEY = "d2ed918b221562e42169b26066343f32";
+    <<<TRELLO_API_TOKEN>>>
+    <<<TRELLO_API_KEY>>>
 
     document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {
         const checkBox = document.querySelector('#isLogFileAvailable')
@@ -253,6 +253,16 @@
           }
         }
         return "not found";
+    }
+
+    function updateFieldValue(board, cardId, fieldName, fieldValue) {
+        try {
+            var customFieldID = getCustomFieldId(board, fieldName);
+            request = new XMLHttpRequest();
+            request.open("PUT", "https://api.trello.com/1/cards/" + cardId + "/customField/" + customFieldID + "/item?key=" + KEY + "&token=" + TOKEN , false);
+            request.setRequestHeader('Content-Type', 'application/json');
+            request.send(JSON.stringify({"value":{"text":fieldValue}}));
+        } catch (e) {}
     }
 
     function createTicket() {
@@ -327,11 +337,8 @@
 
                 // #### Update custom fields ####
                 var fieldName = "TESt fiELD";
-                var customFieldID = getCustomFieldId(board, fieldName);
-                request = new XMLHttpRequest();
-                request.open("PUT", "https://api.trello.com/1/cards/" + cardId + "/customField/" + customFieldID + "/item?key=" + KEY + "&token=" + TOKEN , false);
-                request.setRequestHeader('Content-Type', 'application/json');
-                request.send(JSON.stringify({"value":{"text":accountName}}));
+                var fieldValue = "value";
+                updateFieldValue(board, cardId, fieldName, fieldValue);
 
                 // #### Hide loader ####
                 loader.style.display = 'none';

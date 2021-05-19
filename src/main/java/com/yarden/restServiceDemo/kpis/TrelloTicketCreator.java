@@ -1,5 +1,6 @@
 package com.yarden.restServiceDemo.kpis;
 
+import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
 import org.apache.commons.io.IOUtils;
 
@@ -12,6 +13,8 @@ public class TrelloTicketCreator {
     public static String getTicketCreationForm() throws IOException {
         InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
         String page = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        page = page.replace("<<<TRELLO_API_TOKEN>>>", Enums.EnvVariables.TrelloApiToken.value);
+        page = page.replace("<<<TRELLO_API_KEY>>>", Enums.EnvVariables.TrelloApiKey.value);
         inputStream.close();
         return page;
     }

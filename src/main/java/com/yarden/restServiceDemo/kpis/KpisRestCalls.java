@@ -3,18 +3,13 @@ package com.yarden.restServiceDemo.kpis;
 import com.google.gson.Gson;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
-import com.yarden.restServiceDemo.reportService.SdkReportService;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 
 @RestController
 public class KpisRestCalls {
@@ -76,16 +71,6 @@ public class KpisRestCalls {
     @ResponseBody
     public String get_create_ticket_page() throws IOException {
         return TrelloTicketCreator.getTicketCreationForm();
-    }
-
-    @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
-    public ResponseEntity create_trello_ticket(@RequestBody String formParams) {
-        try {
-            TrelloTicketCreator.create(formParams);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity("Ticket created", HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/get_list_of_sdks")

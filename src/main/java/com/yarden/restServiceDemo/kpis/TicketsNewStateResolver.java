@@ -214,7 +214,7 @@ public class TicketsNewStateResolver {
             return TicketStates.WaitingForRD;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("To be Deployed next Hotfix")) {
             return TicketStates.WaitingForRD;
-        } else if (request.getCurrent_trello_list().contains("Done")) {
+        } else if (request.getCurrent_trello_list().toLowerCase().contains("done")) {
             return TicketStates.Done;
         } else if (request.getCurrent_trello_list().equalsIgnoreCase("Waiting for field approval")) {
             return TicketStates.WaitingForFieldApproval;

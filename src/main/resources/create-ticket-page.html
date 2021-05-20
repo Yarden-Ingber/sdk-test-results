@@ -103,6 +103,10 @@
 	color:red;
 	font-weight:normal;
 }
+.creationDone,
+.creationDone > span{
+  display: none;
+}
 </style>
 </head>
 
@@ -171,7 +175,7 @@
 
 <script>
 
-    document.querySelector('#btn-submit').addEventListener('submit', (e) => {
+    document.querySelector('#btn-submit').addEventListener('click', (e) => {
         // #### Disable submit button ####
         var submitButton = document.getElementById('btn-submit');
         submitButton.disabled = true;

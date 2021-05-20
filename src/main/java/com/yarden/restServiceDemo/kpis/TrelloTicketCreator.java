@@ -8,7 +8,6 @@ import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
 

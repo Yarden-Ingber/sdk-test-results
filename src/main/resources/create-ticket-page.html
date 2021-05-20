@@ -169,8 +169,6 @@
 
 <script>
 
-    console.log("JS start");
-
     document.querySelector('#btn-submit').addEventListener('submit', (e) => {
         // #### Disable submit button ####
         var submitButton = document.getElementById('btn-submit');
@@ -224,7 +222,6 @@
     }
 
     window.addEventListener("message", (event) => {
-        console.log("message recieved");
         if (event.data.includes("accountName:")) {
             var accountName = event.data.split(":")[1];
             var select = document.querySelector("#account");

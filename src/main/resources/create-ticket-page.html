@@ -110,7 +110,7 @@
 
 <center>
     <div class="form-style-3">
-        <form id="myForm" name="myForm" method="POST" action="/create_trello_ticket" enctype="multipart/form-data">
+        <form id="myForm" name="myForm" method="POST" action="/create_trello_ticket" enctype="multipart/form-data" target="dummyframe">
             <fieldset><legend>Ticket data</legend>
 
 
@@ -167,6 +167,8 @@
     </div>
 </center>
 
+<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
 <script>
 
     document.querySelector('#btn-submit').addEventListener('submit', (e) => {
@@ -174,6 +176,10 @@
         var submitButton = document.getElementById('btn-submit');
         submitButton.disabled = true;
         submitButton.style.background = '#C1C1C1';
+
+        // #### Show loader ####
+        var loader = document.getElementById('loader');
+        loader.style.display = 'block';
     })
 
     document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {
@@ -198,14 +204,10 @@
           }
     })
 
-    // #### Show loader ####
-    var loader = document.getElementById('loader');
-    loader.style.display = 'block';
-
     // #### Hide loader ####
-    loader.style.display = 'none';
-    var doneLabel = document.querySelector('.creationDone span');
-    doneLabel.style.display = 'block';
+    //loader.style.display = 'none';
+    //var doneLabel = document.querySelector('.creationDone span');
+    //doneLabel.style.display = 'block';
 
     function string_to_slug (str) {
         str = str.replace(/^\s+|\s+$/g, '');

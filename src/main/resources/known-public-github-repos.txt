@@ -175,3 +175,4 @@ karate_imagesdk_example
 the-kitchen
 automation-cookbook
 Applitools-Webdriverio-GithubActions
+tutorial-webdriverio7-typescript-basic

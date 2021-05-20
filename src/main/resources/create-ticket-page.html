@@ -169,13 +169,13 @@
 
 <script>
 
-    document.querySelector('#btn-submit').addEventListener('click', (e) => {
+    console.log("JS start");
 
+    document.querySelector('#btn-submit').addEventListener('submit', (e) => {
         // #### Disable submit button ####
         var submitButton = document.getElementById('btn-submit');
         submitButton.disabled = true;
         submitButton.style.background = '#C1C1C1';
-
     })
 
     document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {

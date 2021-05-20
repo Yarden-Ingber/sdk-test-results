@@ -103,35 +103,19 @@
 	color:red;
 	font-weight:normal;
 }
-.loader {
-  border: 4px solid #f3f3f3; /* Light grey */
-  border-top: 4px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 2s linear infinite;
-  display: none;
-}
-.creationDone > span{
-  display: none;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 </style>
 </head>
 
 <body min-width="100px">
 
-
+<center>
     <div class="form-style-3">
-        <form id="myForm" name="myForm" enctype="multipart/form-data" onsubmit="createTicket()" target="dummyframe">
+        <form id="myForm" name="myForm" method="POST" action="/create_trello_ticket" enctype="multipart/form-data">
             <fieldset><legend>Ticket data</legend>
 
+
                 <label for="account"><span>Account:</span>
-                    <select id="account" required name="account" size="7">
-                    </select></label><br>
+                    <select id="account" required name="account" size="7"><<<ACCOUNTS>>></select></label><br>
 
                 <label for="boards"><span>Select a board:</span>
                     <select id="boards" required name="boards" size="5">
@@ -140,7 +124,7 @@
                         <option value="5cab78d7155c518ad76a353a,5cab7a9b2983377b7787b01d">Ultrafast Grid</option>
                         <option value="5cd7ff05ad760377c1528bf8,5cd7ff40aa40ea48c43f8d8d">Algo Bugs</option>
                         <option value="5cee20e6ed367d2da14cdabd,5cee3e1d2d449d729624e28f">Eyes App - Issues</option>
-                        <option value="5f01beffc787887211ed98f1,5f01beffc787887211ed98f2">Quality</option>
+                        <option value="5f01beffc787887211ed98f1,5f01beffc787887211ed98f2">Quality team</option>
                     </select></label><br>
 
                 <label for="ticketTitle"><span>Ticket title:</span>
@@ -153,8 +137,7 @@
                     <input type="text" id="customerAppUrl" name="customerAppUrl" size="80" required></label><br>
 
                 <label for="sdk"><span>Select an SDK:</span>
-                    <select id="sdk" required name="sdk" size="7">
-                    </select></label><br>
+                    <select id="sdk" required name="sdk" size="7"><<<SDKS>>></select></label><br>
 
                 <label for="sdkVersion"><span>SDK version:</span>
                     <input type="text" id="sdkVersion" name="sdkVersion" required></label><br>
@@ -179,18 +162,15 @@
 
                 <input type="submit" id="btn-submit" value="Create ticket">
 
-                <input type="hidden" id="extensionVersion" name="extensionVersion"value="1.0">
-
 
             </fieldset></form>
     </div>
-    <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-
+</center>
 
 <script>
 
-    <<<TRELLO_API_TOKEN>>>
-    <<<TRELLO_API_KEY>>>
+    document.querySelector('#btn-submit').addEventListener('click', (e) => {
+    }
 
     document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {
         const checkBox = document.querySelector('#isLogFileAvailable')
@@ -214,139 +194,62 @@
           }
     })
 
-    // #### Fill sdk selector with options ####
-    var sdkOptionSelector = document.querySelector("#sdk");
-    request = new XMLHttpRequest();
-    request.open("GET", "https://sdk-test-results.herokuapp.com/get_list_of_sdks" , false);
-    request.send();
-    var arrOfSdks = request.responseText.split(",");
-    for (i = 0; i < arrOfSdks.length; i++) {
-        var option = document.createElement("option");
-        option.text = arrOfSdks[i];
-        option.value = arrOfSdks[i];
-        sdkOptionSelector.add(option);
-    }
+    // #### Disable submit button ####
+    var submitButton = document.getElementById('btn-submit');
+    submitButton.disabled = true;
+    submitButton.style.background = '#C1C1C1';
 
-    // #### Fill account names selector with options ####
-    var accountOptionSelector = document.querySelector("#account");
-    request = new XMLHttpRequest();
-    request.open("GET", "https://api.trello.com/1/organizations/applitools/members?key=" + KEY + "&token=" + TOKEN , false);
-    request.send();
-    var jsonObject = JSON.parse(request.responseText);
-    for(var i = 0; i < jsonObject.length; i++) {
-        var option = document.createElement("option");
-        option.text = jsonObject[i].fullName;
-        option.value = jsonObject[i].fullName + "," + jsonObject[i].id;
-        accountOptionSelector.add(option);
-    }
+    // #### Show loader ####
+    var loader = document.getElementById('loader');
+    loader.style.display = 'block';
 
-    function getCustomFieldId(boardID, fieldName) {
-        request = new XMLHttpRequest();
-        request.open("GET", "https://api.trello.com/1/boards/" + boardID + "/customFields?key=" + KEY + "&token=" + TOKEN , false);
-        request.send();
-        var jsonObject = JSON.parse(request.responseText);
-        for(var i = 0; i < jsonObject.length; i++)
-        {
-          if(jsonObject[i].name.toLowerCase() == fieldName.toLowerCase())
-          {
-            return jsonObject[i].id;
-          }
+    // #### Hide loader ####
+    loader.style.display = 'none';
+    var doneLabel = document.querySelector('.creationDone span');
+    doneLabel.style.display = 'block';
+
+    function string_to_slug (str) {
+        str = str.replace(/^\s+|\s+$/g, '');
+        str = str.toLowerCase();
+        var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+        var to   = "aaaaeeeeiiiioooouuuunc------";
+        for (var i=0, l=from.length ; i<l ; i++) {
+            str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
         }
-        return "not found";
+        str = str.replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+        return str;
     }
 
-    function updateFieldValue(board, cardId, fieldName, fieldValue) {
-        try {
-            var customFieldID = getCustomFieldId(board, fieldName);
-            request = new XMLHttpRequest();
-            request.open("PUT", "https://api.trello.com/1/cards/" + cardId + "/customField/" + customFieldID + "/item?key=" + KEY + "&token=" + TOKEN , false);
-            request.setRequestHeader('Content-Type', 'application/json');
-            request.send(JSON.stringify({"value":{"text":fieldValue}}));
-        } catch (e) {}
-    }
-
-    function createTicket() {
-
-
-        // #### Disable submit button ####
-        var submitButton = document.getElementById('btn-submit');
-        submitButton.disabled = true;
-        submitButton.style.background = '#C1C1C1';
-
-        // #### Show loader ####
-        var loader = document.getElementById('loader');
-        loader.style.display = 'block';
-
-        // #### Get data from form ####
-        var board = document.getElementById('boards').value.split(",")[0];
-        var newListId = document.getElementById('boards').value.split(",")[1];
-        var accountName = document.getElementById('account').value.split(",")[0];
-        var accountId = document.getElementById('account').value.split(",")[1];
-        var title = document.getElementById('ticketTitle').value;
-        var description = document.getElementById('ticketDescription').value;
-        var customerAppUrl = document.getElementById('customerAppUrl').value;
-        var sdk = document.getElementById('sdk').value;
-        var sdkVersion = document.getElementById('sdkVersion').value;
-        var linkToTestResults = document.getElementById('linkToTestResults').value;
-
-        // #### Send create ticket request ####
-        var formDataCreate = new FormData();
-        formDataCreate.append("token", TOKEN);
-        formDataCreate.append("key", KEY);
-        formDataCreate.append("idList", newListId);
-        formDataCreate.append("name", title);
-        formDataCreate.append("desc", description);
-        var createRequest = new XMLHttpRequest();
-        createRequest.open("POST", "https://api.trello.com/1/cards");
-        createRequest.send(formDataCreate);
-        console.log(createRequest.responseText);
-
-        // #### Add data when ticket is created ####
-        createRequest.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var formData = new FormData();
-
-                // #### Get created ticket ID ####
-                var responseJson = JSON.parse(this.responseText);
-                var cardId = responseJson.id;
-
-                // #### Add account to card ####
-                request = new XMLHttpRequest();
-                request.open("POST", "https://api.trello.com/1/cards/" + cardId + "/idMembers?key=" + KEY + "&token=" + TOKEN + "&value=" +  accountId, false);
-                request.send();
-
-                // #### Upload files ####
-                formData = new FormData();
-                formData.append("token", TOKEN);
-                formData.append("key", KEY);
-                var request = new XMLHttpRequest();
-                var logFileList = document.getElementById('logFiles').files;
-                for (let i = 0, numFiles = logFileList.length; i < numFiles; i++) {
-                    formData.append("file", logFileList[i]);
-                    request = new XMLHttpRequest();
-                    request.open("POST", "https://api.trello.com/1/cards/" + cardId + "/attachments", false);
-                    request.send(formData);
+    window.addEventListener("message", (event) => {
+        if (event.data.includes("accountName:")) {
+            var accountName = event.data.split(":")[1];
+            var select = document.querySelector("#account");
+            var i;
+            for (i = 0; i < select.options.length; i++) {
+                if (select.options[i].text == accountName) {
+                    break;
                 }
-                var reproducableFileList = document.getElementById('reproducable').files;
-                for (let i = 0, numFiles = reproducableFileList.length; i < numFiles; i++) {
-                    formData.append("file", reproducableFileList[i]);
-                    request = new XMLHttpRequest();
-                    request.open("POST", "https://api.trello.com/1/cards/" + cardId + "/attachments", false);
-                    request.send(formData);
-                }
-
-                // #### Update custom fields ####
-                var fieldName = "TESt fiELD";
-                var fieldValue = "value";
-                updateFieldValue(board, cardId, fieldName, fieldValue);
-
-                // #### Hide loader ####
-                loader.style.display = 'none';
-                var doneLabel = document.querySelector('.creationDone span');
-                doneLabel.style.display = 'block';
             }
-        };
-    }
+            select.selectedIndex = i;
+        }
+        if (event.data.includes("boardName:")) {
+            var boardName = event.data.split(":")[1];
+            var select = document.querySelector("#boards");
+            var i;
+            for (i = 0; i < select.options.length; i++) {
+                var boardSlug = string_to_slug(select.options[i].text);
+                if (boardSlug == boardName) {
+                    break;
+                }
+            }
+            select.selectedIndex = i;
+        }
+    });
+
+
 </script>
+
 </body>
 </html>

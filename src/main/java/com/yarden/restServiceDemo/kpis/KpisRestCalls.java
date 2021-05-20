@@ -1,13 +1,16 @@
 package com.yarden.restServiceDemo.kpis;
 
 import com.google.gson.Gson;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -69,8 +72,32 @@ public class KpisRestCalls {
 
     @GetMapping(value = "/get_create_ticket_page", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
-    public String get_create_ticket_page() throws IOException {
+    public String get_create_ticket_page() throws IOException, UnirestException {
         return TrelloTicketCreator.getTicketCreationForm();
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
+    public void create_trello_ticket(@RequestParam("account") String account, @RequestParam("boards") String board, @RequestParam("ticketTitle") String ticketTitle, @RequestParam("ticketDescription") String ticketDescription,
+                                     @RequestParam("customerAppUrl") String customerAppUrl, @RequestParam("sdk") String sdk, @RequestParam("sdkVersion") String sdkVersion,
+                                     @RequestParam("linkToTestResults") String linkToTestResults, @RequestParam("logFiles") MultipartFile[] logFiles,
+                                     @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap modelMap) {
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.listID.name(), board.split(",")[1]);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.ticketTitle.name(), ticketTitle);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
+        modelMap.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
+        try {
+            TrelloTicketCreator.create(modelMap);
+        } catch (UnirestException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/get_list_of_sdks")

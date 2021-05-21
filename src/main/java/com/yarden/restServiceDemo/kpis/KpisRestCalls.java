@@ -73,36 +73,31 @@ public class KpisRestCalls {
     @GetMapping(value = "/get_create_ticket_page", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public String get_create_ticket_page() throws IOException, UnirestException {
-        return TrelloTicketCreator.getTicketCreationForm();
+        return TrelloTicketCreator.getTicketCreationFormHtml();
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
     public void create_trello_ticket(@RequestParam("account") String account, @RequestParam("boards") String board, @RequestParam("ticketTitle") String ticketTitle, @RequestParam("ticketDescription") String ticketDescription,
                                      @RequestParam("customerAppUrl") String customerAppUrl, @RequestParam("sdk") String sdk, @RequestParam("sdkVersion") String sdkVersion,
                                      @RequestParam("linkToTestResults") String linkToTestResults, @RequestParam("logFiles") MultipartFile[] logFiles,
-                                     @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap modelMap) {
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.listID.name(), board.split(",")[1]);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.ticketTitle.name(), ticketTitle);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
-        modelMap.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
+                                     @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap ticketFormFields) {
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.listID.name(), board.split(",")[1]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketTitle.name(), ticketTitle);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
         try {
-            TrelloTicketCreator.create(modelMap);
-        } catch (UnirestException | IOException e) {
+            TrelloTicketCreator.createTicket(ticketFormFields);
+        } catch (UnirestException e) {
             e.printStackTrace();
         }
-    }
-
-    @RequestMapping(method = RequestMethod.GET, path = "/get_list_of_sdks")
-    public ResponseEntity get_list_of_sdks() {
-        return new ResponseEntity(TrelloTicketCreator.getSdksList(), HttpStatus.OK);
     }
 
     private void newRequestPrint(String json, String request){

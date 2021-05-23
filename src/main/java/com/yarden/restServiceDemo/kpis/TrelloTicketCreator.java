@@ -53,6 +53,7 @@ public class TrelloTicketCreator {
     }
 
     public static void createTicket(ModelMap ticketFormFields) throws UnirestException {
+        addTicketDetailsToDescription(ticketFormFields);
         String ticketId = TrelloApi.createTicket(ticketFormFields);
         TrelloApi.addMemberToTicket(ticketId, ticketFormFields);
         MultipartFile[] logFiles = ((MultipartFile[])ticketFormFields.get(FormFields.logFiles.name()));
@@ -62,9 +63,28 @@ public class TrelloTicketCreator {
         updateCustomFields(ticketFormFields, ticketId);
     }
 
+    private static void addTicketDetailsToDescription(ModelMap ticketFormFields) {
+        String ticketDescription = (String)ticketFormFields.get(FormFields.ticketDescription.name());
+        ticketDescription = ticketDescription + "\n\nCustomer app url: " + ticketFormFields.get(FormFields.customerAppUrl.name());
+        ticketDescription = ticketDescription + "\n\nSDK: " + ticketFormFields.get(FormFields.sdk.name());
+        ticketDescription = ticketDescription + "\n\nSDK version: " + ticketFormFields.get(FormFields.sdkVersion.name());
+        ticketDescription = ticketDescription + "\n\nEyes dashboard test results: " + ticketFormFields.get(FormFields.linkToTestResults.name());
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
+    }
+
     private static void updateCustomFields(ModelMap ticketFormFields, String ticketId) {
-        String fieldName = "TESt fiELD";
-        String fieldValue = "value";
+        String fieldName;String fieldValue;
+        fieldName = "Affected Versions";
+        fieldValue = (String)ticketFormFields.get(FormFields.sdkVersion.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "sdk";
+        fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "KPI SUB PROJECT";
+        fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "Created by";
+        fieldValue = (String)ticketFormFields.get(FormFields.accountName.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
     }
 

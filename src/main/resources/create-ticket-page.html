@@ -212,30 +212,30 @@
 <script>
 
     function changeFormByBoard () {
-        const boardsSelect = document.querySelector('#boards');
-        if (boardsSelect.value == "5cee20e6ed367d2da14cdabd,5cee3e1d2d449d729624e28f") {
-            document.querySelector('[for="customerAppUrl"]').style.display = "none";
-            document.querySelector('[for="customerAppUrl"]').disabled = true;
-            document.querySelector('[for="sdk"]').style.display = "none";
-            document.querySelector('[for="sdk"]').disabled = true;
-            document.querySelector('[for="sdkVersion"]').style.display = "none";
-            document.querySelector('[for="sdkVersion"]').disabled = true;
-            document.querySelector('[for="yes"]').style.display = "none";
-            document.querySelector('[for="yes"]').disabled = true;
-            document.querySelector('[for="logFiles"]').style.display = "none";
-            document.querySelector('[for="logFiles"]').disabled = true;
-        } else {
-            document.querySelector('[for="customerAppUrl"]').style.display = "block";
-            document.querySelector('[for="customerAppUrl"]').disabled = false;
-            document.querySelector('[for="sdk"]').style.display = "block";
-            document.querySelector('[for="sdk"]').disabled = false;
-            document.querySelector('[for="sdkVersion"]').style.display = "block";
-            document.querySelector('[for="sdkVersion"]').disabled = false;
-            document.querySelector('[for="yes"]').style.display = "block";
-            document.querySelector('[for="yes"]').disabled = false;
-            document.querySelector('[for="logFiles"]').style.display = "block";
-            document.querySelector('[for="logFiles"]').disabled = false;
-        }
+        //const boardsSelect = document.querySelector('#boards');
+        //if (boardsSelect.value == "5cee20e6ed367d2da14cdabd,5cee3e1d2d449d729624e28f") {
+        //    document.querySelector('[for="customerAppUrl"]').style.display = "none";
+        //    document.querySelector('[for="customerAppUrl"]').disabled = true;
+        //    document.querySelector('[for="sdk"]').style.display = "none";
+        //    document.querySelector('[for="sdk"]').disabled = true;
+        //    document.querySelector('[for="sdkVersion"]').style.display = "none";
+        //    document.querySelector('[for="sdkVersion"]').disabled = true;
+        //    document.querySelector('[for="yes"]').style.display = "none";
+        //    document.querySelector('[for="yes"]').disabled = true;
+        //    document.querySelector('[for="logFiles"]').style.display = "none";
+        //    document.querySelector('[for="logFiles"]').disabled = true;
+        //} else {
+        //    document.querySelector('[for="customerAppUrl"]').style.display = "block";
+        //    document.querySelector('[for="customerAppUrl"]').disabled = false;
+        //    document.querySelector('[for="sdk"]').style.display = "block";
+        //    document.querySelector('[for="sdk"]').disabled = false;
+        //    document.querySelector('[for="sdkVersion"]').style.display = "block";
+        //    document.querySelector('[for="sdkVersion"]').disabled = false;
+        //    document.querySelector('[for="yes"]').style.display = "block";
+        //    document.querySelector('[for="yes"]').disabled = false;
+        //    document.querySelector('[for="logFiles"]').style.display = "block";
+        //    document.querySelector('[for="logFiles"]').disabled = false;
+        //}
     }
 
     document.querySelector('#boards').addEventListener('change', (event) => {

@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 public class TrelloTicketCreator {
 
-    private static final String sdks = "Java,Java Appium,Python,Ruby,Dotnet,Espresso,XCUI,Earlgrey,PHP,Images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Selenium IDE,JS images,Not relevant";
+    private static final String sdks = "java,java appium,python,ruby,dotnet,espresso,xcui,earlgrey,php,images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Selenium IDE,JS images,Not relevant";
 
     public static String getTicketCreationFormHtml() throws IOException, UnirestException {
         InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");

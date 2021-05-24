@@ -77,10 +77,18 @@ public class KpisRestCalls {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
-    public void create_trello_ticket(@RequestParam("account") String account, @RequestParam("boards") String board, @RequestParam("ticketTitle") String ticketTitle, @RequestParam("ticketDescription") String ticketDescription,
-                                     @RequestParam("customerAppUrl") String customerAppUrl, @RequestParam("sdk") String sdk, @RequestParam("sdkVersion") String sdkVersion,
-                                     @RequestParam("linkToTestResults") String linkToTestResults, @RequestParam("isAccessible") String isAppAccessible,
-                                     @RequestParam("logFiles") MultipartFile[] logFiles, @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap ticketFormFields) {
+    public void create_trello_ticket(@RequestParam(name="account") String account,
+                                     @RequestParam(name="boards") String board,
+                                     @RequestParam(name="ticketTitle") String ticketTitle,
+                                     @RequestParam(name="ticketDescription") String ticketDescription,
+                                     @RequestParam(required=false,name="customerAppUrl") String customerAppUrl,
+                                     @RequestParam(required=false,name="sdk") String sdk,
+                                     @RequestParam(required=false,name="sdkVersion") String sdkVersion,
+                                     @RequestParam(required=false,name="linkToTestResults") String linkToTestResults,
+                                     @RequestParam(name="isAccessible") String isAppAccessible,
+                                     @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
+                                     @RequestParam(required=false,name="reproducable") MultipartFile[] reproducableFiles,
+                                     ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);

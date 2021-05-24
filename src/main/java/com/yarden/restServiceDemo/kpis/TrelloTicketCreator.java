@@ -69,6 +69,7 @@ public class TrelloTicketCreator {
         ticketDescription = ticketDescription + "\n\nSDK: " + ticketFormFields.get(FormFields.sdk.name());
         ticketDescription = ticketDescription + "\n\nSDK version: " + ticketFormFields.get(FormFields.sdkVersion.name());
         ticketDescription = ticketDescription + "\n\nEyes dashboard test results: " + ticketFormFields.get(FormFields.linkToTestResults.name());
+        ticketDescription = ticketDescription + "\n\nIs customer app accessible: " + ticketFormFields.get(FormFields.isAppAccessible.name());
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
     }
 
@@ -89,7 +90,7 @@ public class TrelloTicketCreator {
     }
 
     public enum FormFields {
-        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles
+        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible
     }
 
 }

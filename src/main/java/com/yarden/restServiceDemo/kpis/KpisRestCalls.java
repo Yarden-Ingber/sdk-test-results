@@ -79,8 +79,8 @@ public class KpisRestCalls {
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
     public void create_trello_ticket(@RequestParam("account") String account, @RequestParam("boards") String board, @RequestParam("ticketTitle") String ticketTitle, @RequestParam("ticketDescription") String ticketDescription,
                                      @RequestParam("customerAppUrl") String customerAppUrl, @RequestParam("sdk") String sdk, @RequestParam("sdkVersion") String sdkVersion,
-                                     @RequestParam("linkToTestResults") String linkToTestResults, @RequestParam("logFiles") MultipartFile[] logFiles,
-                                     @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap ticketFormFields) {
+                                     @RequestParam("linkToTestResults") String linkToTestResults, @RequestParam("isAccessible") String isAppAccessible,
+                                     @RequestParam("logFiles") MultipartFile[] logFiles, @RequestParam("reproducable") MultipartFile[] reproducableFiles, ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
@@ -93,6 +93,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible);
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);
         } catch (UnirestException e) {

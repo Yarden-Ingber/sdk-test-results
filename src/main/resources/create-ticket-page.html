@@ -228,6 +228,10 @@
         }
     }
 
+    document.querySelector('#boards').addEventListener('change', (event) => {
+        changeFormByBoard();
+    });
+
     document.querySelector('#myForm').addEventListener('submit', (e) => {
         // #### Disable submit button ####
         var submitButton = document.getElementById('btn-submit');

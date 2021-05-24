@@ -95,13 +95,13 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.listID.name(), board.split(",")[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketTitle.name(), ticketTitle);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl == null ? "" : customerAppUrl);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk == null ? "" : sdk);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion == null ? "" : sdkVersion);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults == null ? "" : linkToTestResults);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);
         } catch (UnirestException e) {

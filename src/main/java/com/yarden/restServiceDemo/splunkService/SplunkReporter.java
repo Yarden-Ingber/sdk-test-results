@@ -41,7 +41,7 @@ public class SplunkReporter extends TimerTask {
     public void report(Enums.SplunkSourceTypes sourcetype, String json){
         synchronized (lock) {
             try {
-                reportQueue.get().add(new SplunkReportObject(sourcetype, json));
+//                reportQueue.get().add(new SplunkReportObject(sourcetype, json));
             } catch (NullPointerException e) {
             } catch (Throwable t) {
                 t.printStackTrace();

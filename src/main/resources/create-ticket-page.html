@@ -80,6 +80,18 @@
 	background: #e8eeef;
 	width:50%;
 }
+.form-style-3 input[type=text]:disabled,
+.form-style-3 input[type=date]:disabled,
+.form-style-3 input[type=datetime]:disabled,
+.form-style-3 input[type=number]:disabled,
+.form-style-3 input[type=search]:disabled,
+.form-style-3 input[type=time]:disabled,
+.form-style-3 input[type=url]:disabled,
+.form-style-3 input[type=email]:disabled,
+.form-style-3 select:disabled,
+.form-style-3 textarea:disabled{
+	background: #C1C1C1;
+}
 .form-style-3 select:focus{
 	background: #d2d9dd;
 }
@@ -152,28 +164,38 @@
                     <textarea name="ticketDescription" id="ticketDescription" cols="60" rows="4" required></textarea></label><br>
 
                 <label for="customerAppUrl"><span>Customer app url:</span>
-                    <input type="text" id="customerAppUrl" name="customerAppUrl" size="80" required></label><br>
+                    <input type="text" id="customerAppUrl" name="customerAppUrl" size="80" required>
+                    <input type="checkbox" id="isCustomerAppAvailable" name="isCustomerAppAvailable" checked=true></label><br>
 
                 <label for="sdk"><span>Select an SDK:</span>
                     <select id="sdk" required name="sdk" size="7"><<<SDKS>>></select></label><br>
 
                 <label for="sdkVersion"><span>SDK version:</span>
-                    <input type="text" id="sdkVersion" name="sdkVersion" required></label><br>
+                    <input type="text" id="sdkVersion" name="sdkVersion" required>
+                    <input type="checkbox" id="isSdkVersionAvailable" name="isSdkVersionAvailable" checked=true></label><br>
 
                 <label for="linkToTestResults"><span>Link to dashboard test results:</span>
-                    <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required></label><br><br>
+                    <input type="text" id="linkToTestResults" name="linkToTestResults" size="80" required>
+                    <input type="checkbox" id="isLinkToTestResultAvailable" name="isLinkToTestResultAvailable" checked=true></label><br><br>
 
-                <label for="isAppAccessible"><span>Check if the customer app is accessible to the R&D</span><br><br>
-                    <input type="checkbox" required id="isAppAccessible" name="isAppAccessible"></label><br><br><br>
+                <label for="yes"><span>Check if the customer app is accessible to the R&D</span>
+                    <p>
+                    <label for="yes"><span>Yes</span></label>
+                    <input type="radio" id="yes" name="isAccessible" value="yes" required>
+                    </p>
+                    <p>
+                    <label for="no"><span>&#10;No</span></label>
+                        <input type="radio" id="no" name="isAccessible" value="no" required></p></label><br><br><br>
+
 
                 <label for="logFiles"><span>Log files:</span>
-                    <input type="file" id="logFiles" name="logFiles" required multiple><br>
-                    <span>Disable:</span><input type="checkbox" id="isLogFileAvailable" name="isLogFileAvailable"></label><br><br>
+                    <input type="file" id="logFiles" name="logFiles" required multiple>
+                    <input type="checkbox" id="isLogFileAvailable" name="isLogFileAvailable" checked=true></label><br><br>
 
 
                 <label for="reproducable"><span>Reproducable:</span>
-                    <input type="file" id="reproducable" name="reproducable" required multiple><br>
-                    <span>Disable:</span><input type="checkbox" id="isReproducableAvailable" name="isReproducableAvailable"></label><br><br>
+                    <input type="file" id="reproducable" name="reproducable" required multiple>
+                    <input type="checkbox" id="isReproducableAvailable" name="isReproducableAvailable" checked=true></label><br><br>
 
                 <div id="loader" class="loader"></div>
                 <label id="creationDone" class="creationDone"><span>Done!</span></label>
@@ -188,6 +210,24 @@
 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 
 <script>
+
+    document.querySelector('#boards').addEventListener('change', (event) => {
+        const boardsSelect = document.querySelector('#boards');
+        if (boardsSelect.value == "5cee20e6ed367d2da14cdabd,5cee3e1d2d449d729624e28f") {
+            document.querySelector('[for="customerAppUrl"]').style.display = "none";
+            document.querySelector('[for="sdk"]').style.display = "none";
+            document.querySelector('[for="sdkVersion"]').style.display = "none";
+            document.querySelector('[for="yes"]').style.display = "none";
+            document.querySelector('[for="logFiles"]').style.display = "none";
+        } else {
+            document.querySelector('[for="customerAppUrl"]').style.display = "block";
+            document.querySelector('[for="sdk"]').style.display = "block";
+            document.querySelector('[for="sdkVersion"]').style.display = "block";
+            document.querySelector('[for="yes"]').style.display = "block";
+            document.querySelector('[for="logFiles"]').style.display = "block";
+        }
+        console.log(boardsSelect.value);
+    });
 
     document.querySelector('#myForm').addEventListener('submit', (e) => {
         // #### Disable submit button ####
@@ -208,26 +248,44 @@
         }
     })
 
-    document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {
-        const checkBox = document.querySelector('#isLogFileAvailable')
-        if (checkBox.checked) {
-            const logFileUpload = document.querySelector('#logFiles')
-            logFileUpload.disabled = true
+
+
+    function disableFieldByCheckbox (field, checkbox) {
+        if (checkbox.checked) {
+            field.disabled = false
           } else {
-            const logFileUpload = document.querySelector('#logFiles')
-            logFileUpload.disabled = false
+            field.disabled = true
           }
+    }
+
+    document.querySelector('#isSdkVersionAvailable').addEventListener('change', (e) => {
+        const checkBox = document.querySelector('#isSdkVersionAvailable');
+        const sdkVersionTextBox = document.querySelector('#sdkVersion');
+        disableFieldByCheckbox(sdkVersionTextBox, checkBox);
+    })
+
+    document.querySelector('#isCustomerAppAvailable').addEventListener('change', (e) => {
+        const checkBox = document.querySelector('#isCustomerAppAvailable');
+        const customerAppTextBox = document.querySelector('#customerAppUrl');
+        disableFieldByCheckbox(customerAppTextBox, checkBox);
+    })
+
+    document.querySelector('#isLinkToTestResultAvailable').addEventListener('change', (e) => {
+        const checkBox = document.querySelector('#isLinkToTestResultAvailable');
+        const testResultsTextBox = document.querySelector('#linkToTestResults');
+        disableFieldByCheckbox(testResultsTextBox, checkBox);
+    })
+
+    document.querySelector('#isLogFileAvailable').addEventListener('change', (e) => {
+        const checkBox = document.querySelector('#isLogFileAvailable');
+        const logFileUpload = document.querySelector('#logFiles');
+        disableFieldByCheckbox(logFileUpload, checkBox);
     })
 
     document.querySelector('#isReproducableAvailable').addEventListener('change', (e) => {
         const checkBox = document.querySelector('#isReproducableAvailable')
-        if (checkBox.checked) {
-            const logFileUpload = document.querySelector('#reproducable')
-            logFileUpload.disabled = true
-          } else {
-            const logFileUpload = document.querySelector('#reproducable')
-            logFileUpload.disabled = false
-          }
+        const reproducableFileUpload = document.querySelector('#reproducable');
+        disableFieldByCheckbox(reproducableFileUpload, checkBox);
     })
 
     function string_to_slug (str) {

@@ -328,7 +328,7 @@
             select.selectedIndex = i;
         }
         if (event.data.includes("boardName:")) {
-            var boardName = event.data.split(":")[1];
+            var boardName = string_to_slug(event.data.split(":")[1]);
             var select = document.querySelector("#boards");
             var i;
             for (i = 0; i < select.options.length; i++) {

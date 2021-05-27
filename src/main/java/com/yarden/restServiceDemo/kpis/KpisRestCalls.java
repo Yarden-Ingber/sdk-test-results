@@ -85,7 +85,8 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="sdk") String sdk,
                                      @RequestParam(required=false,name="sdkVersion") String sdkVersion,
                                      @RequestParam(required=false,name="linkToTestResults") String linkToTestResults,
-                                     @RequestParam(name="isAccessible") String isAppAccessible,
+                                     @RequestParam(required=false,name="isAccessible") String isAppAccessible,
+                                     @RequestParam(required=false,name="renderID") String renderID,
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
                                      @RequestParam(required=false,name="reproducable") MultipartFile[] reproducableFiles,
                                      ModelMap ticketFormFields) {
@@ -102,6 +103,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.renderID.name(), renderID == null ? "" : renderID);
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);
         } catch (UnirestException e) {

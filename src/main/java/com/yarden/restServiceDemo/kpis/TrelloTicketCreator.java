@@ -70,6 +70,7 @@ public class TrelloTicketCreator {
         ticketDescription = ticketDescription + "\n\nSDK version: " + ticketFormFields.get(FormFields.sdkVersion.name());
         ticketDescription = ticketDescription + "\n\nEyes dashboard test results: " + ticketFormFields.get(FormFields.linkToTestResults.name());
         ticketDescription = ticketDescription + "\n\nIs customer app accessible: " + ticketFormFields.get(FormFields.isAppAccessible.name());
+        ticketDescription = ticketDescription + "\n\nRender ID: " + ticketFormFields.get(FormFields.renderID.name());
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
     }
 
@@ -78,7 +79,7 @@ public class TrelloTicketCreator {
         fieldName = "Affected Versions";
         fieldValue = (String)ticketFormFields.get(FormFields.sdkVersion.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
-        fieldName = "sdk";
+        fieldName = "SDK";
         fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "KPI SUB PROJECT";
@@ -87,10 +88,13 @@ public class TrelloTicketCreator {
         fieldName = "Created by";
         fieldValue = (String)ticketFormFields.get(FormFields.accountName.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "Render ID";
+        fieldValue = (String)ticketFormFields.get(FormFields.renderID.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
     }
 
     public enum FormFields {
-        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible
+        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible, renderID
     }
 
 }

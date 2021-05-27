@@ -119,19 +119,126 @@
 .creationDone > span{
   display: none;
 }
-.loader {
-  border: 4px solid #f3f3f3; /* Light grey */
-  border-top: 4px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 2s linear infinite;
-  display: none;
+
+
+/* Absolute Center Spinner */
+.loading {
+  position: fixed;
+  z-index: 999;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Transparent Overlay */
+.loading:before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255,0.5);
+}
+
+/* :not(:required) hides these rules from IE9 and below */
+.loading:not(:required) {
+  /* hide "loading..." text */
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+.loading:not(:required):after {
+  content: '';
+  display: block;
+  font-size: 10px;
+  width: 50px;
+  height: 50px;
+  margin-top: -0.5em;
+
+  border: 15px solid rgba(33, 150, 243, 1.0);
+  border-radius: 100%;
+  border-bottom-color: transparent;
+  -webkit-animation: spinner 1s linear 0s infinite;
+  animation: spinner 1s linear 0s infinite;
+
+
+}
+
+/* Animation */
+
+@-webkit-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 </style>
 </head>
@@ -200,7 +307,7 @@
                         <option value="5f01beffc787887211ed98f1,5f01beffc787887211ed98f2">Quality team</option>
                     </select></label><br>
 
-                <div id="loader" class="loader"></div>
+                <div id="loading" class="loading">Loading&#8230;</div>
                 <label id="creationDone" class="creationDone"><span>Done!</span></label>
 
                 <input type="submit" id="btn-submit" value="Create ticket">
@@ -213,6 +320,9 @@
 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 
 <script>
+
+    showLoader();
+    setTimeout(() => hideLoader(), 3500);
 
     function changeFormForBoardEyesAppIssues () {
         const boardsSelect = document.querySelector('#boards');
@@ -337,21 +447,24 @@
         var submitButton = document.getElementById('btn-submit');
         submitButton.disabled = true;
         submitButton.style.background = '#C1C1C1';
-
-        // #### Show loader ####
-        var loader = document.getElementById('loader');
-        loader.style.display = 'block';
-
+        showLoader();
         var dummyFrame = document.getElementById('dummyframe');
         dummyFrame.onload = function() {
-            // #### Hide loader ####
-            loader.style.display = 'none';
+            hideLoader();
             var doneLabel = document.querySelector('.creationDone span');
             doneLabel.style.display = 'block';
         }
     })
 
+    function showLoader() {
+        var loading = document.getElementById('loading');
+        loading.style.display = 'block';
+    }
 
+    function hideLoader() {
+        var loading = document.getElementById('loading');
+        loading.style.display = 'none';
+    }
 
     function disableFieldByCheckbox (field, checkbox) {
         if (checkbox.checked) {

@@ -65,12 +65,24 @@ public class TrelloTicketCreator {
 
     private static void addTicketDetailsToDescription(ModelMap ticketFormFields) {
         String ticketDescription = (String)ticketFormFields.get(FormFields.ticketDescription.name());
-        ticketDescription = ticketDescription + "\n\nCustomer app url: " + ticketFormFields.get(FormFields.customerAppUrl.name());
-        ticketDescription = ticketDescription + "\n\nSDK: " + ticketFormFields.get(FormFields.sdk.name());
-        ticketDescription = ticketDescription + "\n\nSDK version: " + ticketFormFields.get(FormFields.sdkVersion.name());
-        ticketDescription = ticketDescription + "\n\nEyes dashboard test results: " + ticketFormFields.get(FormFields.linkToTestResults.name());
-        ticketDescription = ticketDescription + "\n\nIs customer app accessible: " + ticketFormFields.get(FormFields.isAppAccessible.name());
-        ticketDescription = ticketDescription + "\n\nRender ID: " + ticketFormFields.get(FormFields.renderID.name());
+        if (!((String)ticketFormFields.get(FormFields.customerAppUrl.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nCustomer app url: " + ticketFormFields.get(FormFields.customerAppUrl.name());
+        }
+        if (!((String)ticketFormFields.get(FormFields.sdk.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nSDK: " + ticketFormFields.get(FormFields.sdk.name());
+        }
+        if (!((String)ticketFormFields.get(FormFields.sdkVersion.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nSDK version: " + ticketFormFields.get(FormFields.sdkVersion.name());
+        }
+        if (!((String)ticketFormFields.get(FormFields.linkToTestResults.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nEyes dashboard test results: " + ticketFormFields.get(FormFields.linkToTestResults.name());
+        }
+        if (!((String)ticketFormFields.get(FormFields.isAppAccessible.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nIs customer app accessible: " + ticketFormFields.get(FormFields.isAppAccessible.name());
+        }
+        if (!((String)ticketFormFields.get(FormFields.renderID.name())).isEmpty()) {
+            ticketDescription = ticketDescription + "\n\nRender ID: " + ticketFormFields.get(FormFields.renderID.name());
+        }
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
     }
 

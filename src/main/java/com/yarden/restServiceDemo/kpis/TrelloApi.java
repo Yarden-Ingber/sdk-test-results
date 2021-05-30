@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public class TrelloApi {
 
@@ -40,7 +41,7 @@ public class TrelloApi {
         }
     }
 
-    public static String createTicket(ModelMap ticketFormFields) throws UnirestException {
+    public static JSONObject createTicket(ModelMap ticketFormFields) throws UnirestException {
         HttpResponse<JsonNode> createTicketResponse = Unirest.post("https://api.trello.com/1/cards")
                 .queryString("key", trelloApiKey)
                 .queryString("token", trelloApiToken)
@@ -48,8 +49,7 @@ public class TrelloApi {
                 .queryString("name", ticketFormFields.get(TrelloTicketCreator.FormFields.ticketTitle.name()))
                 .queryString("desc", ticketFormFields.get(TrelloTicketCreator.FormFields.ticketDescription.name()))
                 .asJson();
-        JSONObject myObj = createTicketResponse.getBody().getObject();
-        return myObj.getString("id");
+        return createTicketResponse.getBody().getObject();
     }
 
     public static void addMemberToTicket(String ticketId, ModelMap ticketFormFields) throws UnirestException {

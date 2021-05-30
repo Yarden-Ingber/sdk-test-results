@@ -111,6 +111,10 @@
 	-moz-border-radius: 3px;
 	font-weight: bold;
 }
+.ticketUrl,
+.ticketUrl > span{
+  display: none;
+}
 .required{
 	color:red;
 	font-weight:normal;
@@ -305,7 +309,10 @@
 
                 <div id="loading" class="loading">Loading&#8230;</div>
 
+                <input type="hidden" id="requestID" name="requestID" value="random">
+
                 <input type="submit" id="btn-submit" value="Create ticket">
+                <center><label id="ticketUrl" class="ticketUrl"><span>Done!</span></label></center>
 
 
             </fieldset></form>
@@ -315,6 +322,9 @@
 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 
 <script>
+
+    let requestID = Math.random();
+    document.querySelector('#requestID').value = requestID;
 
     showLoader();
     setTimeout(() => hideLoader(), 3500);
@@ -427,7 +437,13 @@
         dummyFrame.onload = function() {
             hideLoader();
             submitButton.value = "Done!";
-            doneLabel.style.display = 'block';
+
+            request = new XMLHttpRequest();
+            request.open("GET", "/get_trello_ticket_url?requestID=" + requestID, false);
+            request.send();
+            var ticketUrlLabel = document.querySelector('.ticketUrl span');
+            ticketUrlLabel.style.display = 'block';
+            ticketUrlLabel.textContent = request.responseText;
         }
     })
 

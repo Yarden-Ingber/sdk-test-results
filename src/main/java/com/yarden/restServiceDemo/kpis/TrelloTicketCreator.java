@@ -11,10 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TrelloTicketCreator {
 
     private static final String sdks = "java,java appium,python,ruby,dotnet,espresso,xcui,earlgrey,php,images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Selenium IDE,JS images,Not relevant";
+    private static AtomicReference<Map> ticketUrls = new AtomicReference<>();
 
     public static String getTicketCreationFormHtml() throws IOException, UnirestException {
         InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
@@ -23,6 +27,10 @@ public class TrelloTicketCreator {
         page = page.replace("<<<SDKS>>>", getSdksHtmlOptions());
         inputStream.close();
         return page;
+    }
+
+    public static String getTrelloTicketUrl(String requestID) {
+        return (String)ticketUrls.get().get(requestID);
     }
 
     private static String getSdksHtmlOptions(){
@@ -54,7 +62,12 @@ public class TrelloTicketCreator {
 
     public static void createTicket(ModelMap ticketFormFields) throws UnirestException {
         addTicketDetailsToDescription(ticketFormFields);
-        String ticketId = TrelloApi.createTicket(ticketFormFields);
+        JSONObject createResponse = TrelloApi.createTicket(ticketFormFields);
+        if (ticketUrls.get() == null) {
+            ticketUrls.set(new HashMap());
+        }
+        ticketUrls.get().put(ticketFormFields.get(FormFields.requestID.name()), createResponse.getString("shortUrl"));
+        String ticketId = createResponse.getString("id");
         TrelloApi.addMemberToTicket(ticketId, ticketFormFields);
         MultipartFile[] logFiles = ((MultipartFile[])ticketFormFields.get(FormFields.logFiles.name()));
         TrelloApi.uploadFilesToTicket(ticketId, logFiles);
@@ -106,7 +119,7 @@ public class TrelloTicketCreator {
     }
 
     public enum FormFields {
-        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible, renderID
+        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible, renderID, requestID
     }
 
 }

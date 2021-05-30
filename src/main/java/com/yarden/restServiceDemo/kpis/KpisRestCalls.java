@@ -5,6 +5,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -76,11 +77,17 @@ public class KpisRestCalls {
         return TrelloTicketCreator.getTicketCreationFormHtml();
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/get_trello_ticket_url")
+    public String get_trello_ticket_url(@RequestParam String requestID) {
+        return TrelloTicketCreator.getTrelloTicketUrl(requestID);
+    }
+
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")
     public void create_trello_ticket(@RequestParam(name="account") String account,
                                      @RequestParam(name="boards") String board,
                                      @RequestParam(name="ticketTitle") String ticketTitle,
                                      @RequestParam(name="ticketDescription") String ticketDescription,
+                                     @RequestParam(name="requestID") String requestID,
                                      @RequestParam(required=false,name="customerAppUrl") String customerAppUrl,
                                      @RequestParam(required=false,name="sdk") String sdk,
                                      @RequestParam(required=false,name="sdkVersion") String sdkVersion,
@@ -90,6 +97,7 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
                                      @RequestParam(required=false,name="reproducable") MultipartFile[] reproducableFiles,
                                      ModelMap ticketFormFields) {
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.requestID.name(), requestID);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
@@ -104,6 +112,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.renderID.name(), renderID == null ? "" : renderID);
+        Logger.info("Trello ticket creation request: " + ticketFormFields.toString());
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);
         } catch (UnirestException e) {

@@ -71,8 +71,8 @@ public class TrelloTicketCreator {
         TrelloApi.addMemberToTicket(ticketId, ticketFormFields);
         MultipartFile[] logFiles = ((MultipartFile[])ticketFormFields.get(FormFields.logFiles.name()));
         TrelloApi.uploadFilesToTicket(ticketId, logFiles);
-        MultipartFile[] reproducableFiles = ((MultipartFile[])ticketFormFields.get(FormFields.reproducableFiles.name()));
-        TrelloApi.uploadFilesToTicket(ticketId, reproducableFiles);
+        MultipartFile[] reproducibleFiles = ((MultipartFile[])ticketFormFields.get(FormFields.reproducibleFiles.name()));
+        TrelloApi.uploadFilesToTicket(ticketId, reproducibleFiles);
         updateCustomFields(ticketFormFields, ticketId);
     }
 
@@ -119,7 +119,7 @@ public class TrelloTicketCreator {
     }
 
     public enum FormFields {
-        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducableFiles, isAppAccessible, renderID, requestID
+        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducibleFiles, isAppAccessible, renderID, requestID
     }
 
 }

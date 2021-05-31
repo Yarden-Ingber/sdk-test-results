@@ -290,9 +290,9 @@
                     <input type="checkbox" id="isLogFileAvailable" name="isLogFileAvailable" checked=true></label><br><br></div>
 
 
-                <div id="reproducableDiv"><label for="reproducable"><span>Reproducable and examples:</span>
-                    <input type="file" id="reproducable" name="reproducable" required multiple>
-                    <input type="checkbox" id="isReproducableAvailable" name="isReproducableAvailable" checked=true></label><br><br></div>
+                <div id="reproducibleDiv"><label for="reproducible"><span>Reproducible and examples:</span>
+                    <input type="file" id="reproducible" name="reproducible" required multiple>
+                    <input type="checkbox" id="isReproducibleAvailable" name="isReproducibleAvailable" checked=true></label><br><br></div>
 
                 <div id="accountDiv"><label for="account"><span>Account:</span>
                     <select id="account" required name="account" size="7"><<<ACCOUNTS>>></select></label><br></div>
@@ -492,10 +492,10 @@
         disableFieldByCheckbox(logFileUpload, checkBox);
     })
 
-    document.querySelector('#isReproducableAvailable').addEventListener('change', (e) => {
-        const checkBox = document.querySelector('#isReproducableAvailable')
-        const reproducableFileUpload = document.querySelector('#reproducable');
-        disableFieldByCheckbox(reproducableFileUpload, checkBox);
+    document.querySelector('#isReproducibleAvailable').addEventListener('change', (e) => {
+        const checkBox = document.querySelector('#isReproducibleAvailable')
+        const reproducibleFileUpload = document.querySelector('#reproducible');
+        disableFieldByCheckbox(reproducibleFileUpload, checkBox);
     })
 
     document.querySelector('#isRenderIDAvailable').addEventListener('change', (e) => {

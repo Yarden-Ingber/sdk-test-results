@@ -5,7 +5,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.yarden.restServiceDemo.Logger;
 import com.yarden.restServiceDemo.RestCalls;
 import com.yarden.restServiceDemo.reportService.WriteEntireSheetsPeriodically;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +94,7 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="isAccessible") String isAppAccessible,
                                      @RequestParam(required=false,name="renderID") String renderID,
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
-                                     @RequestParam(required=false,name="reproducable") MultipartFile[] reproducableFiles,
+                                     @RequestParam(required=false,name="reproducible") MultipartFile[] reproducibleFiles,
                                      ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.requestID.name(), requestID);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
@@ -109,7 +108,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion == null ? "" : sdkVersion);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults == null ? "" : linkToTestResults);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducableFiles.name(), reproducableFiles);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducibleFiles.name(), reproducibleFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.renderID.name(), renderID == null ? "" : renderID);
         Logger.info("Trello ticket creation request: " + ticketFormFields.toString());

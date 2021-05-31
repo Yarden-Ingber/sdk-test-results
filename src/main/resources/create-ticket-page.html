@@ -312,7 +312,7 @@
                 <input type="hidden" id="requestID" name="requestID" value="random">
 
                 <input type="submit" id="btn-submit" value="Create ticket">
-                <center><label id="ticketUrl" class="ticketUrl"><span><a href="">Done!</a></span></label></center>
+                <center><label id="ticketUrl" class="ticketUrl"><span><a href="" target="_blank">Done!</a></span></label></center>
 
 
             </fieldset></form>
@@ -444,8 +444,8 @@
             var ticketUrl = request.responseText;
             var ticketUrlLabel = document.querySelector('.ticketUrl span');
             ticketUrlLabel.style.display = 'block';
-            ticketUrlLabel.textContent = ticketUrl;
             var ticketUrlLink = ticketUrlLabel.querySelector('a');
+            ticketUrlLink.textContent = ticketUrl;
             ticketUrlLink.href = ticketUrl;
         }
     })

@@ -312,7 +312,7 @@
                 <input type="hidden" id="requestID" name="requestID" value="random">
 
                 <input type="submit" id="btn-submit" value="Create ticket">
-                <center><label id="ticketUrl" class="ticketUrl"><span>Done!</span></label></center>
+                <center><label id="ticketUrl" class="ticketUrl"><span><a href="">Done!</a></span></label></center>
 
 
             </fieldset></form>
@@ -441,9 +441,12 @@
             request = new XMLHttpRequest();
             request.open("GET", "/get_trello_ticket_url?requestID=" + requestID, false);
             request.send();
+            var ticketUrl = request.responseText;
             var ticketUrlLabel = document.querySelector('.ticketUrl span');
             ticketUrlLabel.style.display = 'block';
-            ticketUrlLabel.textContent = request.responseText;
+            ticketUrlLabel.textContent = ticketUrl;
+            var ticketUrlLink = ticketUrlLabel.querySelector('a');
+            ticketUrlLink.href = ticketUrl;
         }
     })
 

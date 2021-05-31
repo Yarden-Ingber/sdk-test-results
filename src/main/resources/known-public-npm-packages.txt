@@ -49,3 +49,4 @@
 @applitools/eyes-api
 @applitools/eyes-scm
 @applitools/sdk-shared
+@applitools/types

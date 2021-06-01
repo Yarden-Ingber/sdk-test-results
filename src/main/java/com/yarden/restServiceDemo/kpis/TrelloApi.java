@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
 
 public class TrelloApi {
 
@@ -59,20 +58,33 @@ public class TrelloApi {
 
     public static void updateCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String fieldValue) {
         try {
-            String customFieldID = getCustomFieldId(ticketFormFields, customFieldName);
-            HttpResponse<JsonNode> response2 = Unirest.put("https://api.trello.com/1/cards/" + ticketID + "/customField/" + customFieldID + "/item?key=" + trelloApiKey + "&token=" + trelloApiToken)
-                    .header("Content-Type", "application/json")
-                    .body("{\"value\":{\"text\":\"" + fieldValue + "\"}}")
-                    .asJson();
+            String requestBody = "{\"value\":{\"text\":\"" + fieldValue + "\"}}";
+            updateGenericCustomFieldValue(ticketFormFields, customFieldName, ticketID, requestBody);
         } catch (Throwable t) {
             Logger.warn("Failed to set custom field value " + customFieldName + "=" + fieldValue);
         }
-
     }
 
-    public static String getCustomFieldId(ModelMap ticketFormFields, String desiredField) throws UnirestException {
-        HttpResponse<JsonNode> response = Unirest.get("https://api.trello.com/1/boards/" + ticketFormFields.get(TrelloTicketCreator.FormFields.board.name()) + "/customFields?key=" + trelloApiKey + "&token=" + trelloApiToken).asJson();
-        JSONArray customFieldsArray = response.getBody().getArray();
+    public static void updateDropdownCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String fieldValue) {
+        try {
+            String optionID = getCustomFieldDropdownOptionId(ticketFormFields, customFieldName, fieldValue);
+            String requestBody = "{\"idValue\":\"" + optionID + "\"}";
+            updateGenericCustomFieldValue(ticketFormFields, customFieldName, ticketID, requestBody);
+        } catch (Throwable t) {
+            Logger.warn("Failed to set custom field value " + customFieldName);
+        }
+    }
+
+    private static void updateGenericCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String requestBody) throws UnirestException {
+        String customFieldID = getCustomFieldId(ticketFormFields, customFieldName);
+        HttpResponse<JsonNode> response2 = Unirest.put("https://api.trello.com/1/cards/" + ticketID + "/customField/" + customFieldID + "/item?key=" + trelloApiKey + "&token=" + trelloApiToken)
+                .header("Content-Type", "application/json")
+                .body(requestBody)
+                .asJson();
+    }
+
+    private static String getCustomFieldId(ModelMap ticketFormFields, String desiredField) throws UnirestException {
+        JSONArray customFieldsArray = getCustomFieldsArray(ticketFormFields);
         for (Object customField : customFieldsArray) {
             String fieldName = (String)((JSONObject)customField).get("name");
             if (fieldName.equalsIgnoreCase(desiredField)) {
@@ -80,6 +92,27 @@ public class TrelloApi {
             }
         }
         return "not found";
+    }
+
+    private static String getCustomFieldDropdownOptionId(ModelMap ticketFormFields, String desiredField, String optionText) throws UnirestException {
+        JSONArray customFieldsArray = getCustomFieldsArray(ticketFormFields);
+        for (Object customField : customFieldsArray) {
+            String fieldName = (String)((JSONObject)customField).get("name");
+            if (fieldName.equalsIgnoreCase(desiredField)) {
+                JSONArray options = (JSONArray)((JSONObject)customField).get("options");
+                for (Object option : options) {
+                    if (((String)((JSONObject)((JSONObject)option).get("value")).get("text")).equalsIgnoreCase(optionText)) {
+                        return (String)((JSONObject)option).get("id");
+                    }
+                }
+            }
+        }
+        return "not found";
+    }
+
+    private static JSONArray getCustomFieldsArray(ModelMap ticketFormFields) throws UnirestException {
+        HttpResponse<JsonNode> response = Unirest.get("https://api.trello.com/1/boards/" + ticketFormFields.get(TrelloTicketCreator.FormFields.board.name()) + "/customFields?key=" + trelloApiKey + "&token=" + trelloApiToken).asJson();
+        return response.getBody().getArray();
     }
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile, String fileName) {

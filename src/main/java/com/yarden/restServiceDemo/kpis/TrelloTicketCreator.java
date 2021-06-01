@@ -109,7 +109,7 @@ public class TrelloTicketCreator {
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "KPI SUB PROJECT";
         fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Created by";
         fieldValue = (String)ticketFormFields.get(FormFields.accountName.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);

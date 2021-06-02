@@ -111,7 +111,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducibleFiles.name(), reproducibleFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.renderID.name(), renderID == null ? "" : renderID);
-        Logger.info("Trello ticket creation request: " + ticketFormFields.toString());
+        Logger.info("KpisRestCalls: Trello ticket creation request: " + ticketFormFields.toString());
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);
         } catch (UnirestException e) {

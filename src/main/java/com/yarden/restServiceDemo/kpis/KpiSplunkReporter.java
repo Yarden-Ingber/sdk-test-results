@@ -24,6 +24,7 @@ public class KpiSplunkReporter {
         addColumnsToEvent(splunkEventJson, ticket);
         Logger.info("KPIs: reporting the latest state of ticket to Splunk: " + splunkEventJson.toString());
         new SplunkReporter().report(Enums.SplunkSourceTypes.RawKPILog, splunkEventJson.toString());
+        throw new NullPointerException("Change log value is null");
     }
 
     public void reportStandAloneEvent(TicketStates newState) {

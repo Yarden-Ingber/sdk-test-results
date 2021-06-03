@@ -78,7 +78,9 @@ public class KpisRestCalls {
 
     @RequestMapping(method = RequestMethod.GET, path = "/get_trello_ticket_url")
     public String get_trello_ticket_url(@RequestParam String requestID) {
-        return TrelloTicketCreator.getTrelloTicketUrl(requestID);
+        String ticketUrl = TrelloTicketCreator.getTrelloTicketUrl(requestID);
+        Logger.info("KpisRestCalls: request for a created ticket url: " + ticketUrl);
+        return ticketUrl;
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/create_trello_ticket")

@@ -50,3 +50,4 @@
 @applitools/eyes-scm
 @applitools/sdk-shared
 @applitools/types
+@applitools/test-utils

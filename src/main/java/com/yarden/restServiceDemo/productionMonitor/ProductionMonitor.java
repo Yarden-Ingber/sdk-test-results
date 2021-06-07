@@ -84,7 +84,8 @@ public class ProductionMonitor extends TimerTask {
         for (String domainSite : domainsSitesList) {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
-            if (!(site.equals("Jpmcqa") || site.equals("Verison") || site.equals("Itai") || site.equals("Yotamtest") || site.equals("Yotam") || domain.contains("publicbeyes.applitools.com"))) {
+            if (!(site.equals("Jpmcqa") || site.equals("Verison") || site.equals("Itai") || site.equals("Yotamtest") ||
+                    site.equals("Yotam") || domain.contains("publicbeyes.applitools.com") || site.equalsIgnoreCase("Futuredev"))) {
                 domain = domain + "/api/admin/userinfo";
                 URL endpoint = new URL(domain);
                 JSONObject productionMonitorEventJson = new JSONObject();
@@ -119,6 +120,8 @@ public class ProductionMonitor extends TimerTask {
                 }
                 productionMonitorEventJson.put("uuid", UUID.randomUUID().toString().substring(0, 8));
                 new SplunkReporter().report(Enums.SplunkSourceTypes.ProductionMonitor, productionMonitorEventJson.toString());
+            } else {
+                Logger.info("ProductionMonitor: site=" + site + ", domain=" + domain + " was skipped in monitor");
             }
         }
         if (!failedEndpoints.toString().isEmpty()) {

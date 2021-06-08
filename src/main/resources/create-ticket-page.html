@@ -558,7 +558,8 @@
             document.querySelector('#zendeskCompanyName').value = zendeskCompanyName;
         }
         if (event.data.includes("zendeskUrl:")) {
-            var zendeskUrl = event.data.split(":")[1];
+            var zendeskUrlArray = event.data.split(":");
+            var zendeskUrl = zendeskUrlArray[1] + ":" + zendeskUrlArray[2];
             document.querySelector('#zendeskUrl').value = zendeskUrl;
         }
         if (event.data.includes("zendeskTier:")) {

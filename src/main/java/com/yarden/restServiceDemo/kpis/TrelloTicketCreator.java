@@ -116,10 +116,20 @@ public class TrelloTicketCreator {
         fieldName = "Render ID";
         fieldValue = (String)ticketFormFields.get(FormFields.renderID.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "ZENDESK URL";
+        fieldValue = (String)ticketFormFields.get(FormFields.zendeskUrl.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "CUSTOMER'S NAME";
+        fieldValue = (String)ticketFormFields.get(FormFields.zendeskCompanyName.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "COMPANY'S NAME";
+        fieldValue = (String)ticketFormFields.get(FormFields.zendeskCompanyName.name());
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
     }
 
     public enum FormFields {
-        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles, reproducibleFiles, isAppAccessible, renderID, requestID
+        accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles,
+        reproducibleFiles, isAppAccessible, renderID, requestID, zendeskCustomerName, zendeskCompanyName, zendeskUrl, zendeskTier, zendeskCustomerType
     }
 
 }

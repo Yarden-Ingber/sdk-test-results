@@ -95,6 +95,11 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="linkToTestResults") String linkToTestResults,
                                      @RequestParam(required=false,name="isAccessible") String isAppAccessible,
                                      @RequestParam(required=false,name="renderID") String renderID,
+                                     @RequestParam(required=false,name="zendeskCustomerName") String zendeskCustomerName,
+                                     @RequestParam(required=false,name="zendeskCompanyName") String zendeskCompanyName,
+                                     @RequestParam(required=false,name="zendeskUrl") String zendeskUrl,
+                                     @RequestParam(required=false,name="zendeskTier") String zendeskTier,
+                                     @RequestParam(required=false,name="zendeskCustomerType") String zendeskCustomerType,
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
                                      @RequestParam(required=false,name="reproducible") MultipartFile[] reproducibleFiles,
                                      ModelMap ticketFormFields) {
@@ -113,6 +118,11 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducibleFiles.name(), reproducibleFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.isAppAccessible.name(), isAppAccessible == null ? "" : isAppAccessible);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.renderID.name(), renderID == null ? "" : renderID);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskCustomerName.name(), zendeskCustomerName == null ? "" : zendeskCustomerName);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskCompanyName.name(), zendeskCompanyName == null ? "" : zendeskCompanyName);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskUrl.name(), zendeskUrl == null ? "" : zendeskUrl);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskTier.name(), zendeskTier == null ? "" : zendeskTier);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskCustomerType.name(), zendeskCustomerType == null ? "" : zendeskCustomerType);
         Logger.info("KpisRestCalls: Trello ticket creation request: " + ticketFormFields.toString());
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);

@@ -310,6 +310,11 @@
                 <div id="loading" class="loading">Loading&#8230;</div>
 
                 <input type="hidden" id="requestID" name="requestID" value="random">
+                <input type="hidden" id="zendeskCustomerName" name="zendeskCustomerName" value="">
+                <input type="hidden" id="zendeskCompanyName" name="zendeskCompanyName" value="">
+                <input type="hidden" id="zendeskUrl" name="zendeskUrl" value="">
+                <input type="hidden" id="zendeskTier" name="zendeskTier" value="">
+                <input type="hidden" id="zendeskCustomerType" name="zendeskCustomerType" value="">
 
                 <input type="submit" id="btn-submit" value="Create ticket">
                 <center><label id="ticketUrl" class="ticketUrl"><span><a href="" target="_blank">Done!</a></span></label></center>
@@ -543,6 +548,21 @@
             }
             select.selectedIndex = i;
             changeFormForBoardEyesAppIssues();
+        }
+        if (event.data.includes("zendeskCustomerName:")) {
+            document.querySelector('#zendeskCustomerName').value = event.data;
+        }
+        if (event.data.includes("zendeskCompanyName:")) {
+            document.querySelector('#zendeskCompanyName').value = event.data;
+        }
+        if (event.data.includes("zendeskUrl:")) {
+            document.querySelector('#zendeskUrl').value = event.data;
+        }
+        if (event.data.includes("zendeskTier:")) {
+            document.querySelector('#zendeskTier').value = event.data;
+        }
+        if (event.data.includes("zendeskCustomerType:")) {
+            document.querySelector('#zendeskCustomerType').value = event.data;
         }
     });
 

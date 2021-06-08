@@ -550,19 +550,24 @@
             changeFormForBoardEyesAppIssues();
         }
         if (event.data.includes("zendeskCustomerName:")) {
-            document.querySelector('#zendeskCustomerName').value = event.data;
+            var zendeskCustomerName = event.data.split(":")[1];
+            document.querySelector('#zendeskCustomerName').value = zendeskCustomerName;
         }
         if (event.data.includes("zendeskCompanyName:")) {
-            document.querySelector('#zendeskCompanyName').value = event.data;
+            var zendeskCompanyName = event.data.split(":")[1];
+            document.querySelector('#zendeskCompanyName').value = zendeskCompanyName;
         }
         if (event.data.includes("zendeskUrl:")) {
-            document.querySelector('#zendeskUrl').value = event.data;
+            var zendeskUrl = event.data.split(":")[1];
+            document.querySelector('#zendeskUrl').value = zendeskUrl;
         }
         if (event.data.includes("zendeskTier:")) {
-            document.querySelector('#zendeskTier').value = event.data;
+            var zendeskTier = event.data.split(":")[1];
+            document.querySelector('#zendeskTier').value = zendeskTier;
         }
         if (event.data.includes("zendeskCustomerType:")) {
-            document.querySelector('#zendeskCustomerType').value = event.data;
+            var zendeskCustomerType = event.data.split(":")[1];
+            document.querySelector('#zendeskCustomerType').value = zendeskCustomerType;
         }
     });
 

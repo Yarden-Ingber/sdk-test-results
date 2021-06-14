@@ -51,3 +51,4 @@
 @applitools/sdk-shared
 @applitools/types
 @applitools/test-utils
+@applitools/test-server

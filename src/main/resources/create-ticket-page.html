@@ -523,52 +523,68 @@
         return str;
     }
 
+    var undefinedString = "undefined";
+
     window.addEventListener("message", (event) => {
         console.log(event.data);
         if (event.data.includes("accountName:")) {
             var accountName = event.data.split(":")[1];
-            var select = document.querySelector("#account");
-            var i;
-            for (i = 0; i < select.options.length; i++) {
-                if (select.options[i].text == accountName) {
-                    break;
+            if (accountName != undefinedString) {
+                var select = document.querySelector("#account");
+                var i;
+                for (i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text == accountName) {
+                        break;
+                    }
                 }
+                select.selectedIndex = i;
             }
-            select.selectedIndex = i;
         }
         if (event.data.includes("boardName:")) {
             var boardName = string_to_slug(event.data.split(":")[1]);
-            var select = document.querySelector("#boards");
-            var i;
-            for (i = 0; i < select.options.length; i++) {
-                var boardSlug = string_to_slug(select.options[i].text);
-                if (boardSlug == boardName) {
-                    break;
+            if (boardName != undefinedString) {
+                var select = document.querySelector("#boards");
+                var i;
+                for (i = 0; i < select.options.length; i++) {
+                    var boardSlug = string_to_slug(select.options[i].text);
+                    if (boardSlug == boardName) {
+                        break;
+                    }
                 }
+                select.selectedIndex = i;
+                changeFormForBoardEyesAppIssues();
             }
-            select.selectedIndex = i;
-            changeFormForBoardEyesAppIssues();
         }
         if (event.data.includes("zendeskCustomerName:")) {
             var zendeskCustomerName = event.data.split(":")[1];
-            document.querySelector('#zendeskCustomerName').value = zendeskCustomerName;
+            if (zendeskCustomerName != undefinedString) {
+                document.querySelector('#zendeskCustomerName').value = zendeskCustomerName;
+            }
         }
         if (event.data.includes("zendeskCompanyName:")) {
             var zendeskCompanyName = event.data.split(":")[1];
-            document.querySelector('#zendeskCompanyName').value = zendeskCompanyName;
+            if (zendeskCompanyName != undefinedString) {
+                document.querySelector('#zendeskCompanyName').value = zendeskCompanyName;
+            }
         }
         if (event.data.includes("zendeskUrl:")) {
             var zendeskUrlArray = event.data.split(":");
-            var zendeskUrl = zendeskUrlArray[1] + ":" + zendeskUrlArray[2];
-            document.querySelector('#zendeskUrl').value = zendeskUrl;
+            if (zendeskUrlArray != undefinedString) {
+                var zendeskUrl = zendeskUrlArray[1] + ":" + zendeskUrlArray[2];
+                document.querySelector('#zendeskUrl').value = zendeskUrl;
+            }
         }
         if (event.data.includes("zendeskTier:")) {
             var zendeskTier = event.data.split(":")[1];
-            document.querySelector('#zendeskTier').value = zendeskTier;
+            if (zendeskTier != undefinedString) {
+                document.querySelector('#zendeskTier').value = zendeskTier;
+            }
         }
         if (event.data.includes("zendeskCustomerType:")) {
             var zendeskCustomerType = event.data.split(":")[1];
-            document.querySelector('#zendeskCustomerType').value = zendeskCustomerType;
+            if (zendeskCustomerType != undefinedString) {
+                document.querySelector('#zendeskCustomerType').value = zendeskCustomerType;
+            }
         }
     });
 

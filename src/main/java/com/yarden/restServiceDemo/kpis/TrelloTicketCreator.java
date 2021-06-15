@@ -125,9 +125,9 @@ public class TrelloTicketCreator {
         fieldName = "COMPANY'S NAME";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCompanyName.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
-        fieldName = "CUSTOMER TYPE";
+        fieldName = "Z. customer type";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerType.name());
-        TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "TIER";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskTier.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);

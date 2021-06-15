@@ -101,13 +101,13 @@ public class TrelloTicketCreator {
 
     private static void updateCustomFields(ModelMap ticketFormFields, String ticketId) {
         String fieldName;String fieldValue;
+        fieldName = "KPI SUB PROJECT";
+        fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
+        TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Affected Versions";
         fieldValue = (String)ticketFormFields.get(FormFields.sdkVersion.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "SDK";
-        fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
-        TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
-        fieldName = "KPI SUB PROJECT";
         fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Created by";
@@ -129,7 +129,7 @@ public class TrelloTicketCreator {
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerType.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "TIER";
-        fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerType.name());
+        fieldValue = (String)ticketFormFields.get(FormFields.zendeskTier.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
     }
 

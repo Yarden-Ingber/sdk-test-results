@@ -569,7 +569,7 @@
         }
         if (event.data.includes("zendeskUrl:")) {
             var zendeskUrlArray = event.data.split(":");
-            if (zendeskUrlArray != undefinedString) {
+            if (zendeskUrlArray[1] != undefinedString) {
                 var zendeskUrl = zendeskUrlArray[1] + ":" + zendeskUrlArray[2];
                 document.querySelector('#zendeskUrl').value = zendeskUrl;
             }

@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TrelloTicketCreator {
 
-    private static final String sdks = "java,java appium,python,ruby,dotnet,espresso,xcui,earlgrey,php,images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Selenium IDE,JS images,Not relevant";
+    private static final String sdks = "java,java appium,python,ruby,dotnet,espresso,xcui,earlgrey,php,images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Puppeteer,Selenium IDE,JS images,Not relevant";
     private static AtomicReference<Map> ticketUrls = new AtomicReference<>();
 
     public static String getTicketCreationFormHtml() throws IOException, UnirestException {

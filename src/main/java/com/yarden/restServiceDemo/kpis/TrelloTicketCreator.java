@@ -128,9 +128,28 @@ public class TrelloTicketCreator {
         fieldName = "Z. customer type";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerType.name());
         TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "CUSTOMER TYPE";
+        fieldValue = mapZendeskCustomerTypeToDropdownOptionInTrello((String)ticketFormFields.get(FormFields.zendeskCustomerType.name()));
+        TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "TIER";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskTier.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+    }
+
+    private static String mapZendeskCustomerTypeToDropdownOptionInTrello(String zendeskCustomerType) {
+        try {
+            if (zendeskCustomerType.equalsIgnoreCase("Customer")) {
+                return "Paying";
+            } else if (zendeskCustomerType.equalsIgnoreCase("Prospect")) {
+                return "POC";
+            } else if (zendeskCustomerType.isEmpty()) {
+                return "Lead";
+            } else {
+                return "";
+            }
+        } catch (Throwable t) {
+            return "";
+        }
     }
 
     public enum FormFields {

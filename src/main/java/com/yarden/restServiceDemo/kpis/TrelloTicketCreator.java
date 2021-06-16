@@ -3,6 +3,7 @@ package com.yarden.restServiceDemo.kpis;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.yarden.restServiceDemo.reportService.SdkReportService;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.ui.ModelMap;
@@ -138,11 +139,11 @@ public class TrelloTicketCreator {
 
     private static String mapZendeskCustomerTypeToDropdownOptionInTrello(String zendeskCustomerType) {
         try {
-            if (zendeskCustomerType.equalsIgnoreCase("Customer")) {
+            if (StringUtils.isEmpty(zendeskCustomerType)) {
                 return "Paying";
             } else if (zendeskCustomerType.equalsIgnoreCase("Prospect")) {
                 return "POC";
-            } else if (zendeskCustomerType.isEmpty()) {
+            } else if (zendeskCustomerType.equalsIgnoreCase("Customer")) {
                 return "Lead";
             } else {
                 return "";

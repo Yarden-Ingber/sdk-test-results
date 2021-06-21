@@ -56,9 +56,18 @@ public class TrelloApi {
                 .asString();
     }
 
-    public static void updateCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String fieldValue) {
+    public static void updateStringCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String fieldValue) {
         try {
             String requestBody = "{\"value\":{\"text\":\"" + fieldValue + "\"}}";
+            updateGenericCustomFieldValue(ticketFormFields, customFieldName, ticketID, requestBody);
+        } catch (Throwable t) {
+            Logger.warn("Failed to set custom field value " + customFieldName + "=" + fieldValue);
+        }
+    }
+
+    public static void updateCheckboxCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, boolean fieldValue) {
+        try {
+            String requestBody = "{\"value\":{\"checked\":\"" + fieldValue + "\"}}";
             updateGenericCustomFieldValue(ticketFormFields, customFieldName, ticketID, requestBody);
         } catch (Throwable t) {
             Logger.warn("Failed to set custom field value " + customFieldName + "=" + fieldValue);

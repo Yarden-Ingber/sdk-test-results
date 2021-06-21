@@ -102,6 +102,8 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="zendeskCustomerType") String zendeskCustomerType,
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
                                      @RequestParam(required=false,name="reproducible") MultipartFile[] reproducibleFiles,
+                                     @RequestParam(required=false,name="workaround") String workaround,
+                                     @RequestParam(required=false,name="blocker") String blocker,
                                      ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.requestID.name(), requestID);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
@@ -123,6 +125,8 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskUrl.name(), zendeskUrl == null ? "" : zendeskUrl);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskTier.name(), zendeskTier == null ? "" : zendeskTier);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskCustomerType.name(), zendeskCustomerType == null ? "" : zendeskCustomerType);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.workaround.name(), workaround == null ? false : true);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.blocker.name(), blocker == null ? false : true);
         Logger.info("KpisRestCalls: Trello ticket creation request: " + ticketFormFields.toString());
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);

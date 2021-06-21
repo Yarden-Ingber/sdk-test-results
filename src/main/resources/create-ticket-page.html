@@ -12,6 +12,9 @@
 .form-style-3{
 	max-width: 100%;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	color: #0a8073;
+	font-size: 13px;
+	font-weight: bold;
 }
 .form-style-3 label{
 	display:block;
@@ -310,6 +313,15 @@
                 <div id="reproducibleDiv"><label for="reproducible"><span>Reproducible and examples:</span>
                     <input type="file" id="reproducible" name="reproducible" required multiple>
                     <input type="checkbox" id="isReproducibleAvailable" name="isReproducibleAvailable" checked=true></label><br><br></div>
+
+                <details>
+                    <summary>Extras</summary>
+                    <br><br>
+                    <div id="workaroundDiv"><label for="workaround"><span>workaround:</span>
+                        <input type="checkbox" id="workaround" name="workaround"><br><br>
+                    <div id="blockerDiv"><label for="blocker"><span>blocker:</span>
+                        <input type="checkbox" id="blocker" name="blocker">
+                </details><br><br>
 
                 <div id="loading" class="loading">Loading&#8230;</div>
 

@@ -107,34 +107,38 @@ public class TrelloTicketCreator {
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Affected Versions";
         fieldValue = (String)ticketFormFields.get(FormFields.sdkVersion.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "SDK";
         fieldValue = (String)ticketFormFields.get(FormFields.sdk.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Created by";
         fieldValue = (String)ticketFormFields.get(FormFields.accountName.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Render ID";
         fieldValue = (String)ticketFormFields.get(FormFields.renderID.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "ZENDESK URL";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskUrl.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "CUSTOMER'S NAME";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerName.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "COMPANY'S NAME";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCompanyName.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "Z. customer type";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskCustomerType.name());
-        TrelloApi.updateCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        TrelloApi.updateStringCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "CUSTOMER TYPE";
         fieldValue = mapZendeskCustomerTypeToDropdownOptionInTrello((String)ticketFormFields.get(FormFields.zendeskCustomerType.name()));
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
         fieldName = "TIER";
         fieldValue = (String)ticketFormFields.get(FormFields.zendeskTier.name());
         TrelloApi.updateDropdownCustomFieldValue(ticketFormFields, fieldName, ticketId, fieldValue);
+        fieldName = "BLOCKER?";
+        TrelloApi.updateCheckboxCustomFieldValue(ticketFormFields, fieldName, ticketId, (boolean)ticketFormFields.get(FormFields.blocker.name()));
+        fieldName = "WORKAROUND?";
+        TrelloApi.updateCheckboxCustomFieldValue(ticketFormFields, fieldName, ticketId, (boolean)ticketFormFields.get(FormFields.workaround.name()));
     }
 
     private static String mapZendeskCustomerTypeToDropdownOptionInTrello(String zendeskCustomerType) {
@@ -155,7 +159,8 @@ public class TrelloTicketCreator {
 
     public enum FormFields {
         accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles,
-        reproducibleFiles, isAppAccessible, renderID, requestID, zendeskCustomerName, zendeskCompanyName, zendeskUrl, zendeskTier, zendeskCustomerType
+        reproducibleFiles, isAppAccessible, renderID, requestID, zendeskCustomerName, zendeskCompanyName, zendeskUrl, zendeskTier, zendeskCustomerType,
+        workaround, blocker
     }
 
 }

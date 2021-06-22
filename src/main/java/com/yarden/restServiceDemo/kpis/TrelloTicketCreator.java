@@ -144,11 +144,11 @@ public class TrelloTicketCreator {
     private static String mapZendeskCustomerTypeToDropdownOptionInTrello(String zendeskCustomerType) {
         try {
             if (StringUtils.isEmpty(zendeskCustomerType)) {
-                return "Paying";
+                return "Lead";
             } else if (zendeskCustomerType.equalsIgnoreCase("Prospect")) {
                 return "POC";
             } else if (zendeskCustomerType.equalsIgnoreCase("Customer")) {
-                return "Lead";
+                return "Paying";
             } else {
                 return "";
             }

@@ -25,7 +25,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Configuration
+//@Configuration
 public class ProductionMonitor extends TimerTask {
 
     private static boolean isRunning = false;
@@ -85,7 +85,8 @@ public class ProductionMonitor extends TimerTask {
             String domain = domainSite.split(",")[0];
             String site = domainSite.split(",")[1];
             if (!(site.equals("Jpmcqa") || site.equals("Verison") || site.equals("Itai") || site.equals("Yotamtest") ||
-                    site.equals("Yotam") || domain.contains("publicbeyes.applitools.com") || site.equalsIgnoreCase("Futuredev"))) {
+                    site.equals("Yotam") || domain.contains("publicbeyes.applitools.com") || site.equalsIgnoreCase("Futuredev") ||
+                    site.equals("Jpmccib"))) {
                 domain = domain + "/api/admin/userinfo";
                 URL endpoint = new URL(domain);
                 JSONObject productionMonitorEventJson = new JSONObject();

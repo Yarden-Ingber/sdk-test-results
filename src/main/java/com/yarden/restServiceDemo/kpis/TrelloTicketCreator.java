@@ -69,12 +69,20 @@ public class TrelloTicketCreator {
         }
         ticketUrls.get().put(ticketFormFields.get(FormFields.requestID.name()), createResponse.getString("shortUrl"));
         String ticketId = createResponse.getString("id");
+        updateCustomFields(ticketFormFields, ticketId);
         TrelloApi.addMemberToTicket(ticketId, ticketFormFields);
         MultipartFile[] logFiles = ((MultipartFile[])ticketFormFields.get(FormFields.logFiles.name()));
         TrelloApi.uploadFilesToTicket(ticketId, logFiles);
         MultipartFile[] reproducibleFiles = ((MultipartFile[])ticketFormFields.get(FormFields.reproducibleFiles.name()));
         TrelloApi.uploadFilesToTicket(ticketId, reproducibleFiles);
-        updateCustomFields(ticketFormFields, ticketId);
+        uploadExtraFiles(ticketId, ticketFormFields);
+    }
+
+    private static void uploadExtraFiles(String ticketId, ModelMap ticketFormFields) throws UnirestException {
+        for (int i = 1; i < 6; i++) {
+            MultipartFile[] extraFiles = ((MultipartFile[])ticketFormFields.get(FormFields.valueOf("extraFiles" + i).name()));
+            TrelloApi.uploadFilesToTicket(ticketId, extraFiles);
+        }
     }
 
     private static void addTicketDetailsToDescription(ModelMap ticketFormFields) {
@@ -160,7 +168,7 @@ public class TrelloTicketCreator {
     public enum FormFields {
         accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles,
         reproducibleFiles, isAppAccessible, renderID, requestID, zendeskCustomerName, zendeskCompanyName, zendeskUrl, zendeskTier, zendeskCustomerType,
-        workaround, blocker
+        workaround, blocker, extraFiles1, extraFiles2, extraFiles3, extraFiles4, extraFiles5
     }
 
 }

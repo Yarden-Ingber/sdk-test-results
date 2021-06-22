@@ -104,6 +104,11 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="reproducible") MultipartFile[] reproducibleFiles,
                                      @RequestParam(required=false,name="workaround") String workaround,
                                      @RequestParam(required=false,name="blocker") String blocker,
+                                     @RequestParam(required=false,name="extraFiles1") MultipartFile[] extraFiles1,
+                                     @RequestParam(required=false,name="extraFiles2") MultipartFile[] extraFiles2,
+                                     @RequestParam(required=false,name="extraFiles3") MultipartFile[] extraFiles3,
+                                     @RequestParam(required=false,name="extraFiles4") MultipartFile[] extraFiles4,
+                                     @RequestParam(required=false,name="extraFiles5") MultipartFile[] extraFiles5,
                                      ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.requestID.name(), requestID);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
@@ -127,6 +132,11 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.zendeskCustomerType.name(), zendeskCustomerType == null ? "" : zendeskCustomerType);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.workaround.name(), workaround == null ? false : true);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.blocker.name(), blocker == null ? false : true);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraFiles1.name(), extraFiles1);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraFiles2.name(), extraFiles2);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraFiles3.name(), extraFiles3);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraFiles4.name(), extraFiles4);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraFiles5.name(), extraFiles5);
         Logger.info("KpisRestCalls: Trello ticket creation request: " + ticketFormFields.toString());
         try {
             TrelloTicketCreator.createTicket(ticketFormFields);

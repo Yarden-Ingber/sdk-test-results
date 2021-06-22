@@ -6,6 +6,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.yarden.restServiceDemo.Enums;
 import com.yarden.restServiceDemo.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.ui.ModelMap;
@@ -31,12 +32,14 @@ public class TrelloApi {
 
     public static void uploadFilesToTicket(String ticketId, MultipartFile[] fileArray) throws UnirestException {
         for (MultipartFile multipartFile : fileArray) {
-            File file = convertMultipartFileToFile(multipartFile, multipartFile.getOriginalFilename());
-            HttpResponse<String> response = Unirest.post("https://api.trello.com/1/cards/" + ticketId + "/attachments")
-                    .queryString("key", trelloApiKey)
-                    .queryString("token", trelloApiToken)
-                    .field("file", file).asString();
-            file.delete();
+            if (StringUtils.isNotEmpty(multipartFile.getOriginalFilename())) {
+                File file = convertMultipartFileToFile(multipartFile, multipartFile.getOriginalFilename());
+                HttpResponse<String> response = Unirest.post("https://api.trello.com/1/cards/" + ticketId + "/attachments")
+                        .queryString("key", trelloApiKey)
+                        .queryString("token", trelloApiToken)
+                        .field("file", file).asString();
+                file.delete();
+            }
         }
     }
 
@@ -126,8 +129,9 @@ public class TrelloApi {
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile, String fileName) {
         Logger.info("TrelloApi: Uploading file: " + fileName);
-        File file = new File(System.getProperty("java.io.tmpdir")+"/"+fileName);
-        Logger.info("TrelloApi: local file path: " + System.getProperty("java.io.tmpdir")+"/"+fileName);
+        String filePath = System.getProperty("java.io.tmpdir")+fileName;
+        File file = new File(filePath);
+        Logger.info("TrelloApi: local file path: " + filePath);
         try (OutputStream os = new FileOutputStream(file)) {
             os.write(multipartFile.getBytes());
         } catch (IOException e) {

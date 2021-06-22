@@ -32,7 +32,7 @@ public class TrelloApi {
     public static void uploadFilesToTicket(String ticketId, MultipartFile[] fileArray) throws UnirestException {
         for (MultipartFile multipartFile : fileArray) {
             File file = convertMultipartFileToFile(multipartFile, multipartFile.getOriginalFilename());
-            HttpResponse<String> response2 = Unirest.post("https://api.trello.com/1/cards/" + ticketId + "/attachments")
+            HttpResponse<String> response = Unirest.post("https://api.trello.com/1/cards/" + ticketId + "/attachments")
                     .queryString("key", trelloApiKey)
                     .queryString("token", trelloApiToken)
                     .field("file", file).asString();
@@ -86,7 +86,7 @@ public class TrelloApi {
 
     private static void updateGenericCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String requestBody) throws UnirestException {
         String customFieldID = getCustomFieldId(ticketFormFields, customFieldName);
-        HttpResponse<JsonNode> response2 = Unirest.put("https://api.trello.com/1/cards/" + ticketID + "/customField/" + customFieldID + "/item?key=" + trelloApiKey + "&token=" + trelloApiToken)
+        HttpResponse<JsonNode> response = Unirest.put("https://api.trello.com/1/cards/" + ticketID + "/customField/" + customFieldID + "/item?key=" + trelloApiKey + "&token=" + trelloApiToken)
                 .header("Content-Type", "application/json")
                 .body(requestBody)
                 .asJson();
@@ -125,7 +125,9 @@ public class TrelloApi {
     }
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile, String fileName) {
+        Logger.info("TrelloApi: Uploading file: " + fileName);
         File file = new File(System.getProperty("java.io.tmpdir")+"/"+fileName);
+        Logger.info("TrelloApi: local file path: " + System.getProperty("java.io.tmpdir")+"/"+fileName);
         try (OutputStream os = new FileOutputStream(file)) {
             os.write(multipartFile.getBytes());
         } catch (IOException e) {

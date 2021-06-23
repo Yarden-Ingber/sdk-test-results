@@ -129,7 +129,7 @@ public class TrelloApi {
 
     private static File convertMultipartFileToFile(MultipartFile multipartFile, String fileName) {
         Logger.info("TrelloApi: Uploading file: " + fileName);
-        String filePath = System.getProperty("java.io.tmpdir")+fileName;
+        String filePath = System.getProperty("java.io.tmpdir")+File.separator+fileName;
         File file = new File(filePath);
         Logger.info("TrelloApi: local file path: " + filePath);
         try (OutputStream os = new FileOutputStream(file)) {

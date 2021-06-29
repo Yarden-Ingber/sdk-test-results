@@ -31,3 +31,7 @@ jobs:
           distribution: 'adopt'
       - name: Build with Gradle
         run: ./gradlew build -x test 
+      - name: install codacy
+        run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
+      - name: install codacy 2
+        cd codacy-analysis-cli-* && sudo make install

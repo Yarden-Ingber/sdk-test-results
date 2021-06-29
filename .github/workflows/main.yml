@@ -35,3 +35,5 @@ jobs:
         run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
       - name: install codacy 2
         run: cd codacy-analysis-cli-* && sudo make install
+      - name: run codacy
+        run: codacy-analysis-cli analyze --tool spotbugs

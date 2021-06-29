@@ -30,7 +30,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Build with Gradle
-        run: ./gradlew build -x test 
+        run: ./gradlew build -x test --stacktrace
       - name: install codacy
         run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
       - name: install codacy 2

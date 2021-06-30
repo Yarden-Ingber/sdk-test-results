@@ -22,8 +22,12 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - name: pwd 1
+        run: pwd
       - name: change dir
         run: cd $GITHUB_WORKSPACE
+      - name: pwd 2
+        run: pwd
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -31,8 +35,12 @@ jobs:
           distribution: 'adopt'
       - name: Build with Gradle
         run: ./gradlew build -x test --stacktrace
+      - name: pwd 3
+        run: pwd
       - name: exit git folder
         run: cd ..
+      - name: pwd 4
+        run: pwd
       - name: install codacy
         run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
       - name: install codacy 2

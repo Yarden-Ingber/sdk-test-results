@@ -42,8 +42,8 @@ jobs:
       - name: pwd 4
         run: pwd
       - name: install codacy
-        run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
+        run: cd .. && curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
       - name: install codacy 2
-        run: cd codacy-analysis-cli-* && sudo make install
+        run: cd .. && cd codacy-analysis-cli-* && sudo make install
       - name: run codacy
-        run: codacy-analysis-cli analyze --tool spotbugs --upload --allow-network --max-allowed-issues 999999
+        run: cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --allow-network --max-allowed-issues 999999

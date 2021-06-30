@@ -31,6 +31,8 @@ jobs:
           distribution: 'adopt'
       - name: Build with Gradle
         run: ./gradlew build -x test --stacktrace
+      - name: exit git folder
+        run: cd ..
       - name: install codacy
         run: curl -L https://github.com/codacy/codacy-analysis-cli/archive/master.tar.gz | tar xvz
       - name: install codacy 2

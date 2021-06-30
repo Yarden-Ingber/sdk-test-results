@@ -36,4 +36,4 @@ jobs:
       - name: install codacy 2
         run: cd codacy-analysis-cli-* && sudo make install
       - name: run codacy
-        run: codacy-analysis-cli analyze --tool spotbugs
+        run: codacy-analysis-cli analyze --tool spotbugs --upload --allow-network --max-allowed-issues 999999

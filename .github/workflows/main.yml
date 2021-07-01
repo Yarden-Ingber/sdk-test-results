@@ -46,4 +46,4 @@ jobs:
       - name: install codacy 2
         run: cd .. && cd codacy-analysis-cli-* && sudo make install
       - name: run codacy
-        run: export CODACY_PROJECT_TOKEN=${{secret.CODACY_PROJECT_TOKEN}} && cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $GITHUB_SHA
+        run: export CODACY_PROJECT_TOKEN=${{ secrets.CODACY_PROJECT_TOKEN }} && cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $GITHUB_SHA

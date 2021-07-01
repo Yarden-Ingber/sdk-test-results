@@ -15,6 +15,7 @@ public class HTMLTableBuilder {
     public static String ROW_END = "</tr>";
     public static String COLUMN_START = "<td>";
     public static String COLUMN_END = "</td>";
+    public static String TEST_CAN_BE_REMOVED = "";
 
 
     /**

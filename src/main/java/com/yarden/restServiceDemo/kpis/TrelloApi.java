@@ -55,8 +55,15 @@ public class TrelloApi {
     }
 
     public static void addMemberToTicket(String ticketId, ModelMap ticketFormFields) throws UnirestException {
-        Unirest.post("https://api.trello.com/1/cards/" + ticketId + "/idMembers?key=" + trelloApiKey + "&token=" + trelloApiToken + "&value=" +  ticketFormFields.get(TrelloTicketCreator.FormFields.accountID.name()))
+        final String requestUrl = "https://api.trello.com/1/cards/" + ticketId + "/idMembers?key=" + trelloApiKey + "&token=" + trelloApiToken + "&value=";
+        Unirest.post(requestUrl +  ticketFormFields.get(TrelloTicketCreator.FormFields.accountID.name()))
                 .asString();
+        String[] extraAccounts = ((String)ticketFormFields.get(TrelloTicketCreator.FormFields.extraAccounts.name())).split(",");
+        for (String account : extraAccounts) {
+            String accountID = account.split(TrelloTicketCreator.AccountsSeparator)[1];
+            Unirest.post(requestUrl +  accountID)
+                    .asString();
+        }
     }
 
     public static void updateStringCustomFieldValue(ModelMap ticketFormFields, String customFieldName, String ticketID, String fieldValue) {

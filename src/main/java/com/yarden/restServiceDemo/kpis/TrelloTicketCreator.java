@@ -20,11 +20,12 @@ public class TrelloTicketCreator {
 
     private static final String sdks = "java,java appium,python,ruby,dotnet,espresso,xcui,earlgrey,php,images,DOM capture,UFT,XCTest,DOM snapshot,Integrations,Storybook,Cypress,Testcafe,JS Selenium 4,JS Selenium 3,WDIO 4,WDIO 5,Protractor,Playwright,Nightwatch,Puppeteer,Selenium IDE,JS images,Integrations,Not relevant";
     private static AtomicReference<Map> ticketUrls = new AtomicReference<>();
+    public static final String AccountsSeparator = "@";
 
     public static String getTicketCreationFormHtml() throws IOException, UnirestException {
         InputStream inputStream = SdkReportService.class.getResourceAsStream("/create-ticket-page.html");
         String page = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
-        page = page.replace("<<<ACCOUNTS>>>", getTrelloAccountsHtmlOptions());
+        page = page.replaceAll("<<<ACCOUNTS>>>", getTrelloAccountsHtmlOptions());
         page = page.replace("<<<SDKS>>>", getSdksHtmlOptions());
         inputStream.close();
         return page;
@@ -55,7 +56,7 @@ public class TrelloTicketCreator {
         for (int i = 0; i < arraySize ; i++) {
             String memberName = (String)((JSONObject)accountsArray.get(i)).get("fullName");
             String memberId = (String)((JSONObject)accountsArray.get(i)).get("id");
-            String option = "<option value=\"" + memberName + "," + memberId + "\">" + memberName + "</option>\n";
+            String option = "<option value=\"" + memberName + AccountsSeparator + memberId + "\">" + memberName + "</option>\n";
             stringBuilder.append(option);
         }
         return stringBuilder.toString();
@@ -168,7 +169,7 @@ public class TrelloTicketCreator {
     public enum FormFields {
         accountName, accountID, board, listID, ticketTitle, ticketDescription, customerAppUrl, sdk, sdkVersion, linkToTestResults, logFiles,
         reproducibleFiles, isAppAccessible, renderID, requestID, zendeskCustomerName, zendeskCompanyName, zendeskUrl, zendeskTier, zendeskCustomerType,
-        workaround, blocker, extraFiles1, extraFiles2, extraFiles3, extraFiles4, extraFiles5
+        workaround, blocker, extraFiles1, extraFiles2, extraFiles3, extraFiles4, extraFiles5, extraAccounts
     }
 
 }

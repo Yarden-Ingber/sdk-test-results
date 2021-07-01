@@ -102,6 +102,7 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="zendeskCustomerType") String zendeskCustomerType,
                                      @RequestParam(required=false,name="logFiles") MultipartFile[] logFiles,
                                      @RequestParam(required=false,name="reproducible") MultipartFile[] reproducibleFiles,
+                                     @RequestParam(required=false,name="extraAccounts") String extraAccounts,
                                      @RequestParam(required=false,name="workaround") String workaround,
                                      @RequestParam(required=false,name="blocker") String blocker,
                                      @RequestParam(required=false,name="extraFiles1") MultipartFile[] extraFiles1,
@@ -111,8 +112,8 @@ public class KpisRestCalls {
                                      @RequestParam(required=false,name="extraFiles5") MultipartFile[] extraFiles5,
                                      ModelMap ticketFormFields) {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.requestID.name(), requestID);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(",")[0]);
-        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(",")[1]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountName.name(), account.split(TrelloTicketCreator.AccountsSeparator)[0]);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.accountID.name(), account.split(TrelloTicketCreator.AccountsSeparator)[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.board.name(), board.split(",")[0]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.listID.name(), board.split(",")[1]);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketTitle.name(), ticketTitle);
@@ -120,6 +121,7 @@ public class KpisRestCalls {
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.customerAppUrl.name(), customerAppUrl == null ? "" : customerAppUrl);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdk.name(), sdk == null ? "" : sdk);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.sdkVersion.name(), sdkVersion == null ? "" : sdkVersion);
+        ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.extraAccounts.name(), extraAccounts == null ? "" : extraAccounts);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.linkToTestResults.name(), linkToTestResults == null ? "" : linkToTestResults);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.logFiles.name(), logFiles);
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.reproducibleFiles.name(), reproducibleFiles);

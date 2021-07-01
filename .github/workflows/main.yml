@@ -22,8 +22,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: export api key
-        run: export CODACY_PROJECT_TOKEN=$CODACY_PROJECT_TOKEN
       - name: pwd 1
         run: pwd
       - name: change dir
@@ -49,3 +47,5 @@ jobs:
         run: cd .. && cd codacy-analysis-cli-* && sudo make install
       - name: run codacy
         run: cd .. && codacy-analysis-cli analyze --tool spotbugs --upload --verbose --allow-network --max-allowed-issues 999999 --commit-uuid $GITHUB_SHA
+        env:
+          CODACY_PROJECT_TOKEN: $CODACY_PROJECT_TOKEN

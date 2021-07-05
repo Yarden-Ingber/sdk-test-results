@@ -45,6 +45,7 @@ public class RepoMonitor extends TimerTask{
             timer = new Timer("RepoMonitor");
             timer.scheduleAtFixedRate(new RepoMonitor(), 30, 1000 * 60 * 60 * 5);
             isRunning = true;
+            Logger.info("RepoMonitor started");
         }
     }
 

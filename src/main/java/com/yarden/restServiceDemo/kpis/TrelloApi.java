@@ -60,9 +60,11 @@ public class TrelloApi {
                 .asString();
         String[] extraAccounts = ((String)ticketFormFields.get(TrelloTicketCreator.FormFields.extraAccounts.name())).split(",");
         for (String account : extraAccounts) {
-            String accountID = account.split(TrelloTicketCreator.AccountsSeparator)[1];
-            Unirest.post(requestUrl +  accountID)
-                    .asString();
+            if (StringUtils.isNotEmpty(account)) {
+                String accountID = account.split(TrelloTicketCreator.AccountsSeparator)[1];
+                Unirest.post(requestUrl +  accountID)
+                        .asString();
+            }
         }
     }
 

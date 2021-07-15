@@ -110,7 +110,7 @@ public class TrelloTicketCreator {
             ticketDescription = ticketDescription + "\n\nCreated by: " + ticketFormFields.get(FormFields.accountName.name());
         }
         if (StringUtils.isNotEmpty((String)ticketFormFields.get(FormFields.zendeskCompanyName.name()))) {
-            ticketDescription = ticketDescription + "\n\nZendesk company name: " + ticketFormFields.get(FormFields.accountName.name());
+            ticketDescription = ticketDescription + "\n\nZendesk company name: " + ticketFormFields.get(FormFields.zendeskCompanyName.name());
         }
         ticketFormFields.addAttribute(TrelloTicketCreator.FormFields.ticketDescription.name(), ticketDescription);
     }
